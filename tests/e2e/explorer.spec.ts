@@ -19,7 +19,7 @@ test('expands a word into a multi-hop network, shows selected readings, and supp
   await page.getByRole('button', { name: '选中词汇発音', exact: true }).click();
   await expect(page.getByLabel('平假名读音', { exact: true })).toHaveText('はつおん');
   await page.getByRole('button', { name: '展开汉字音', exact: true }).click();
-  expect(await page.getByTestId('word-node').count()).toBeGreaterThan(firstCount);
+  await expect.poll(() => page.getByTestId('word-node').count()).toBeGreaterThan(firstCount);
   await expect(page.getByRole('button', { name: '继续展开共用汉字発', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: '继续展开共用汉字音', exact: true })).toBeVisible();
   await page.getByRole('button', { name: '显示读音', exact: true }).click();
@@ -27,7 +27,7 @@ test('expands a word into a multi-hop network, shows selected readings, and supp
   await page.getByRole('button', { name: '撤回上一步' }).click();
   await expect(page.getByTestId('word-node')).toHaveCount(firstCount);
   await page.getByRole('button', { name: '重做', exact: true }).click();
-  expect(await page.getByTestId('word-node').count()).toBeGreaterThan(firstCount);
+  await expect.poll(() => page.getByTestId('word-node').count()).toBeGreaterThan(firstCount);
   expect(errors).toEqual([]);
 });
 

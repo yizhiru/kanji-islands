@@ -1,0 +1,21 @@
+.DS_Store
+
+# 下载及整理后的词典、词汇 JSON、元数据等仅保留在本地。
+/data/
+# 教材 PDF、下载压缩包及未完成下载不纳入版本管理。
+*.pdf
+*.zip
+*.gz
+*.part
+# 数据分析结果、截图和临时文件。
+/output/
+/tmp/
+__pycache__/
+node_modules/
+dist/
+release/
+test-results/
+playwright-report/
+/public/vocabulary.json
+/public/dictionary-notices.txt
+/public/sources/

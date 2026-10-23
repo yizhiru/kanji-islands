@@ -1,0 +1,92 @@
+{
+  "name": "kanji-islands",
+  "version": "0.1.0",
+  "private": true,
+  "description": "汉字岛：词汇成岛，汉字相连。",
+  "author": "Kanji Islands contributors",
+  "type": "module",
+  "main": "electron/main.cjs",
+  "license": "MIT",
+  "scripts": {
+    "data:build": "node scripts/prepare-app-data.mjs",
+    "dev": "npm run data:build && node scripts/dev.mjs",
+    "dev:web": "npm run data:build && vite --host 127.0.0.1",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write src electron tests scripts/*.mjs *.json *.ts index.html",
+    "format:check": "prettier --check src electron tests scripts/*.mjs *.json *.ts index.html",
+    "build": "npm run data:build && npm run typecheck && vite build",
+    "start": "electron .",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "npm run data:build && vitest run",
+    "test:e2e": "playwright test",
+    "test:desktop": "node scripts/smoke-desktop.mjs",
+    "package": "npm run build && electron-builder --dir",
+    "dist": "npm run build && electron-builder"
+  },
+  "dependencies": {
+    "d3-force": "3.0.0",
+    "lucide-react": "1.61.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "@types/d3-force": "^3.0.10",
+    "@types/node": "^26.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "6.1.2",
+    "electron": "45.0.0",
+    "electron-builder": "26.15.3",
+    "prettier": "^3.9.10",
+    "typescript": "7.0.2",
+    "vite": "8.3.5",
+    "vitest": "5.0.5"
+  },
+  "build": {
+    "appId": "org.kanjiislands.desktop",
+    "productName": "汉字岛",
+    "asar": true,
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json",
+      "LICENSE"
+    ],
+    "extraResources": [
+      {
+        "from": "初级词汇表_完整校对文字版.pdf",
+        "to": "sources/beginner.pdf"
+      },
+      {
+        "from": "中级词汇表_完整校对文字版.pdf",
+        "to": "sources/intermediate.pdf"
+      }
+    ],
+    "mac": {
+      "category": "public.app-category.education",
+      "icon": "public/app-icon.png",
+      "identity": "-",
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "win": {
+      "icon": "public/app-icon.png",
+      "target": [
+        "nsis"
+      ]
+    },
+    "linux": {
+      "category": "Education",
+      "icon": "public/app-icon.png",
+      "target": [
+        "AppImage"
+      ]
+    }
+  }
+}

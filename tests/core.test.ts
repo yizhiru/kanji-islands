@@ -1,15 +1,23 @@
 import { describe, expect, it } from 'vitest';
-import { readFileSync } from 'node:fs';
-import type { Dataset, Entry, Filter, Source } from '../src/core/types';
+import { existsSync, readFileSync } from 'node:fs';
+import type { Dataset, PackedDataset, Entry, Filter, Source } from '../src/core/types';
 import {
   entriesFor,
+  decodeDataset,
   kanjiOf,
   referencesFor,
   sourceMatches,
   Vocabulary,
   wordId,
 } from '../src/core/vocabulary';
-import { BATCH_SIZE, expandNetwork, graphOf, MAX_WORDS, startNetwork } from '../src/core/network';
+import {
+  BATCH_SIZE,
+  expandNetwork,
+  graphOf,
+  MAX_WORDS,
+  removeExpansion,
+  startNetwork,
+} from '../src/core/network';
 
 const all: Filter = { scope: 'all', lesson: '' };
 const beginner: Filter = { scope: 'beginner', lesson: '' };
@@ -66,6 +74,44 @@ const vocab = fixture([
 ]);
 
 describe('word indexing and textbook filters', () => {
+  it('ranks beginner, intermediate, then unmatched candidates before dictionary frequency', () => {
+    const ordered = fixture([
+      { ...entry('発外', []), priority: 10000 },
+      { ...entry('発中', [source('中级', 1)]), priority: 5000 },
+      { ...entry('発初'), priority: 0 },
+      entry('発両', [source('中级', 1), source('初级', 2)]),
+    ]);
+    const words = ordered.related('発', all).map((w) => w.text);
+    expect(new Set(words.slice(0, 2))).toEqual(new Set(['発初', '発両']));
+    expect(words.slice(2)).toEqual(['発中', '発外']);
+    expect(ordered.related('発', { scope: 'intermediate', lesson: '' }).map((w) => w.text)).toEqual(
+      ['発中', '発両'],
+    );
+    expect(ordered.related('発', { scope: 'all', lesson: '中级:1' }).map((w) => w.text)).toEqual([
+      '発中',
+      '発両',
+    ]);
+    const batched = fixture([
+      ...Array.from({ length: 10 }, (_, i) => ({
+        ...entry(`発中${i}`, [source('中级', 1)]),
+        priority: 5000,
+      })),
+      ...Array.from({ length: 10 }, (_, i) => entry(`発初${i}`)),
+      { ...entry('発外', []), priority: 10000 },
+    ]);
+    const network = expandNetwork(startNetwork(wordId('発点')), '発', batched, all);
+    expect(network.words.slice(1).every((id) => id.startsWith('word:発初'))).toBe(true);
+  });
+  it('includes dictionary-only entries in the main library without inventing textbook lessons', () => {
+    const dictionary = fixture([entry('量子計算', [], 'りょうしけいさん'), entry('計算')]);
+    expect(dictionary.search('量子', all)[0].text).toBe('量子計算');
+    expect(dictionary.inScope(all)).toHaveLength(2);
+    expect(dictionary.search('量子', beginner)).toEqual([]);
+    expect(dictionary.inScope({ scope: 'all', lesson: '初级:1' }).map((w) => w.text)).toEqual([
+      '計算',
+    ]);
+    expect(referencesFor(dictionary.get(wordId('量子計算')).entries)).toBe('');
+  });
   it('uses complete Unicode kanji and ignores kana, repeated characters and iteration marks', () => {
     expect(kanjiOf('時々、時に𠮷！')).toEqual(['時', '𠮷']);
     expect(kanjiOf('カタカナ')).toEqual([]);
@@ -102,6 +148,51 @@ describe('word indexing and textbook filters', () => {
 });
 
 describe('point-to-network expansion', () => {
+  it('removes a hub and detached descendants, resets selection, and allows re-expansion', () => {
+    let net = expandNetwork(startNetwork(wordId('発表')), '発', vocab, all);
+    net = expandNetwork({ ...net, selected: wordId('発音') }, '音', vocab, all);
+    const before = JSON.stringify(net);
+    const removed = removeExpansion(net, '発', vocab);
+    expect(removed).toEqual(startNetwork(wordId('発表')));
+    expect(JSON.stringify(net)).toBe(before);
+    expect(expandNetwork(removed, '発', vocab, all).words).toContain(wordId('発音'));
+    expect(removeExpansion(net, '学', vocab)).toBe(net);
+  });
+  it('preserves shared words and independent branches while removing exclusive candidates', () => {
+    let net = expandNetwork(startNetwork(wordId('発表')), '発', vocab, all);
+    net = expandNetwork(net, '表', vocab, all);
+    const removed = removeExpansion({ ...net, selected: wordId('発音') }, '発', vocab);
+    expect(removed.words).toEqual([wordId('発表'), wordId('表面')]);
+    expect(removed.expansions.map((e) => e.kanji)).toEqual(['表']);
+    expect(removed.selected).toBe(wordId('発表'));
+
+    let nested = expandNetwork(startNetwork(wordId('発表')), '発', vocab, all);
+    nested = expandNetwork({ ...nested, selected: wordId('発音') }, '音', vocab, all);
+    const leafRemoved = removeExpansion({ ...nested, selected: wordId('音楽') }, '音', vocab);
+    expect(leafRemoved.words).toContain(wordId('発音'));
+    expect(leafRemoved.words).not.toContain(wordId('音楽'));
+    expect(leafRemoved.selected).toBe(wordId('発音'));
+    expect(graphOf(leafRemoved, vocab).edges.every((e) => e.kanji !== '音')).toBe(true);
+  });
+  it('prunes cycles detached from the seed instead of retaining orphaned words and hubs', () => {
+    const cyclic = fixture(['発表', '発音', '音楽', '楽発'].map((word) => entry(word)));
+    let net = expandNetwork(startNetwork(wordId('発表')), '発', cyclic, all);
+    net = expandNetwork({ ...net, selected: wordId('発音') }, '音', cyclic, all);
+    net = expandNetwork({ ...net, selected: wordId('音楽') }, '楽', cyclic, all);
+    expect(removeExpansion(net, '発', cyclic)).toEqual(startNetwork(wordId('発表')));
+  });
+  it('keeps cross-connected descendants reachable through another remaining hub', () => {
+    const shared = fixture(['発表', '発電', '発表音', '表面', '音楽'].map((word) => entry(word)));
+    let net = expandNetwork(startNetwork(wordId('発表')), '発', shared, all);
+    net = expandNetwork({ ...net, selected: wordId('発表音') }, '音', shared, all);
+    net = expandNetwork({ ...net, selected: wordId('発表') }, '表', shared, all);
+    const removed = removeExpansion(net, '発', shared);
+    expect(removed.words).not.toContain(wordId('発電'));
+    expect(removed.words).toEqual(
+      expect.arrayContaining(['発表', '発表音', '表面', '音楽'].map(wordId)),
+    );
+    expect(removed.expansions.map((e) => e.kanji)).toEqual(['音', '表']);
+  });
   it('expands only the clicked character and retains earlier branches', () => {
     let net = expandNetwork(startNetwork(wordId('発表')), '発', vocab, all);
     expect(net.words).toContain(wordId('発音'));
@@ -137,14 +228,45 @@ describe('point-to-network expansion', () => {
 });
 
 describe('production vocabulary integrity', () => {
-  const data: Dataset = JSON.parse(readFileSync('public/vocabulary.json', 'utf8'));
-  it('ships the complete approved vocabulary without the review queue', () => {
-    const raw = JSON.parse(readFileSync('data/vocabulary/vocabulary.json', 'utf8'));
-    expect(data.entries.map((e) => e.id)).toEqual(raw.entries.map((e: Entry) => e.id));
+  const packed: PackedDataset = JSON.parse(readFileSync('public/vocabulary.json', 'utf8'));
+  const data = decodeDataset(packed);
+  it('ships the standard dictionary and every curated textbook entry without the review queue', () => {
+    const ids = new Set(data.entries.map((e) => e.id));
+    expect(ids.size).toBe(data.entries.length);
+    expect(data.entries.filter((e) => e.sources.length)).toHaveLength(
+      data.metadata.textbookEntries!,
+    );
     expect(data.metadata.entryCount).toBe(data.entries.length);
+    expect(data.metadata.dictionaryEntries).toBeGreaterThan(200000);
+    expect(data.entries.some((e) => !e.sources.length && e.senses.length > 0)).toBe(true);
     expect('ambiguous' in data).toBe(false);
-    expect(new Vocabulary(data).words.size).toBeGreaterThan(5000);
+    expect(new Set(data.entries.map((e) => e.word)).size).toBeGreaterThan(200000);
+    expect(packed.senses.length).toBeLessThan(
+      data.entries.reduce((sum, e) => sum + e.senses.length, 0),
+    );
   });
+  it.skipIf(!existsSync('data/vocabulary/vocabulary.json'))(
+    'retains every verified textbook source on the exact word, reading and dictionary ID',
+    () => {
+      const raw = JSON.parse(readFileSync('data/vocabulary/vocabulary.json', 'utf8'));
+      const byID = new Map(data.entries.map((e) => [e.id, e]));
+      expect(data.metadata.textbookEntries).toBe(raw.entries.length);
+      for (const entry of raw.entries) {
+        const built = byID.get(entry.id)!;
+        expect([built.word, built.reading_hiragana, built.jmdict_id]).toEqual([
+          entry.word,
+          entry.reading_hiragana,
+          entry.jmdict_id,
+        ]);
+        expect(built.sources.map((s) => s.lessons)).toEqual(
+          entry.sources.map(
+            (s: Source & { corrected_lessons?: Source['lessons'] }) =>
+              s.corrected_lessons ?? s.lessons,
+          ),
+        );
+      }
+    },
+  );
   it('keeps corrected references and original evidence and labels lemma meanings', () => {
     const skate = data.entries.find((e) => e.word === 'スケート')!;
     expect(skate.sources[0].lessons[1].symbol).toBe('');

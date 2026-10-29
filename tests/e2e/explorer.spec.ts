@@ -37,7 +37,7 @@ test('reveals card readings on hover and focus while details stay visible indepe
   await page.goto('/');
   await expect(page).toHaveTitle('汉字岛');
   await expect(page.getByRole('link', { name: '汉字岛首页' })).toBeVisible();
-  const root = page.getByTestId('word-node').filter({ hasText: '発表' });
+  const root = page.locator('[data-testid="word-node"][data-word="発表"]');
   await expect(root.locator('.node-reading')).toBeHidden();
   await root.hover();
   await expect(root.locator('.node-reading')).toBeVisible();
@@ -156,4 +156,176 @@ test('remains usable at narrow widths without horizontal overflow', async ({ pag
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.getByRole('button', { name: '展开汉字発', exact: true }).click();
   expect(await page.getByTestId('word-node').count()).toBeGreaterThan(1);
+});
+
+test('searches the standard dictionary and keeps textbook-only filters', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByRole('button', { name: '标准词库', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  const search = page.getByRole('combobox', { name: '输入起始词' });
+  await search.fill('量子力学');
+  await page.getByRole('option').first().click();
+  await expect(page.getByRole('heading', { name: '量子力学', exact: true })).toBeVisible();
+  await expect(page.locator('.word-references')).toContainText('未匹配标日课次');
+  await expect(page.locator('.entry-meanings')).not.toHaveCount(0);
+  await page.getByRole('button', { name: '初级', exact: true }).click();
+  await search.fill('量子力学');
+  await expect(page.locator('#search-suggestions [role="option"]')).toHaveCount(0);
+  await page.getByRole('button', { name: '标准词库', exact: true }).click();
+  await search.focus();
+  await expect(page.locator('#search-suggestions [role="option"]').first()).toContainText(
+    '量子力学',
+  );
+});
+
+test('copies card and detail words without expanding or selecting another card', async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.goto('/');
+  await page.getByRole('button', { name: '复制单词', exact: true }).click();
+  await expect(page.getByRole('status')).toContainText('已复制「発表」');
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('発表');
+  await page.getByRole('button', { name: '展开汉字発', exact: true }).click();
+  const count = await page.getByTestId('word-node').count();
+  await page.locator('[data-word="発音"]').hover();
+  await page.getByRole('button', { name: '复制词卡单词発音', exact: true }).click();
+  await expect(page.getByRole('status')).toContainText('已复制「発音」');
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('発音');
+  await expect(page.getByRole('heading', { name: '発表', exact: true })).toBeVisible();
+  await expect(page.getByTestId('word-node')).toHaveCount(count);
+  expect(
+    await page.locator('.selected-word-block h2').evaluate((element) => {
+      const range = document.createRange();
+      range.selectNodeContents(element);
+      window.getSelection()?.removeAllRanges();
+      window.getSelection()?.addRange(range);
+      return window.getSelection()?.toString();
+    }),
+  ).toBe('発表');
+});
+
+test('offers separate local Japanese readings and a dictionary link', async ({ page }) => {
+  await page.addInitScript(() => {
+    const state = window as unknown as { spoken: string[]; canceled: number };
+    state.spoken = [];
+    state.canceled = 0;
+    Object.defineProperty(window, 'SpeechSynthesisUtterance', {
+      value: class {
+        constructor(public text: string) {}
+      },
+    });
+    Object.defineProperty(window, 'speechSynthesis', {
+      value: {
+        getVoices: () => [{ name: 'Test Japanese', lang: 'ja-JP', localService: true }],
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        cancel: () => {
+          state.canceled++;
+        },
+        speak: (utterance: SpeechSynthesisUtterance) => {
+          state.spoken.push(utterance.text);
+        },
+      },
+    });
+  });
+  await page.goto('/');
+  await page.getByRole('button', { name: '朗读はっぴょう', exact: true }).click();
+  expect(await page.evaluate(() => (window as unknown as { spoken: string[] }).spoken)).toEqual([
+    'はっぴょう',
+  ]);
+  const search = page.getByRole('combobox', { name: '输入起始词' });
+  await search.fill('生物');
+  await page.getByRole('button', { name: '开始探索' }).click();
+  await expect(page.getByRole('button', { name: '朗读なまもの', exact: true })).toBeEnabled();
+  await expect(page.getByRole('button', { name: '朗读せいぶつ', exact: true })).toBeEnabled();
+  await page.getByRole('button', { name: '朗读なまもの', exact: true }).click();
+  expect(await page.evaluate(() => (window as unknown as { spoken: string[] }).spoken)).toEqual([
+    'はっぴょう',
+    'なまもの',
+  ]);
+  await expect(page.getByRole('link', { name: 'Jisho 词典' })).toHaveAttribute(
+    'href',
+    'https://jisho.org/search/%E7%94%9F%E7%89%A9',
+  );
+  const help = page.getByRole('button', { name: '读音说明', exact: true });
+  const note = page.locator('.pronunciation-note');
+  await expect(note).toBeHidden();
+  await help.hover();
+  await expect(note).toBeVisible();
+  await expect(note).toContainText('系统合成语音');
+  await page.getByRole('heading', { name: '生物', exact: true }).hover();
+  await expect(note).toBeHidden();
+  await help.focus();
+  await expect(note).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(note).toBeHidden();
+  await help.click();
+  await expect(note).toBeVisible();
+  await page.getByRole('heading', { name: '生物', exact: true }).hover();
+  await expect(note).toBeVisible();
+  await help.click();
+  await expect(note).toBeHidden();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await help.click();
+  await expect(note).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.getByRole('heading', { name: '生物', exact: true }).click();
+  await expect(note).toBeHidden();
+});
+
+test('explains missing local speech voices and retains the external dictionary fallback', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(window, 'speechSynthesis', {
+      value: {
+        getVoices: () => [
+          { name: 'English', lang: 'en-US', localService: true },
+          { name: 'Remote Japanese', lang: 'ja-JP', localService: false },
+        ],
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        cancel: () => {},
+      },
+    });
+  });
+  await page.goto('/');
+  await expect(page.getByRole('button', { name: '朗读はっぴょう', exact: true })).toBeDisabled();
+  await expect(page.locator('.pronunciation-note')).toBeHidden();
+  await page.getByRole('button', { name: '读音说明', exact: true }).click();
+  await expect(page.locator('.pronunciation-note')).toBeVisible();
+  await expect(page.locator('.pronunciation-note')).toContainText('本机未检测到日语语音');
+  await expect(page.getByRole('link', { name: 'Jisho 词典' })).toBeVisible();
+});
+
+test('removes a kanji branch and its detached words with undo and redo', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: '展开汉字発', exact: true }).click();
+  await page.getByRole('button', { name: '选中词汇発音', exact: true }).click();
+  await page.getByRole('button', { name: '展开汉字音', exact: true }).click();
+  const count = await page.getByTestId('word-node').count();
+  await page.getByRole('button', { name: '删除汉字音及其分支', exact: true }).click();
+  await expect(page.getByRole('button', { name: '继续展开共用汉字音', exact: true })).toHaveCount(
+    0,
+  );
+  await expect(page.getByRole('button', { name: '继续展开共用汉字発', exact: true })).toBeVisible();
+  await expect(page.locator('[data-word="発音"]')).toBeVisible();
+  expect(await page.getByTestId('word-node').count()).toBeLessThan(count);
+  await page.getByRole('button', { name: '撤回上一步', exact: true }).click();
+  await expect(page.getByTestId('word-node')).toHaveCount(count);
+  await expect(page.getByRole('button', { name: '删除汉字音及其分支', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: '重做', exact: true }).click();
+  await expect(page.getByRole('button', { name: '继续展开共用汉字音', exact: true })).toHaveCount(
+    0,
+  );
+  await page.getByRole('button', { name: '删除汉字発及其分支', exact: true }).click();
+  await expect(page.getByTestId('word-node')).toHaveCount(1);
+  await expect(page.getByRole('heading', { name: '発表', exact: true })).toBeVisible();
+  await expect(page.getByTestId('network-stat')).toContainText('0 个汉字');
+  await page.getByRole('button', { name: '展开汉字発', exact: true }).click();
+  await expect(page.getByRole('button', { name: '删除汉字発及其分支', exact: true })).toBeVisible();
 });

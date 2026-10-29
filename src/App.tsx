@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowRight,
   BookOpen,
@@ -14,10 +14,11 @@ import {
   WifiOff,
   X,
 } from 'lucide-react';
-import type { Dataset, Filter, Network, Scope } from './core/types';
-import { MAX_WORDS, expandNetwork, graphOf, startNetwork } from './core/network';
+import type { Dataset, PackedDataset, Filter, Network, Scope } from './core/types';
+import { MAX_WORDS, expandNetwork, graphOf, removeExpansion, startNetwork } from './core/network';
 import {
   entriesFor,
+  decodeDataset,
   kanjiOf,
   normalize,
   referencesFor,
@@ -33,7 +34,7 @@ interface Timeline {
   future: Network[];
 }
 const scopeNames: Record<Scope, string> = {
-  all: '合并词库',
+  all: '标准词库',
   beginner: '初级',
   intermediate: '中级',
 };
@@ -70,7 +71,7 @@ function About({ vocab, onClose }: { vocab: Vocabulary; onClose: () => void }) {
       </div>
       <p>
         <b>不会保存学习记录。</b>{' '}
-        当前词网只存在于这个窗口中，刷新或关闭后清空。无需登录，也无需网络或大模型。
+        当前词网只存在于这个窗口中，刷新或关闭后清空。查词与探索无需网络；打开外部词典时需联网。
       </p>
       <p>
         悬停词卡查看平假名读音，选中后在详情中显示。片假名单词保留原词形。课次中的 <b>※</b>{' '}
@@ -78,8 +79,15 @@ function About({ vocab, onClose }: { vocab: Vocabulary; onClose: () => void }) {
         <b>▼</b> 表示关联词语，无符号表示课文／正文中的生词。数字表示初次出现的课次。
       </p>
       <p>
-        仅使用已进入主词库的词条，另有 {vocab.data.metadata.pendingGroups.toLocaleString()}{' '}
-        组未匹配或有疑点的项目未纳入。自定义起点可以参与共字连接，但不会生成读音或释义。
+        主库为完整 JMdict / Jitendex 快照，含{' '}
+        {vocab.data.metadata.dictionaryEntries?.toLocaleString()} 个词典条目， 同时保留{' '}
+        {vocab.data.metadata.textbookEntries?.toLocaleString()} 条已核对的标日词条与课次。 另有{' '}
+        {vocab.data.metadata.pendingGroups.toLocaleString()} 组教材匹配待核对，不自动附加课次。
+        “未匹配标日课次”不代表教材中一定没有该词。自定义起点可参与共字连接。
+      </p>
+      <p>
+        假名来自词典。朗读使用本机日语合成语音，不作为真人发音或音调标准；多读音可分别播放。Jisho
+        词典在浏览器中打开，真人音频以其收录为准。
       </p>
       <p>
         中文：{vocab.data.metadata.chineseVersion}。英文：{vocab.data.metadata.englishVersion}
@@ -123,7 +131,7 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
   const [about, setAbout] = useState(false);
   const [message, setMessage] = useState('');
   const input = useRef<HTMLInputElement>(null);
-  const suggestions = vocab.search(query, filter);
+  const suggestions = useMemo(() => vocab.search(query, filter), [vocab, query, filter]);
   const graph = graphOf(network, vocab);
   const scopeWords = vocab.inScope(filter).length;
   const commit = (next: Network) =>
@@ -269,7 +277,11 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
                 setFocused(true);
               }}
               onFocus={() => setFocused(true)}
-              onBlur={() => setTimeout(() => setFocused(false), 150)}
+              onBlur={() =>
+                setTimeout(() => {
+                  if (document.activeElement !== input.current) setFocused(false);
+                }, 150)
+              }
               onKeyDown={(e) => {
                 if (e.key === 'Escape') {
                   setFocused(false);
@@ -416,6 +428,8 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
                 const parent = network.expansions.find((e) => e.kanji === kanji)!.parent;
                 expand(kanji, { ...network, selected: parent });
               }}
+              onNotify={notify}
+              onRemoveHub={(kanji) => commit(removeExpansion(network, kanji, vocab))}
             />
           </section>
           <WordDetails
@@ -424,6 +438,7 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
             filter={filter}
             onExpand={expand}
             onSelect={select}
+            onNotify={notify}
           />
         </div>
         <footer className="page-footer">
@@ -484,9 +499,9 @@ export default function App() {
     fetch(`${import.meta.env.BASE_URL}vocabulary.json`, { signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error(`无法读取本地词库（${response.status}）`);
-        return response.json() as Promise<Dataset>;
+        return response.json() as Promise<Dataset | PackedDataset>;
       })
-      .then((data) => setVocab(new Vocabulary(data)))
+      .then((data) => setVocab(new Vocabulary(decodeDataset(data))))
       .catch((e) => {
         if (e.name !== 'AbortError') setError(e.message);
       });

@@ -3,6 +3,8 @@ import { useEffect, useId, useState } from 'react';
 import type { Filter, Network } from '../core/types';
 import { BATCH_SIZE, MAX_WORDS } from '../core/network';
 import { entriesFor, referencesFor, Vocabulary } from '../core/vocabulary';
+import { CopyButton } from './CopyButton';
+import { Pronunciation } from './Pronunciation';
 
 const formNames: Record<string, string> = {
   te: 'て形',
@@ -21,9 +23,10 @@ interface Props {
   filter: Filter;
   onExpand: (k: string) => void;
   onSelect: (id: string) => void;
+  onNotify: (message: string) => void;
 }
 
-export function WordDetails({ vocab, network, filter, onExpand, onSelect }: Props) {
+export function WordDetails({ vocab, network, filter, onExpand, onSelect, onNotify }: Props) {
   const [showMeaning, setShowMeaning] = useState(true);
   const referenceHelpId = useId();
   const word = vocab.get(network.selected);
@@ -40,17 +43,27 @@ export function WordDetails({ vocab, network, filter, onExpand, onSelect }: Prop
     <aside className="details-panel" aria-label="词汇详情">
       <div className="details-heading">
         <span className="detail-index">词汇详情</span>
+        <CopyButton text={word.text} label="复制单词" onNotify={onNotify} />
       </div>
       <div className="selected-word-block">
         <h2 lang="ja">{word.text}</h2>
         <p className="selected-reading" lang="ja" aria-label="平假名读音">
           {[...new Set(entries.map((e) => e.reading_hiragana))].join(' / ') || '词库中暂无读音'}
         </p>
+        <Pronunciation
+          word={word.text}
+          readings={[...new Set(entries.map((e) => e.reading_hiragana))]}
+          onNotify={onNotify}
+        />
         <div className="word-references">
           <BookOpen size={16} />
           <span>
             {references ||
-              (word.entries.length ? '该词不在当前筛选范围内' : '自定义起点 · 词库暂未收录')}
+              (entries.length
+                ? '未匹配标日课次'
+                : word.entries.length
+                  ? '该词不在当前筛选范围内'
+                  : '自定义起点 · 词库暂未收录')}
           </span>
           {references && (
             <div className="reference-help" key={`${word.id}:${references}`}>
@@ -134,7 +147,8 @@ export function WordDetails({ vocab, network, filter, onExpand, onSelect }: Prop
             <div className="entry-meanings" key={entry.id}>
               {entries.length > 1 && (
                 <span className="variant-label">
-                  {entry.reading_hiragana} · {textbookReferences(referencesFor([entry], filter))}
+                  {entry.reading_hiragana} ·{' '}
+                  {textbookReferences(referencesFor([entry], filter)) || '未匹配标日课次'}
                 </span>
               )}
               {entry.inflection && (
@@ -151,7 +165,9 @@ export function WordDetails({ vocab, network, filter, onExpand, onSelect }: Prop
                 <ol className="sense-list">
                   {entry.senses.map((sense) => (
                     <li key={sense.id}>
-                      <div className="chinese-gloss">{sense.zh.join('；')}</div>
+                      <div className="chinese-gloss">
+                        {sense.zh.join('；') || '暂无可靠对应的中文释义，请参阅英文。'}
+                      </div>
                       {sense.notes_zh.length > 0 && (
                         <div className="sense-note">{sense.notes_zh.join('；')}</div>
                       )}
@@ -218,7 +234,7 @@ export function WordDetails({ vocab, network, filter, onExpand, onSelect }: Prop
             </button>
           </>
         ) : (
-          <p className="muted">当前范围没有其他共用汉字的词，可以试试合并词库。</p>
+          <p className="muted">当前范围没有其他共用汉字的词，可以试试标准词库。</p>
         )}
       </section>
     </aside>

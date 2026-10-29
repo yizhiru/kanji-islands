@@ -33,17 +33,31 @@ export interface Entry {
   references: string;
   meanings_scope?: string;
   inflection?: { lemma: string; form: string; lemma_reading_hiragana: string };
+  priority?: number;
 }
 export interface Dataset {
-  version: number;
+  version: 1;
   metadata: {
     entryCount: number;
     pendingGroups: number;
     sourceHash: string;
     chineseVersion: string;
     englishVersion: string;
+    dictionaryEntries?: number;
+    textbookEntries?: number;
+    textbookWords?: number;
+    englishOnlyEntries?: number;
   };
   entries: Entry[];
+}
+export interface PackedDataset {
+  version: 2;
+  metadata: Dataset['metadata'];
+  senses: Sense[];
+  entries: (Omit<Entry, 'senses' | 'meanings_zh' | 'meanings_en' | 'references' | 'sources'> & {
+    sense_ids: number[];
+    sources?: Source[];
+  })[];
 }
 export interface Word {
   id: string;
@@ -68,6 +82,8 @@ export interface Network {
 }
 export interface AppBridge {
   openSource: (level: Level, page: number) => Promise<void>;
+  copyText: (text: string) => Promise<void>;
+  openDictionary: (word: string, reading: string) => Promise<void>;
 }
 declare global {
   interface Window {

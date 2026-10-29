@@ -36,6 +36,50 @@ export function expandNetwork(
   };
 }
 
+export function removeExpansion(network: Network, kanji: string, vocab: Vocabulary): Network {
+  const removed = network.expansions.find((e) => e.kanji === kanji);
+  if (!removed) return network;
+  const remaining = network.expansions.filter((e) => e.kanji !== kanji);
+  const wordsByKanji = new Map(remaining.map((e) => [e.kanji, [] as string[]]));
+  for (const id of network.words)
+    for (const character of vocab.get(id).kanji) wordsByKanji.get(character)?.push(id);
+
+  // Keep only the component connected to the seed through the remaining hubs.
+  // Shared words survive; branches and cycles detached from the seed disappear.
+  const reachableWords = new Set([network.root]);
+  const reachableKanji = new Set<string>();
+  const queue = [network.root];
+  for (let index = 0; index < queue.length; index++) {
+    for (const character of vocab.get(queue[index]).kanji) {
+      if (!wordsByKanji.has(character) || reachableKanji.has(character)) continue;
+      reachableKanji.add(character);
+      for (const id of wordsByKanji.get(character)!) {
+        if (reachableWords.has(id)) continue;
+        reachableWords.add(id);
+        queue.push(id);
+      }
+    }
+  }
+  const words = network.words.filter((id) => reachableWords.has(id));
+  return {
+    ...network,
+    words,
+    selected: reachableWords.has(network.selected)
+      ? network.selected
+      : reachableWords.has(removed.parent)
+        ? removed.parent
+        : network.root,
+    expansions: remaining
+      .filter((e) => reachableKanji.has(e.kanji))
+      .map((e) => ({
+        ...e,
+        parent: reachableWords.has(e.parent)
+          ? e.parent
+          : wordsByKanji.get(e.kanji)!.find((id) => reachableWords.has(id))!,
+      })),
+  };
+}
+
 export interface GraphNode {
   id: string;
   kind: 'word' | 'kanji';

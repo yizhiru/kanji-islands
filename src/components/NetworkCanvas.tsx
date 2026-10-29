@@ -9,10 +9,11 @@ import {
   forceY,
 } from 'd3-force';
 import type { SimulationNodeDatum } from 'd3-force';
-import { LocateFixed, Minus, Plus, Move } from 'lucide-react';
+import { LocateFixed, Minus, Plus, Move, X } from 'lucide-react';
 import { graphOf } from '../core/network';
 import type { Filter, Network } from '../core/types';
 import { entriesFor, referencesFor, Vocabulary } from '../core/vocabulary';
+import { CopyButton } from './CopyButton';
 
 interface Props {
   vocab: Vocabulary;
@@ -22,6 +23,8 @@ interface Props {
   onSelect: (id: string) => void;
   onExpand: (kanji: string) => void;
   onHub: (kanji: string) => void;
+  onRemoveHub: (kanji: string) => void;
+  onNotify: (message: string) => void;
 }
 interface Positioned extends SimulationNodeDatum {
   id: string;
@@ -40,6 +43,8 @@ export function NetworkCanvas({
   onSelect,
   onExpand,
   onHub,
+  onRemoveHub,
+  onNotify,
 }: Props) {
   const host = useRef<HTMLDivElement>(null);
   const positions = useRef(new Map<string, Positioned>());
@@ -148,7 +153,7 @@ export function NetworkCanvas({
       className="network-canvas"
       data-testid="network-canvas"
       onPointerDown={(e) => {
-        if ((e.target as Element).closest('button')) return;
+        if ((e.target as Element).closest('.word-node, button')) return;
         drag.current = { x: e.clientX, y: e.clientY, initialX: camera.x, initialY: camera.y };
         e.currentTarget.setPointerCapture(e.pointerId);
       }}
@@ -194,15 +199,29 @@ export function NetworkCanvas({
                   y={node.y! - 26}
                   width={52}
                   height={52}
+                  className="hub-object"
                 >
-                  <button
-                    className="hub-node"
-                    onClick={() => onHub(node.text)}
-                    aria-label={`继续展开共用汉字${node.text}`}
-                    title={`继续添加含「${node.text}」的词`}
-                  >
-                    {node.text}
-                  </button>
+                  <div className="hub-controls">
+                    <button
+                      className="hub-node"
+                      onClick={() => onHub(node.text)}
+                      aria-label={`继续展开共用汉字${node.text}`}
+                      title={`继续添加含「${node.text}」的词`}
+                    >
+                      {node.text}
+                    </button>
+                    <button
+                      className="hub-remove"
+                      aria-label={`删除汉字${node.text}及其分支`}
+                      title={`删除「${node.text}」分支，可撤回`}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onRemoveHub(node.text);
+                      }}
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
                 </foreignObject>
               );
             const word = vocab.get(node.id);
@@ -225,6 +244,12 @@ export function NetworkCanvas({
                   data-testid="word-node"
                   data-word={node.text}
                 >
+                  <CopyButton
+                    text={node.text}
+                    label={`复制词卡单词${node.text}`}
+                    compact
+                    onNotify={onNotify}
+                  />
                   {selected ? (
                     <div className="node-glyphs" aria-label={`当前词汇${node.text}`}>
                       {[...node.text].map((c, i) =>
@@ -253,7 +278,10 @@ export function NetworkCanvas({
                     </button>
                   )}
                   <span className="node-subtitle node-reference">
-                    {node.root ? '探索起点' : referencesFor(entries, filter) || '自定义词汇'}
+                    {node.root
+                      ? '探索起点'
+                      : referencesFor(entries, filter) ||
+                        (word.entries.length ? '未匹配标日课次' : '自定义词汇')}
                   </span>
                   <span className="node-subtitle node-reading" lang="ja">
                     {reading || '词库中暂无读音'}

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, Menu, protocol, net } = require('electron');
+const { app, BrowserWindow, ipcMain, Menu, protocol, net, clipboard, shell } = require('electron');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 
@@ -75,6 +75,24 @@ app.whenReady().then(() => {
     });
     viewer.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
     await viewer.loadFile(path.join(sources, filename), { hash: `page=${page}` });
+  });
+  ipcMain.handle('clipboard:copy', (event, text) => {
+    if (event.sender !== mainWindow?.webContents) throw new Error('Unknown sender');
+    if (typeof text !== 'string' || !text || text.length > 256) throw new Error('Invalid text');
+    clipboard.writeText(text);
+  });
+  ipcMain.handle('dictionary:open', async (event, word, reading) => {
+    if (event.sender !== mainWindow?.webContents) throw new Error('Unknown sender');
+    if (
+      typeof word !== 'string' ||
+      !word ||
+      word.length > 256 ||
+      typeof reading !== 'string' ||
+      reading.length > 256
+    )
+      throw new Error('Invalid dictionary query');
+    const query = reading && reading !== word ? `${word} ${reading}` : word;
+    await shell.openExternal(`https://jisho.org/search/${encodeURIComponent(query)}`);
   });
   Menu.setApplicationMenu(
     Menu.buildFromTemplate([

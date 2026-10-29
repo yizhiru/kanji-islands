@@ -15,7 +15,7 @@ const version = tag.slice(1);
 const gh = (args) => execFileSync('gh', args, { encoding: 'utf8', timeout: 600_000 });
 const api = (endpoint) => JSON.parse(gh(['api', `repos/${repository}/${endpoint}`]));
 const run = api(`actions/runs/${runID}`);
-assert.equal(run.name, 'Windows installer');
+assert.equal(run.workflow_id, api('actions/workflows/windows-build.yml').id);
 assert.equal(run.head_repository.full_name, repository);
 assert.equal(run.status, 'completed');
 assert.equal(run.conclusion, 'success', 'Installer tests must pass before uploading');
@@ -26,6 +26,10 @@ let release = api(`releases/${databaseId}`);
 assert.equal(release.draft, true, 'Only draft releases may receive these assets');
 assert.equal(release.tag_name, tag);
 assert.equal(release.target_commitish, run.head_sha, 'Draft must target the tested source commit');
+if (process.env.RELEASE_PREFLIGHT_ONLY === '1') {
+  console.log('Validated successful Windows workflow, source commit, and draft release.');
+  process.exit(0);
+}
 
 const directory = await mkdtemp(path.join(os.tmpdir(), 'kanji-release-'));
 gh(['run', 'download', runID, '--repo', repository, '--dir', directory]);

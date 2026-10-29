@@ -57,7 +57,7 @@ jobs:
         run: node scripts/cloud-build-data.mjs restore "$env:RUNNER_TEMP/build-data.enc"
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --registry=https://registry.npmjs.org --no-audit --no-fund --fetch-timeout=60000
 
       - name: Check resource packaging tools
         run: node --test tests/cloud-build-data.test.mjs

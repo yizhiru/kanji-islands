@@ -46,6 +46,8 @@ gh run download RUN_ID --repo yizhiru/kanji-islands --dir release/windows-cloud
 
 也可以打开 GitHub 仓库 → Actions → Windows installer → Run workflow。成功后在该次运行的 Artifacts 区域下载安装包与 `SHA256SUMS.txt`。安装包保留 14 天，失败诊断保留 7 天；工作流不会自动创建公开 Release，也不配置 Windows 代码签名。
 
+如需把已测试的 Windows 安装包转存到已有 Release 草稿，可运行 `release-assets.yml`，传入 `installer_run_id` 和 `release_tag`。该流程只接受成功的本仓库 Windows 构建，要求草稿目标提交与构建提交一致；校验 Windows 安装包和已上传的 macOS 附件后生成统一的 `SHA256SUMS.txt`。它只上传草稿附件，正式发布仍单独操作。
+
 流程包括：
 
 1. 获取选定提交的代码，安装 Node.js 24。

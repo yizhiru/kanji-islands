@@ -8,7 +8,7 @@ const archive = process.argv[2];
 assert(archive, '请提供 app.asar 路径。');
 for (const source of resourcePaths) {
   const local = await readFile(source);
-  const packed = asar.extractFile(archive, source.replace(/^public\//, 'dist/'));
+  const packed = asar.extractFile(archive, path.normalize(source.replace(/^public\//, 'dist/')));
   assert.equal(digest(packed), digest(local), `安装包资源不匹配：${source}`);
 }
 for (const name of ['beginner.pdf', 'intermediate.pdf']) {

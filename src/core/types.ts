@@ -1,5 +1,5 @@
 export type Level = '初级' | '中级';
-export type Scope = 'all' | 'beginner' | 'intermediate';
+export type Scope = 'all' | 'textbook' | 'beginner' | 'intermediate';
 export interface Lesson {
   lesson: number;
   symbol: string;

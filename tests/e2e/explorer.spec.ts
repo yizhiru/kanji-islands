@@ -74,7 +74,7 @@ test('searches real words, accepts custom seeds, and changes scope and lesson', 
   await expect(page.getByLabel('平假名读音', { exact: true })).toHaveText('词库中暂无读音');
   await page.getByRole('button', { name: '展开汉字発', exact: true }).click();
   expect(await page.getByTestId('word-node').count()).toBeGreaterThan(1);
-  await page.getByRole('button', { name: '初级', exact: true }).click();
+  await page.getByRole('button', { name: '标日', exact: true }).click();
   await expect(page.getByTestId('word-node')).toHaveCount(1);
   await page.getByRole('combobox', { name: '筛选课次' }).selectOption('初级:28');
   await page.getByRole('button', { name: '通过発展开关联词', exact: true }).click();
@@ -170,9 +170,22 @@ test('searches the standard dictionary and keeps textbook-only filters', async (
   await expect(page.getByRole('heading', { name: '量子力学', exact: true })).toBeVisible();
   await expect(page.locator('.word-references')).toContainText('未匹配标日课次');
   await expect(page.locator('.entry-meanings')).not.toHaveCount(0);
-  await page.getByRole('button', { name: '初级', exact: true }).click();
+  await page.getByRole('button', { name: '标日', exact: true }).click();
+  await expect(page.locator('.scope-control button')).toHaveText(['标准词库', '标日']);
+  await expect(
+    page.getByRole('combobox', { name: '筛选课次' }).locator('optgroup'),
+  ).toHaveCount(2);
+  await expect(page.locator('option[value="初级:1"]')).toHaveCount(1);
+  await expect(page.locator('option[value="中级:1"]')).toHaveCount(1);
   await search.fill('量子力学');
   await expect(page.locator('#search-suggestions [role="option"]')).toHaveCount(0);
+  await search.fill('発音');
+  await page.getByRole('button', { name: '开始探索', exact: true }).click();
+  await expect(page.locator('.word-references')).toContainText('标日初级28※');
+  await search.fill('発表');
+  await page.getByRole('button', { name: '开始探索', exact: true }).click();
+  await expect(page.locator('.word-references')).toContainText('标日中级7※');
+  await search.fill('量子力学');
   await page.getByRole('button', { name: '标准词库', exact: true }).click();
   await search.focus();
   await expect(page.locator('#search-suggestions [role="option"]').first()).toContainText(

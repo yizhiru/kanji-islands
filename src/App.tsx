@@ -35,6 +35,7 @@ interface Timeline {
 }
 const scopeNames: Record<Scope, string> = {
   all: '标准词库',
+  textbook: '标日',
   beginner: '初级',
   intermediate: '中级',
 };
@@ -343,7 +344,7 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
             随机起点
           </button>
           <div className="scope-control" aria-label="选择词库范围">
-            {(['all', 'beginner', 'intermediate'] as Scope[]).map((scope) => (
+            {(['all', 'textbook'] as Scope[]).map((scope) => (
               <button
                 key={scope}
                 aria-pressed={filter.scope === scope}
@@ -456,21 +457,15 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
                 onChange={(e) => changeFilter({ ...filter, lesson: e.target.value })}
               >
                 <option value="">全部课次</option>
-                {(['初级', '中级'] as const)
-                  .filter(
-                    (level) =>
-                      filter.scope === 'all' ||
-                      (filter.scope === 'beginner' ? level === '初级' : level === '中级'),
-                  )
-                  .map((level) => (
-                    <optgroup label={level} key={level}>
-                      {Array.from({ length: level === '初级' ? 48 : 32 }, (_, i) => (
-                        <option key={i} value={`${level}:${i + 1}`}>
-                          {level} · 第 {i + 1} 课
-                        </option>
-                      ))}
-                    </optgroup>
-                  ))}
+                {(['初级', '中级'] as const).map((level) => (
+                  <optgroup label={level} key={level}>
+                    {Array.from({ length: level === '初级' ? 48 : 32 }, (_, i) => (
+                      <option key={i} value={`${level}:${i + 1}`}>
+                        {level} · 第 {i + 1} 课
+                      </option>
+                    ))}
+                  </optgroup>
+                ))}
               </select>
             </label>
           </div>

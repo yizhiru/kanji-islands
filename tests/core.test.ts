@@ -103,9 +103,17 @@ describe('word indexing and textbook filters', () => {
     expect(network.words.slice(1).every((id) => id.startsWith('word:発初'))).toBe(true);
   });
   it('includes dictionary-only entries in the main library without inventing textbook lessons', () => {
-    const dictionary = fixture([entry('量子計算', [], 'りょうしけいさん'), entry('計算')]);
+    const dictionary = fixture([
+      entry('量子計算', [], 'りょうしけいさん'),
+      entry('計算'),
+      entry('表面', [source('中级', 2)]),
+    ]);
     expect(dictionary.search('量子', all)[0].text).toBe('量子計算');
-    expect(dictionary.inScope(all)).toHaveLength(2);
+    expect(dictionary.inScope(all)).toHaveLength(3);
+    expect(dictionary.inScope({ scope: 'textbook', lesson: '' }).map((w) => w.text)).toEqual([
+      '計算',
+      '表面',
+    ]);
     expect(dictionary.search('量子', beginner)).toEqual([]);
     expect(dictionary.inScope({ scope: 'all', lesson: '初级:1' }).map((w) => w.text)).toEqual([
       '計算',
@@ -119,6 +127,12 @@ describe('word indexing and textbook filters', () => {
   it('groups spellings without dropping multiple readings', () => {
     expect(vocab.get(wordId('生物')).entries).toHaveLength(2);
     expect(entriesFor(vocab.get(wordId('生物')), beginner)[0].reading_hiragana).toBe('なまもの');
+    const textbook: Filter = { scope: 'textbook', lesson: '' };
+    expect(entriesFor(vocab.get(wordId('生物')), textbook)).toHaveLength(2);
+    expect(referencesFor(entriesFor(vocab.get(wordId('生物')), textbook), textbook)).toBe(
+      '初级1；中级2',
+    );
+    expect(vocab.search('せいぶつ', textbook)[0].text).toBe('生物');
   });
   it('matches scope and lesson on the same source occurrence', () => {
     const e = entry('共有', [source('初级', 1), source('中级', 2)]);

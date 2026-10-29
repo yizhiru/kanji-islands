@@ -172,9 +172,7 @@ test('searches the standard dictionary and keeps textbook-only filters', async (
   await expect(page.locator('.entry-meanings')).not.toHaveCount(0);
   await page.getByRole('button', { name: '标日', exact: true }).click();
   await expect(page.locator('.scope-control button')).toHaveText(['标准词库', '标日']);
-  await expect(
-    page.getByRole('combobox', { name: '筛选课次' }).locator('optgroup'),
-  ).toHaveCount(2);
+  await expect(page.getByRole('combobox', { name: '筛选课次' }).locator('optgroup')).toHaveCount(2);
   await expect(page.locator('option[value="初级:1"]')).toHaveCount(1);
   await expect(page.locator('option[value="中级:1"]')).toHaveCount(1);
   await search.fill('量子力学');

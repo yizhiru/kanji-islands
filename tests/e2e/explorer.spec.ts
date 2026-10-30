@@ -38,6 +38,8 @@ test('reveals card readings on hover and focus while details stay visible indepe
   await expect(page).toHaveTitle('汉字岛');
   await expect(page.getByRole('link', { name: '汉字岛首页' })).toBeVisible();
   const root = page.locator('[data-testid="word-node"][data-word="発表"]');
+  await expect(root.locator('.node-reading')).toBeVisible();
+  await page.getByRole('button', { name: '显示读音', exact: true }).click();
   await expect(root.locator('.node-reading')).toBeHidden();
   await root.hover();
   await expect(root.locator('.node-reading')).toBeVisible();
@@ -55,7 +57,7 @@ test('reveals card readings on hover and focus while details stay visible indepe
   await expect(page.getByLabel('平假名读音', { exact: true })).toHaveText('はつおん');
   await page.getByRole('button', { name: '显示读音', exact: true }).click();
   await expect(root.locator('.node-reading')).toBeVisible();
-  await page.getByRole('button', { name: '隐藏读音', exact: true }).click();
+  await page.getByRole('button', { name: '显示读音', exact: true }).click();
   await expect(root.locator('.node-reading')).toBeHidden();
   await expect(page.getByLabel('平假名读音', { exact: true })).toHaveText('はつおん');
 });
@@ -244,6 +246,7 @@ test('offers separate local Japanese readings and a dictionary link', async ({ p
     });
   });
   await page.goto('/');
+  await page.getByRole('button', { name: '选中自动朗读', exact: true }).click();
   await page.getByRole('button', { name: '朗读はっぴょう', exact: true }).click();
   expect(await page.evaluate(() => (window as unknown as { spoken: string[] }).spoken)).toEqual([
     'はっぴょう',

@@ -20,6 +20,22 @@ try {
   await page.getByTestId('word-node').waitFor();
   assert.equal(await page.title(), '汉字岛');
   assert.equal(await page.getByLabel('平假名读音', { exact: true }).textContent(), 'はっぴょう');
+  assert.equal(
+    await page.getByRole('button', { name: '显示读音', exact: true }).getAttribute('aria-pressed'),
+    'true',
+  );
+  assert.equal(
+    await page
+      .getByRole('button', { name: '选中自动朗读', exact: true })
+      .getAttribute('aria-pressed'),
+    'true',
+  );
+  assert.equal(await page.getByRole('button', { name: '朗读当前词', exact: true }).count(), 0);
+  await page.getByRole('button', { name: '设置', exact: true }).click();
+  assert.equal(await page.getByRole('switch', { name: '自动折叠', exact: true }).isChecked(), true);
+  const collapseCount = page.getByRole('spinbutton', { name: '自动折叠保留汉字数', exact: true });
+  assert.equal(await collapseCount.inputValue(), '2');
+  await page.getByRole('button', { name: '关闭设置', exact: true }).click();
   assert.match(page.url(), /^islands:\/\/app\/index\.html$/);
   assert.deepEqual(await page.evaluate(() => Object.keys(window.islands)), [
     'openSource',
@@ -79,6 +95,22 @@ try {
     first,
   );
   assert((await page.getByTestId('word-node').count()) > first);
+  const fullCount = await page.getByTestId('word-node').count();
+  await page.getByRole('button', { name: '设置', exact: true }).click();
+  await collapseCount.fill('1');
+  await page.getByRole('button', { name: '关闭设置', exact: true }).click();
+  await page.waitForFunction(
+    (count) => document.querySelectorAll('[data-testid="word-node"]').length < count,
+    fullCount,
+  );
+  assert.equal(await page.getByLabel('平假名读音', { exact: true }).textContent(), 'はつおん');
+  await page.getByRole('button', { name: '设置', exact: true }).click();
+  await collapseCount.fill('2');
+  await page.getByRole('button', { name: '关闭设置', exact: true }).click();
+  await page.waitForFunction(
+    (count) => document.querySelectorAll('[data-testid="word-node"]').length === count,
+    fullCount,
+  );
   assert.deepEqual(await page.evaluate(() => Object.keys(localStorage)), []);
   const pdfWindow = desktop.waitForEvent('window');
   await page.evaluate(() => window.islands.openSource('初级', 1));
@@ -87,13 +119,15 @@ try {
   // Chromium may wrap the local file in its built-in PDF viewer.
   assert.match(viewer.url(), /beginner\.pdf|chrome-extension:/);
   await viewer.close();
-  await page.getByRole('button', { name: '显示读音', exact: true }).click();
   await page.locator('.details-panel').evaluate((element) => {
     element.scrollTop = 0;
   });
   await page.locator('.toast.visible').waitFor({ state: 'hidden' });
   await mkdir('output/app', { recursive: true });
   await page.screenshot({ path: 'output/app/desktop.png' });
+  await page.getByRole('button', { name: '设置', exact: true }).click();
+  await page.screenshot({ path: 'output/app/settings.png' });
+  await page.getByRole('button', { name: '关闭设置', exact: true }).click();
   const expandedCount = await page.getByTestId('word-node').count();
   await page.getByRole('button', { name: '删除汉字発及其分支', exact: true }).click();
   await page.waitForFunction(
@@ -132,6 +166,8 @@ try {
           'context isolation',
           'offline vocabulary',
           'two-hop expansion',
+          'reading and automatic speech are enabled by default in one toolbar group',
+          'automatic folding is configurable in settings and defaults to two recent characters',
           'local PDF',
           'no persisted exploration',
           'native clipboard from cards and details',

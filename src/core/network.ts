@@ -113,3 +113,48 @@ export function graphOf(
   }
   return { nodes, edges };
 }
+
+// Only the most recently expanded characters retain all their displayed words.
+// Older groups keep the routes to those characters and the selected word.
+// Expansion order already promotes a shared hub when another batch is added.
+export function collapsedNetwork(network: Network, vocab: Vocabulary, keepCount = 2): Network {
+  const count = Number.isFinite(keepCount)
+    ? Math.max(1, Math.min(MAX_WORDS, Math.floor(keepCount)))
+    : 2;
+  if (network.expansions.length <= count) return network;
+  const graph = graphOf(network, vocab);
+  const neighbors = new Map(graph.nodes.map((node) => [node.id, [] as string[]]));
+  for (const edge of graph.edges) {
+    neighbors.get(edge.source)!.push(edge.target);
+    neighbors.get(edge.target)!.push(edge.source);
+  }
+  const parents = new Map<string, string | null>([[network.root, null]]);
+  const queue = [network.root];
+  for (let i = 0; i < queue.length; i++) {
+    for (const id of neighbors.get(queue[i]) ?? []) {
+      if (parents.has(id)) continue;
+      parents.set(id, queue[i]);
+      queue.push(id);
+    }
+  }
+  const pathTo = (target: string) => {
+    const path: string[] = [];
+    let id: string | null = target;
+    while (id != null && parents.has(id)) {
+      path.push(id);
+      id = parents.get(id)!;
+    }
+    return path.reverse();
+  };
+  const visible = new Set([...pathTo(network.selected), network.selected, network.root]);
+  for (const expansion of network.expansions.slice(-count)) {
+    const hub = `kanji:${expansion.kanji}`;
+    for (const id of pathTo(hub)) visible.add(id);
+    for (const word of neighbors.get(hub) ?? []) visible.add(word);
+  }
+  return {
+    ...network,
+    words: network.words.filter((id) => visible.has(id)),
+    expansions: network.expansions.filter((e) => visible.has(`kanji:${e.kanji}`)),
+  };
+}

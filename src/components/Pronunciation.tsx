@@ -1,19 +1,20 @@
 import { ExternalLink, Info, Volume2 } from 'lucide-react';
 import { useEffect, useId, useRef, useState } from 'react';
+import type { PronunciationController } from '../core/usePronunciation';
 import { dictionaryURL } from '../core/actions';
 
 export function Pronunciation({
   word,
   readings,
   onNotify,
+  speech,
 }: {
   word: string;
   readings: string[];
   onNotify: (message: string) => void;
+  speech: PronunciationController;
 }) {
-  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
-  const [speaking, setSpeaking] = useState('');
-  const speechID = useRef(0);
+  const { voice, speaking, play } = speech;
   const helpID = useId();
   const help = useRef<HTMLDivElement>(null);
   const pinned = useRef(false);
@@ -29,26 +30,6 @@ export function Pronunciation({
     document.addEventListener('pointerdown', dismiss);
     return () => document.removeEventListener('pointerdown', dismiss);
   }, [helpOpen]);
-  useEffect(() => {
-    if (!('speechSynthesis' in window)) return;
-    const update = () =>
-      setVoices(
-        window.speechSynthesis
-          .getVoices()
-          .filter((v) => /^ja(?:[-_]|$)/i.test(v.lang) && v.localService),
-      );
-    update();
-    window.speechSynthesis.addEventListener('voiceschanged', update);
-    return () => window.speechSynthesis.removeEventListener('voiceschanged', update);
-  }, []);
-  useEffect(() => {
-    setSpeaking('');
-    return () => {
-      speechID.current++;
-      window.speechSynthesis?.cancel();
-    };
-  }, [word, readings.join('|')]);
-  const voice = voices[0];
   return (
     <div className="pronunciation">
       <div className="pronunciation-actions">
@@ -63,32 +44,7 @@ export function Pronunciation({
                 ? '使用本机日语语音朗读假名'
                 : '请先在系统设置中安装日语语音，或打开词典查看读音'
             }
-            onClick={() => {
-              const id = ++speechID.current;
-              try {
-                window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(reading);
-                utterance.voice = voice;
-                utterance.lang = 'ja-JP';
-                utterance.rate = 0.85;
-                utterance.onstart = () => {
-                  if (speechID.current === id) setSpeaking(reading);
-                };
-                utterance.onend = () => {
-                  if (speechID.current === id) setSpeaking('');
-                };
-                utterance.onerror = (event) => {
-                  if (speechID.current !== id) return;
-                  setSpeaking('');
-                  if (!['interrupted', 'canceled'].includes(event.error))
-                    onNotify('系统朗读失败，可以打开词典查看读音。');
-                };
-                window.speechSynthesis.speak(utterance);
-              } catch {
-                setSpeaking('');
-                onNotify('系统朗读失败，可以打开词典查看读音。');
-              }
-            }}
+            onClick={() => play(reading)}
           >
             <Volume2 size={14} /> {speaking === reading ? '正在朗读' : '朗读'}
             {readings.length > 1 && <span lang="ja">{reading}</span>}

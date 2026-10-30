@@ -25,6 +25,8 @@ interface Props {
   onHub: (kanji: string) => void;
   onRemoveHub: (kanji: string) => void;
   onNotify: (message: string) => void;
+  hiddenCount: number;
+  onOpenSettings: () => void;
 }
 interface Positioned extends SimulationNodeDatum {
   id: string;
@@ -45,6 +47,8 @@ export function NetworkCanvas({
   onHub,
   onRemoveHub,
   onNotify,
+  hiddenCount,
+  onOpenSettings,
 }: Props) {
   const host = useRef<HTMLDivElement>(null);
   const positions = useRef(new Map<string, Positioned>());
@@ -52,7 +56,9 @@ export function NetworkCanvas({
   const [size, setSize] = useState({ width: 800, height: 600 });
   const [camera, setCamera] = useState({ x: 0, y: 0, zoom: 1 });
   const drag = useRef<{ x: number; y: number; initialX: number; initialY: number } | null>(null);
-  const graph = useMemo(() => graphOf(network, vocab), [network.words, network.expansions, vocab]);
+  const wordKey = JSON.stringify(network.words);
+  const hubKey = network.expansions.map((e) => e.kanji).join('');
+  const graph = useMemo(() => graphOf(network, vocab), [wordKey, hubKey, network.root, vocab]);
 
   useEffect(() => {
     const observer = new ResizeObserver(([entry]) =>
@@ -243,6 +249,9 @@ export function NetworkCanvas({
                   style={{ fontSize: [...node.text].length > 8 ? 17 : 25 }}
                   data-testid="word-node"
                   data-word={node.text}
+                  onClick={(event) => {
+                    if (!(event.target as Element).closest('button')) onSelect(node.id);
+                  }}
                 >
                   <CopyButton
                     text={node.text}
@@ -293,6 +302,11 @@ export function NetworkCanvas({
         </g>
       </svg>
       {nodes.length === 1 && <div className="first-step">点击汉字，连接词汇</div>}
+      {hiddenCount > 0 && (
+        <button className="collapse-notice" onClick={onOpenSettings}>
+          已折叠 {hiddenCount} 个旧词 · 设置
+        </button>
+      )}
       <div className="canvas-footer">
         <span>
           <Move size={14} /> 拖动平移 · 滚轮缩放

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowRight,
   BookOpen,
@@ -7,15 +7,28 @@ import {
   Eye,
   EyeOff,
   GitBranch,
+  PanelRightClose,
+  PanelRightOpen,
   Redo2,
   RotateCcw,
   Search,
+  Settings2,
   Undo2,
+  Volume2,
+  VolumeX,
   WifiOff,
   X,
 } from 'lucide-react';
 import type { Dataset, PackedDataset, Filter, Network, Scope } from './core/types';
-import { MAX_WORDS, expandNetwork, graphOf, removeExpansion, startNetwork } from './core/network';
+import {
+  MAX_WORDS,
+  expandNetwork,
+  collapsedNetwork,
+  graphOf,
+  removeExpansion,
+  startNetwork,
+} from './core/network';
+import { usePronunciation } from './core/usePronunciation';
 import {
   entriesFor,
   decodeDataset,
@@ -27,6 +40,7 @@ import {
 } from './core/vocabulary';
 import { NetworkCanvas } from './components/NetworkCanvas';
 import { WordDetails } from './components/WordDetails';
+import { Settings } from './components/Settings';
 
 interface Timeline {
   present: Network;
@@ -75,8 +89,8 @@ function About({ vocab, onClose }: { vocab: Vocabulary; onClose: () => void }) {
         当前词网只存在于这个窗口中，刷新或关闭后清空。查词与探索无需网络；打开外部词典时需联网。
       </p>
       <p>
-        悬停词卡查看平假名读音，选中后在详情中显示。片假名单词保留原词形。课次中的 <b>※</b>{' '}
-        表示讲解或练习中的生词，
+        词卡默认显示平假名读音，关闭后仍可悬停查看；选中后在详情中显示。片假名单词保留原词形。课次中的{' '}
+        <b>※</b> 表示讲解或练习中的生词，
         <b>▼</b> 表示关联词语，无符号表示课文／正文中的生词。数字表示初次出现的课次。
       </p>
       <p>
@@ -128,12 +142,22 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
   const [query, setQuery] = useState('');
   const [focused, setFocused] = useState(false);
   const [suggestionIndex, setSuggestionIndex] = useState(-1);
-  const [showReading, setShowReading] = useState(false);
+  const [showReading, setShowReading] = useState(true);
+  const [autoPlay, setAutoPlay] = useState(true);
+  const [speechRequest, setSpeechRequest] = useState(0);
+  const [autoCollapse, setAutoCollapse] = useState(true);
+  const [visibleKanjiCount, setVisibleKanjiCount] = useState(2);
+  const [detailsCollapsed, setDetailsCollapsed] = useState(false);
   const [about, setAbout] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [message, setMessage] = useState('');
   const input = useRef<HTMLInputElement>(null);
   const suggestions = useMemo(() => vocab.search(query, filter), [vocab, query, filter]);
   const graph = graphOf(network, vocab);
+  const visibleNetwork = useMemo(
+    () => (autoCollapse ? collapsedNetwork(network, vocab, visibleKanjiCount) : network),
+    [network, vocab, autoCollapse, visibleKanjiCount],
+  );
   const scopeWords = vocab.inScope(filter).length;
   const commit = (next: Network) =>
     setTimeline((current) =>
@@ -141,7 +165,21 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
         ? current
         : { present: next, past: [...current.past, current.present].slice(-60), future: [] },
     );
-  const notify = (value: string) => setMessage(value);
+  const notify = useCallback((value: string) => setMessage(value), []);
+  const selectedWord = vocab.get(network.selected);
+  const speech = usePronunciation(
+    selectedWord.text,
+    [
+      ...new Set(
+        entriesFor(selectedWord, filter)
+          .map((e) => e.reading_hiragana)
+          .filter(Boolean),
+      ),
+    ],
+    autoPlay,
+    speechRequest,
+    notify,
+  );
   useEffect(() => {
     if (!message) return;
     const timer = setTimeout(() => setMessage(''), 5000);
@@ -149,6 +187,7 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
   }, [message]);
   useEffect(() => {
     const shortcut = (event: KeyboardEvent) => {
+      if (event.isComposing || document.querySelector('dialog[open]')) return;
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault();
         input.current?.focus();
@@ -177,6 +216,7 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
       }
     }
     commit(startNetwork(id));
+    setSpeechRequest((n) => n + 1);
     setQuery('');
     setFocused(false);
     setSuggestionIndex(-1);
@@ -198,6 +238,7 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
   const select = (id: string) => {
     if (network.words.includes(id)) {
       commit({ ...network, selected: id });
+      setSpeechRequest((n) => n + 1);
       return;
     }
     if (network.words.length >= MAX_WORDS) {
@@ -214,6 +255,7 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
         ? network.expansions
         : [...network.expansions, { kanji: shared, parent: network.selected, limit: 0 }],
     });
+    setSpeechRequest((n) => n + 1);
   };
   const changeFilter = (next: Filter) => {
     setFilter(next);
@@ -234,7 +276,12 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
           <img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="" />
           <strong>汉字岛</strong>
         </a>
+        <h1 className="header-tagline">词汇成岛，汉字相连。</h1>
         <div className="header-actions">
+          <button className="about-button" onClick={() => setSettingsOpen(true)}>
+            <Settings2 size={16} />
+            设置
+          </button>
           <button className="about-button" onClick={() => setAbout(true)}>
             <BookOpen size={16} />
             词库与来源
@@ -242,9 +289,6 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
         </div>
       </header>
       <main>
-        <section className="intro-bar">
-          <h1>词汇成岛，汉字相连。</h1>
-        </section>
         <div className="search-and-filter">
           <form
             className="search-form"
@@ -299,7 +343,7 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
                 }
               }}
             />
-            <kbd>⌘ K</kbd>
+            <kbd>{/Mac|iPhone|iPad/.test(navigator.platform) ? '⌘ K' : 'Ctrl K'}</kbd>
             <button className="primary-button" type="submit">
               开始探索 <ArrowRight size={16} />
             </button>
@@ -356,7 +400,7 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
             ))}
           </div>
         </div>
-        <div className="workspace">
+        <div className={`workspace ${detailsCollapsed ? 'details-collapsed' : ''}`}>
           <section className="graph-panel" aria-label="探索工作区">
             <div className="workspace-toolbar">
               <div className="network-title">
@@ -368,6 +412,27 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
                 </span>
               </div>
               <div className="toolbar-actions">
+                <div className="reading-controls" role="group" aria-label="读音与朗读">
+                  <button
+                    className={`reading-toggle ${showReading ? 'active' : ''}`}
+                    aria-pressed={showReading}
+                    title={showReading ? '关闭词卡常显读音' : '开启词卡常显读音'}
+                    onClick={() => setShowReading((v) => !v)}
+                  >
+                    {showReading ? <Eye size={15} /> : <EyeOff size={15} />}
+                    显示读音
+                  </button>
+                  <button
+                    className={`reading-toggle ${autoPlay ? 'active' : ''}`}
+                    aria-label="选中自动朗读"
+                    aria-pressed={autoPlay}
+                    title="选中词卡时自动朗读第一个读音；多读音可在详情中分别播放"
+                    onClick={() => setAutoPlay((v) => !v)}
+                  >
+                    {autoPlay ? <Volume2 size={15} /> : <VolumeX size={15} />}
+                    自动朗读
+                  </button>
+                </div>
                 <button
                   className="icon-button"
                   title="撤回上一步"
@@ -400,15 +465,6 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
                 </button>
                 <span className="toolbar-divider" />
                 <button
-                  className={`reading-toggle ${showReading ? 'active' : ''}`}
-                  aria-pressed={showReading}
-                  title="常显词卡读音"
-                  onClick={() => setShowReading((v) => !v)}
-                >
-                  {showReading ? <EyeOff size={15} /> : <Eye size={15} />}
-                  {showReading ? '隐藏读音' : '显示读音'}
-                </button>
-                <button
                   className="icon-button"
                   title="重置当前词网"
                   aria-label="重置当前词网"
@@ -416,11 +472,21 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
                 >
                   <RotateCcw size={16} />
                 </button>
+                <button
+                  className="icon-button"
+                  aria-label={detailsCollapsed ? '展开词汇详情' : '收起词汇详情'}
+                  title={detailsCollapsed ? '展开词汇详情' : '收起词汇详情，扩大词网'}
+                  aria-expanded={!detailsCollapsed}
+                  aria-controls="word-details"
+                  onClick={() => setDetailsCollapsed((v) => !v)}
+                >
+                  {detailsCollapsed ? <PanelRightOpen size={16} /> : <PanelRightClose size={16} />}
+                </button>
               </div>
             </div>
             <NetworkCanvas
               vocab={vocab}
-              network={network}
+              network={visibleNetwork}
               filter={filter}
               showReading={showReading}
               onSelect={select}
@@ -430,6 +496,8 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
                 expand(kanji, { ...network, selected: parent });
               }}
               onNotify={notify}
+              hiddenCount={network.words.length - visibleNetwork.words.length}
+              onOpenSettings={() => setSettingsOpen(true)}
               onRemoveHub={(kanji) => commit(removeExpansion(network, kanji, vocab))}
             />
           </section>
@@ -440,6 +508,8 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
             onExpand={expand}
             onSelect={select}
             onNotify={notify}
+            speech={speech}
+            collapsed={detailsCollapsed}
           />
         </div>
         <footer className="page-footer">
@@ -480,6 +550,15 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
         )}
       </div>
       {about && <About vocab={vocab} onClose={() => setAbout(false)} />}
+      {settingsOpen && (
+        <Settings
+          autoCollapse={autoCollapse}
+          visibleKanjiCount={visibleKanjiCount}
+          onAutoCollapse={setAutoCollapse}
+          onVisibleKanjiCount={setVisibleKanjiCount}
+          onClose={() => setSettingsOpen(false)}
+        />
+      )}
     </div>
   );
 }

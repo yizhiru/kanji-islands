@@ -5,6 +5,7 @@ import { BATCH_SIZE, MAX_WORDS } from '../core/network';
 import { entriesFor, referencesFor, Vocabulary } from '../core/vocabulary';
 import { CopyButton } from './CopyButton';
 import { Pronunciation } from './Pronunciation';
+import type { PronunciationController } from '../core/usePronunciation';
 
 const formNames: Record<string, string> = {
   te: 'て形',
@@ -24,9 +25,20 @@ interface Props {
   onExpand: (k: string) => void;
   onSelect: (id: string) => void;
   onNotify: (message: string) => void;
+  speech: PronunciationController;
+  collapsed: boolean;
 }
 
-export function WordDetails({ vocab, network, filter, onExpand, onSelect, onNotify }: Props) {
+export function WordDetails({
+  vocab,
+  network,
+  filter,
+  onExpand,
+  onSelect,
+  onNotify,
+  speech,
+  collapsed,
+}: Props) {
   const [showMeaning, setShowMeaning] = useState(true);
   const referenceHelpId = useId();
   const word = vocab.get(network.selected);
@@ -40,7 +52,7 @@ export function WordDetails({ vocab, network, filter, onExpand, onSelect, onNoti
   const related = active ? vocab.related(active, filter, word.id) : [];
   const references = textbookReferences(referencesFor(entries, filter));
   return (
-    <aside className="details-panel" aria-label="词汇详情">
+    <aside id="word-details" className="details-panel" aria-label="词汇详情" hidden={collapsed}>
       <div className="details-heading">
         <span className="detail-index">词汇详情</span>
         <CopyButton text={word.text} label="复制单词" onNotify={onNotify} />
@@ -54,6 +66,7 @@ export function WordDetails({ vocab, network, filter, onExpand, onSelect, onNoti
           word={word.text}
           readings={[...new Set(entries.map((e) => e.reading_hiragana))]}
           onNotify={onNotify}
+          speech={speech}
         />
         <div className="word-references">
           <BookOpen size={16} />

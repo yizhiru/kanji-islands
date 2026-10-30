@@ -13,6 +13,7 @@ import {
 import {
   BATCH_SIZE,
   expandNetwork,
+  collapsedNetwork,
   graphOf,
   MAX_WORDS,
   removeExpansion,
@@ -162,6 +163,68 @@ describe('word indexing and textbook filters', () => {
 });
 
 describe('point-to-network expansion', () => {
+  it('keeps the two most recently expanded characters and connecting routes without changing history', () => {
+    const chain = fixture(
+      ['発表', '発音', '発展', '音楽', '音声', '楽園', '楽曲', '園芸'].map((w) => entry(w)),
+    );
+    let net = expandNetwork(startNetwork(wordId('発表')), '発', chain, all);
+    net = expandNetwork({ ...net, selected: wordId('発音') }, '音', chain, all);
+    expect(collapsedNetwork(net, chain)).toBe(net);
+    const twoLayers = net;
+    net = expandNetwork({ ...net, selected: wordId('音楽') }, '楽', chain, all);
+    const original = JSON.stringify(net);
+    const focused = collapsedNetwork(net, chain);
+    expect(focused.words).not.toContain(wordId('発展'));
+    expect(focused.words).toEqual(
+      expect.arrayContaining(['発表', '発音', '音楽', '音声', '楽園', '楽曲'].map(wordId)),
+    );
+    expect(focused.expansions.map((e) => e.kanji)).toEqual(['発', '音', '楽']);
+    expect(JSON.stringify(net)).toBe(original);
+    expect(collapsedNetwork(twoLayers, chain)).toBe(twoLayers);
+    const selectedOldWord = collapsedNetwork({ ...net, selected: wordId('発展') }, chain);
+    expect(selectedOldWord.words).toContain(wordId('発展'));
+    net = expandNetwork({ ...net, selected: wordId('楽園') }, '園', chain, all);
+    const deeper = collapsedNetwork(net, chain);
+    expect(deeper.words).not.toContain(wordId('音声'));
+    expect(deeper.words).toContain(wordId('音楽'));
+    expect(deeper.words).toContain(wordId('園芸'));
+    expect(collapsedNetwork(removeExpansion(net, '楽', chain), chain).words).toContain(
+      wordId('発展'),
+    );
+  });
+  it('folds older character groups even when all three expansions start at the same word', () => {
+    const branches = fixture(['発表音', '発展', '表面', '音楽'].map((w) => entry(w)));
+    let net = startNetwork(wordId('発表音'));
+    for (const kanji of ['発', '表', '音']) net = expandNetwork(net, kanji, branches, all);
+    const collapsed = collapsedNetwork(net, branches);
+    expect(collapsed.words).toEqual(['発表音', '表面', '音楽'].map(wordId));
+    expect(collapsed.expansions.map((e) => e.kanji)).toEqual(['表', '音']);
+    expect(collapsedNetwork(net, branches, 1).words).toEqual(['発表音', '音楽'].map(wordId));
+    expect(collapsedNetwork(net, branches, 3)).toBe(net);
+    expect(collapsedNetwork(net, branches, NaN).words).toEqual(collapsed.words);
+    expect(collapsedNetwork(net, branches, 0).words).toEqual(
+      collapsedNetwork(net, branches, 1).words,
+    );
+    const selectedOld = collapsedNetwork({ ...net, selected: wordId('発展') }, branches, 1);
+    expect(selectedOld.words).toContain(wordId('発展'));
+    expect(selectedOld.expansions.map((e) => e.kanji)).toEqual(['発', '音']);
+    net = expandNetwork(net, '発', branches, all);
+    expect(net.expansions.map((e) => e.kanji)).toEqual(['表', '音', '発']);
+    expect(collapsedNetwork(net, branches).words).toEqual(['発表音', '発展', '音楽'].map(wordId));
+    expect(new Set(net.expansions.map((e) => e.kanji)).size).toBe(3);
+  });
+  it('preserves words shared with recent groups and connecting paths through cycles', () => {
+    const shared = fixture(['発表音', '発展', '発音', '表面', '音楽'].map((w) => entry(w)));
+    let net = startNetwork(wordId('発表音'));
+    for (const kanji of ['発', '表', '音']) net = expandNetwork(net, kanji, shared, all);
+    const collapsed = collapsedNetwork(net, shared, 1);
+    expect(collapsed.words).toContain(wordId('発音'));
+    expect(collapsed.words).not.toContain(wordId('発展'));
+    expect(collapsed.words).not.toContain(wordId('表面'));
+    expect(collapsedNetwork(removeExpansion(net, '音', shared), shared).words).toContain(
+      wordId('発展'),
+    );
+  });
   it('removes a hub and detached descendants, resets selection, and allows re-expansion', () => {
     let net = expandNetwork(startNetwork(wordId('発表')), '発', vocab, all);
     net = expandNetwork({ ...net, selected: wordId('発音') }, '音', vocab, all);

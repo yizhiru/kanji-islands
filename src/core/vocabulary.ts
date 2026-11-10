@@ -136,7 +136,12 @@ export class Vocabulary {
     return this.scopes.get(key)!;
   }
 
-  related(kanji: string, filter: Filter, exclude?: string): Word[] {
+  related(
+    kanji: string,
+    filter: Filter,
+    exclude?: string,
+    preferred?: ReadonlySet<string>,
+  ): Word[] {
     const key = `${kanji}:${filter.scope}:${filter.lesson}`;
     if (!this.relations.has(key))
       this.relations.set(
@@ -165,7 +170,10 @@ export class Vocabulary {
           )
           .map(({ word }) => word),
       );
-    return this.relations.get(key)!.filter((w) => w.id !== exclude);
+    const words = this.relations.get(key)!.filter((w) => w.id !== exclude);
+    return preferred
+      ? words.sort((a, b) => Number(preferred.has(b.id)) - Number(preferred.has(a.id)))
+      : words;
   }
 
   search(query: string, filter: Filter, limit = 8): Word[] {

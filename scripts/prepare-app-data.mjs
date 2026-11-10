@@ -22,6 +22,7 @@ await mkdir(out, { recursive: true });
 await writeFile(path.join(out, 'vocabulary.json'), raw);
 const notice = await readFile(path.join(root, 'data/jitendex-zh/NOTICE.md'), 'utf8');
 const license = await readFile(path.join(root, 'data/jitendex-zh/LICENSE'), 'utf8');
+const archiveLicense = await readFile(path.join(root, 'node_modules/fflate/LICENSE'), 'utf8');
 await writeFile(
   path.join(out, 'dictionary-notices.txt'),
   [
@@ -38,6 +39,8 @@ await writeFile(
     notice,
     '\nUPSTREAM LICENSE\n',
     license,
+    '\nAPPLICATION DEPENDENCY: fflate (local ZIP import)\n',
+    archiveLicense,
   ].join('\n\n'),
 );
 // Browser preview can also inspect the exact source pages; production ships these locally.

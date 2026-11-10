@@ -28,7 +28,16 @@ function createWindow() {
     },
   });
   mainWindow.once('ready-to-show', () => mainWindow.show());
-  mainWindow.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
+  const dictionaryHelpURLs = new Set([
+    'https://yomidevs.github.io/wiktionary-to-yomitan/download/',
+    'https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use',
+    'https://jitendex.org/pages/downloads.html',
+    'https://jitendex.org/pages/legal.html',
+  ]);
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (dictionaryHelpURLs.has(url)) shell.openExternal(url).catch(() => {});
+    return { action: 'deny' };
+  });
   mainWindow.webContents.on('will-navigate', (event, url) => {
     const allowedOrigin = devURL ? new URL(devURL).origin : 'islands://app';
     if (!url.startsWith(allowedOrigin + '/')) event.preventDefault();

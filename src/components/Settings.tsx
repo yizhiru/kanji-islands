@@ -1,8 +1,10 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { X } from 'lucide-react';
+import type { DictionaryController } from '../core/dictionaries/useDictionaries';
 import { MAX_WORDS } from '../core/network';
 
 interface Props {
+  dictionaries: DictionaryController;
   autoCollapse: boolean;
   visibleKanjiCount: number;
   onAutoCollapse: (enabled: boolean) => void;
@@ -11,6 +13,7 @@ interface Props {
 }
 
 export function Settings({
+  dictionaries,
   autoCollapse,
   visibleKanjiCount,
   onAutoCollapse,
@@ -85,6 +88,112 @@ export function Settings({
           个汉字
         </label>
         <p>默认保留 2 个。当前词、共用词和必要连接始终保留；关闭自动折叠可显示全部词网。</p>
+      </section>
+      <section className="settings-section" aria-label="用户词典">
+        <h3>用户词典</h3>
+        <p>
+          选择本地 Yomitan v3 ZIP
+          词典。文件仅保存在此设备，不会上传；本软件不内置或自动下载明镜词典。
+        </p>
+        <label className="dictionary-import">
+          导入 Yomitan 词典
+          <input
+            type="file"
+            accept=".zip,application/zip"
+            aria-label="导入 Yomitan 词典"
+            disabled={!dictionaries.ready || !!dictionaries.progress || dictionaries.changing}
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (file) dictionaries.importFile(file);
+              event.target.value = '';
+            }}
+          />
+        </label>
+        <details className="dictionary-help">
+          <summary>如何获取词典</summary>
+          <p>下载 Yomitan 格式的 ZIP，回到此处导入，无需解压或购买 API。</p>
+          <ul>
+            <li>
+              <a
+                href="https://yomidevs.github.io/wiktionary-to-yomitan/download/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                维基词典下载
+              </a>
+              ：Source 选 Japanese，Target 选 Chinese 或 Japanese，Format 选 Yomitan。 文本采用 CC
+              BY-SA 等开放许可，具体以词条和词典包声明为准（
+              <a
+                href="https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use"
+                target="_blank"
+                rel="noreferrer"
+              >
+                使用条款
+              </a>
+              ）。
+            </li>
+            <li>
+              <a href="https://jitendex.org/pages/downloads.html" target="_blank" rel="noreferrer">
+                Jitendex 下载
+              </a>
+              ：选择 Jitendex for Yomitan；日英词典，采用
+              <a href="https://jitendex.org/pages/legal.html" target="_blank" rel="noreferrer">
+                CC BY-SA 4.0
+              </a>
+              。本软件已保留内置英文释义，无需重复导入。
+            </li>
+          </ul>
+          <p>明镜词典需用户自行取得有权使用的 Yomitan 词典包，此处不提供下载链接。</p>
+        </details>
+        {dictionaries.progress && (
+          <div className="dictionary-progress" role="status">
+            <span>{dictionaries.progress}</span>
+            <button
+              className="text-button"
+              disabled={dictionaries.saving}
+              onClick={dictionaries.cancel}
+            >
+              取消导入
+            </button>
+          </div>
+        )}
+        <p>
+          标准与标日词库均优先使用启用词典的中文、日文释义；中文缺失时保留内置译文，英文释义继续保留。多部词典按最近导入优先。
+        </p>
+        <p className="muted">请导入你有权使用的词典；用户导入不改变词典本身的许可。</p>
+        {!dictionaries.dictionaries.length && <p className="muted">尚未导入用户词典。</p>}
+        {dictionaries.changing && <p role="status">正在保存词典更改…</p>}
+        {dictionaries.dictionaries.map((dictionary) => (
+          <div className="user-dictionary" key={dictionary.id}>
+            <strong>{dictionary.title}</strong>
+            <small>
+              {dictionary.revision} · {dictionary.entryCount.toLocaleString()} 个词条 ·{' '}
+              {dictionary.termCount.toLocaleString()} 条索引
+            </small>
+            <div className="dictionary-actions">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={dictionary.enabled}
+                  aria-label={`启用词典${dictionary.title}`}
+                  disabled={!!dictionaries.progress || dictionaries.changing}
+                  onChange={(event) =>
+                    void dictionaries.toggle(dictionary.id, event.target.checked)
+                  }
+                />
+                启用
+              </label>
+              <button
+                className="text-button"
+                aria-label={`删除词典${dictionary.title}`}
+                disabled={!!dictionaries.progress || dictionaries.changing}
+                onClick={() => void dictionaries.remove(dictionary.id)}
+              >
+                删除
+              </button>
+            </div>
+          </div>
+        ))}
       </section>
       <p className="settings-note">更改立即生效。</p>
     </dialog>

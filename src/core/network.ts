@@ -15,10 +15,11 @@ export function expandNetwork(
   kanji: string,
   vocab: Vocabulary,
   filter: Filter,
+  preferred?: ReadonlySet<string>,
 ): Network {
   const parent = vocab.get(network.selected);
   if (!parent.kanji.includes(kanji)) return network;
-  const available = vocab.related(kanji, filter, parent.id);
+  const available = vocab.related(kanji, filter, parent.id, preferred);
   if (!available.length) return network;
   const existing = network.expansions.find((e) => e.kanji === kanji);
   // A single character hub is shared across branches, making real cycles possible.

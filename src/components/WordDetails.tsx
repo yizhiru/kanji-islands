@@ -3,6 +3,9 @@ import { useEffect, useId, useState } from 'react';
 import type { Filter, Network } from '../core/types';
 import { BATCH_SIZE, MAX_WORDS } from '../core/network';
 import { entriesFor, referencesFor, Vocabulary } from '../core/vocabulary';
+import { verbPairsFor } from '../core/verbPairs';
+import { EntryMeanings } from './EntryMeanings';
+import type { DictionaryInfo } from '../core/dictionaries/types';
 import { CopyButton } from './CopyButton';
 import { Pronunciation } from './Pronunciation';
 import type { PronunciationController } from '../core/usePronunciation';
@@ -20,37 +23,53 @@ const formNames: Record<string, string> = {
 const textbookReferences = (references: string) => references.replace(/初级|中级/g, '标日$&');
 interface Props {
   vocab: Vocabulary;
+  dictionaries: DictionaryInfo[];
   network: Network;
   filter: Filter;
   onExpand: (k: string) => void;
   onSelect: (id: string) => void;
   onNotify: (message: string) => void;
   speech: PronunciationController;
+  notebook: ReadonlySet<string>;
+  onToggleNotebook: (id: string) => void;
+  relatedSort: 'default' | 'notebook';
+  onRelatedSort: (sort: 'default' | 'notebook') => void;
   collapsed: boolean;
 }
 
 export function WordDetails({
   vocab,
+  dictionaries,
   network,
   filter,
   onExpand,
   onSelect,
   onNotify,
   speech,
+  notebook,
+  onToggleNotebook,
+  relatedSort,
+  onRelatedSort,
   collapsed,
 }: Props) {
   const [showMeaning, setShowMeaning] = useState(true);
   const referenceHelpId = useId();
   const word = vocab.get(network.selected);
-  const entries = entriesFor(word, filter);
+  const entries = word.entries;
+  const scopedEntries = entriesFor(word, filter);
   const [chosenKanji, setChosenKanji] = useState('');
   useEffect(() => {
     const latest = network.expansions.at(-1);
     if (latest && word.kanji.includes(latest.kanji)) setChosenKanji(latest.kanji);
   }, [network.expansions]);
   const active = word.kanji.includes(chosenKanji) ? chosenKanji : word.kanji[0];
-  const related = active ? vocab.related(active, filter, word.id) : [];
-  const references = textbookReferences(referencesFor(entries, filter));
+  const related = active
+    ? vocab.related(active, filter, word.id, relatedSort === 'notebook' ? notebook : undefined)
+    : [];
+  const expansionLimit = network.expansions.find((e) => e.kanji === active)?.limit ?? 0;
+  const relatedLimit = Math.max(12, expansionLimit);
+  const verbPairs = verbPairsFor(vocab, word, filter);
+  const references = textbookReferences(referencesFor(scopedEntries, filter));
   return (
     <aside id="word-details" className="details-panel" aria-label="词汇详情" hidden={collapsed}>
       <div className="details-heading">
@@ -59,6 +78,13 @@ export function WordDetails({
       </div>
       <div className="selected-word-block">
         <h2 lang="ja">{word.text}</h2>
+        <button
+          className="text-button"
+          aria-pressed={notebook.has(word.id)}
+          onClick={() => onToggleNotebook(word.id)}
+        >
+          {notebook.has(word.id) ? '移出生词本' : '加入生词本'}
+        </button>
         <p className="selected-reading" lang="ja" aria-label="平假名读音">
           {[...new Set(entries.map((e) => e.reading_hiragana))].join(' / ') || '词库中暂无读音'}
         </p>
@@ -72,9 +98,9 @@ export function WordDetails({
           <BookOpen size={16} />
           <span>
             {references ||
-              (entries.length
+              (scopedEntries.length
                 ? '未匹配标日课次'
-                : word.entries.length
+                : entries.length
                   ? '该词不在当前筛选范围内'
                   : '自定义起点 · 词库暂未收录')}
           </span>
@@ -150,7 +176,7 @@ export function WordDetails({
           </button>
         </div>
         {!entries.length ? (
-          <p className="muted">当前词库范围没有可显示的释义，仍可按汉字探索。</p>
+          <p className="muted">词库中暂无释义，仍可按汉字探索。</p>
         ) : !showMeaning ? (
           <button className="meaning-cover" onClick={() => setShowMeaning(true)}>
             查看释义
@@ -173,40 +199,60 @@ export function WordDetails({
                   <span>以下为原形释义；实际含义需结合活用。</span>
                 </div>
               )}
-              <div className="meaning-language" lang="zh-CN">
-                <h4>中文释义</h4>
-                <ol className="sense-list">
-                  {entry.senses.map((sense) => (
-                    <li key={sense.id}>
-                      <div className="chinese-gloss">
-                        {sense.zh.join('；') || '暂无可靠对应的中文释义，请参阅英文。'}
-                      </div>
-                      {sense.notes_zh.length > 0 && (
-                        <div className="sense-note">{sense.notes_zh.join('；')}</div>
-                      )}
-                    </li>
-                  ))}
-                </ol>
-              </div>
-              <div className="meaning-language" lang="en">
-                <h4>英文释义</h4>
-                <ol className="sense-list">
-                  {entry.senses.map((sense) => (
-                    <li key={sense.id}>
-                      <div className="english-gloss">{sense.en.join('; ')}</div>
-                    </li>
-                  ))}
-                </ol>
-              </div>
+              <EntryMeanings word={word.text} entry={entry} dictionaries={dictionaries} />
             </div>
           ))
         )}
       </section>
+      {verbPairs.length > 0 && (
+        <section className="verb-pairs-section">
+          <div className="section-title">
+            <h3>自动词／他动词对应</h3>
+          </div>
+          <p className="muted">
+            自动词：事物自身的变化；他动词：对事物施加动作。配对按具体词义使用。
+          </p>
+          {verbPairs.map((pair) => (
+            <div className="verb-pair" key={`${pair.auto.id}:${pair.transitive.id}`}>
+              {(
+                [
+                  ['自动词', pair.auto, pair.autoReading],
+                  ['他动词', pair.transitive, pair.transitiveReading],
+                ] as const
+              ).map(([label, item, reading]) => (
+                <button
+                  key={label}
+                  className="related-word"
+                  onClick={() => onSelect(item.id)}
+                  aria-label={`查看${label}${item.text}`}
+                >
+                  <small>{label}</small>
+                  <span lang="ja">
+                    {item.text}（{reading}）
+                  </span>
+                  <ArrowUpRight size={14} />
+                </button>
+              ))}
+            </div>
+          ))}
+        </section>
+      )}
       <section className="related-section">
         <div className="section-title">
           <h3>含「{active || '—'}」的关联词</h3>
           <span className="count-label">{related.length}</span>
         </div>
+        <label className="related-sort">
+          候选排序{' '}
+          <select
+            aria-label="候选单词排序"
+            value={relatedSort}
+            onChange={(event) => onRelatedSort(event.target.value as 'default' | 'notebook')}
+          >
+            <option value="default">默认排序</option>
+            <option value="notebook">生词优先</option>
+          </select>
+        </label>
         {word.kanji.length > 1 && (
           <div className="character-tabs" aria-label="查看其他汉字的候选">
             {word.kanji.map((k) => (
@@ -223,7 +269,7 @@ export function WordDetails({
         {related.length ? (
           <>
             <div className="related-list">
-              {related.slice(0, 12).map((item) => (
+              {related.slice(0, relatedLimit).map((item) => (
                 <button
                   key={item.id}
                   className="related-word"
@@ -231,7 +277,10 @@ export function WordDetails({
                   aria-label={`查看关联词${item.text}`}
                 >
                   <span lang="ja">{item.text}</span>
-                  <small>{network.words.includes(item.id) ? '已在网络' : '加入网络'}</small>
+                  <small>
+                    {notebook.has(item.id) && '生词 · '}
+                    {network.words.includes(item.id) ? '已在网络' : '加入网络'}
+                  </small>
                   <ArrowUpRight size={14} />
                 </button>
               ))}
@@ -239,7 +288,7 @@ export function WordDetails({
             <button
               className="expand-more"
               onClick={() => onExpand(active)}
-              disabled={network.words.length >= MAX_WORDS}
+              disabled={network.words.length >= MAX_WORDS || expansionLimit >= related.length}
             >
               <Plus size={14} />
               {network.expansions.some((e) => e.kanji === active) ? '继续展开' : '展开'}「{active}

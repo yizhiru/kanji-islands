@@ -28,6 +28,8 @@ import {
   removeExpansion,
   startNetwork,
 } from './core/network';
+import { Notebook } from './components/Notebook';
+import { useNotebook } from './core/notebook';
 import { usePronunciation } from './core/usePronunciation';
 import {
   entriesFor,
@@ -40,6 +42,7 @@ import {
 } from './core/vocabulary';
 import { NetworkCanvas } from './components/NetworkCanvas';
 import { WordDetails } from './components/WordDetails';
+import { useDictionaries } from './core/dictionaries/useDictionaries';
 import { Settings } from './components/Settings';
 
 interface Timeline {
@@ -85,32 +88,25 @@ function About({ vocab, onClose }: { vocab: Vocabulary; onClose: () => void }) {
         <span>不同词形</span>
       </div>
       <p>
-        <b>不会保存学习记录。</b>{' '}
-        当前词网只存在于这个窗口中，刷新或关闭后清空。查词与探索无需网络；打开外部词典时需联网。
+        <b>标准词库：</b>JMdict / Jitendex 通用日语词典。
       </p>
       <p>
-        词卡默认显示平假名读音，关闭后仍可悬停查看；选中后在详情中显示。片假名单词保留原词形。课次中的{' '}
-        <b>※</b> 表示讲解或练习中的生词，
-        <b>▼</b> 表示关联词语，无符号表示课文／正文中的生词。数字表示初次出现的课次。
+        <b>标日词库：</b>
+        按《标准日本语》初、中级课次筛选。课次来自教材词表，词典释义不等于教材原文。
       </p>
       <p>
-        主库为完整 JMdict / Jitendex 快照，含{' '}
-        {vocab.data.metadata.dictionaryEntries?.toLocaleString()} 个词典条目， 同时保留{' '}
-        {vocab.data.metadata.textbookEntries?.toLocaleString()} 条已核对的标日词条与课次。 另有{' '}
-        {vocab.data.metadata.pendingGroups.toLocaleString()} 组教材匹配待核对，不自动附加课次。
-        “未匹配标日课次”不代表教材中一定没有该词。自定义起点可参与共字连接。
+        <b>中文：</b>优先使用用户导入词典；缺失时使用 Jitendex 中文版（模型翻译／校订）。
       </p>
       <p>
-        假名来自词典。朗读使用本机日语合成语音，不作为真人发音或音调标准；多读音可分别播放。Jisho
-        词典在浏览器中打开，真人音频以其收录为准。
+        <b>日文：</b>来自用户导入的词典。<b>英文：</b>Jitendex / JMdict。
+      </p>
+      <p>支持在设置中导入本地 Yomitan 词典；不内置或自动下载明镜。每种语言的释义均标注实际来源。</p>
+      <p>
+        词网不会保存学习记录，刷新后清空；生词本和用户词典保存在本机。朗读使用本机日语合成语音。
       </p>
       <p>
-        中文：{vocab.data.metadata.chineseVersion}。英文：{vocab.data.metadata.englishVersion}
-        。中文版尚未全部人工核验；普通多义词保留词典义项。
-      </p>
-      <p>
-        词典派生数据：CC BY-SA 4.0。署名：greyindex、Stephen Kraus / Jitendex、EDRDG / JMdict
-        及上游来源。应用代码：MIT。教材 PDF 是独立来源材料。
+        内置词典派生数据：CC BY-SA 4.0。署名：greyindex、Stephen Kraus / Jitendex、EDRDG /
+        JMdict。应用代码：MIT。用户词典遵循各自许可。
       </p>
       <button
         className="secondary-button"
@@ -166,16 +162,14 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
         : { present: next, past: [...current.past, current.present].slice(-60), future: [] },
     );
   const notify = useCallback((value: string) => setMessage(value), []);
+  const notebook = useNotebook(notify);
+  const dictionaries = useDictionaries(notify);
+  const [notebookOpen, setNotebookOpen] = useState(false);
+  const [relatedSort, setRelatedSort] = useState<'default' | 'notebook'>('default');
   const selectedWord = vocab.get(network.selected);
   const speech = usePronunciation(
     selectedWord.text,
-    [
-      ...new Set(
-        entriesFor(selectedWord, filter)
-          .map((e) => e.reading_hiragana)
-          .filter(Boolean),
-      ),
-    ],
+    [...new Set(selectedWord.entries.map((e) => e.reading_hiragana).filter(Boolean))],
     autoPlay,
     speechRequest,
     notify,
@@ -226,7 +220,13 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
       notify(`当前网络已有 ${MAX_WORDS} 个词，可以从新词重新开始探索。`);
       return;
     }
-    const next = expandNetwork(base, kanji, vocab, filter);
+    const next = expandNetwork(
+      base,
+      kanji,
+      vocab,
+      filter,
+      relatedSort === 'notebook' ? notebook.words : undefined,
+    );
     if (next === base) {
       notify(`当前范围没有其他含「${kanji}」的词。`);
       return;
@@ -278,6 +278,9 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
         </a>
         <h1 className="header-tagline">词汇成岛，汉字相连。</h1>
         <div className="header-actions">
+          <button className="about-button" onClick={() => setNotebookOpen(true)}>
+            生词本 · {notebook.words.size}
+          </button>
           <button className="about-button" onClick={() => setSettingsOpen(true)}>
             <Settings2 size={16} />
             设置
@@ -502,6 +505,7 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
             />
           </section>
           <WordDetails
+            dictionaries={dictionaries.dictionaries}
             vocab={vocab}
             network={network}
             filter={filter}
@@ -509,6 +513,10 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
             onSelect={select}
             onNotify={notify}
             speech={speech}
+            notebook={notebook.words}
+            onToggleNotebook={notebook.toggle}
+            relatedSort={relatedSort}
+            onRelatedSort={setRelatedSort}
             collapsed={detailsCollapsed}
           />
         </div>
@@ -549,9 +557,23 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
           </>
         )}
       </div>
+      {notebookOpen && (
+        <Notebook
+          vocab={vocab}
+          words={notebook.words}
+          onRemove={notebook.toggle}
+          onSelect={(id) => {
+            start(vocab.get(id).text);
+            setNotebookOpen(false);
+            setDetailsCollapsed(false);
+          }}
+          onClose={() => setNotebookOpen(false)}
+        />
+      )}
       {about && <About vocab={vocab} onClose={() => setAbout(false)} />}
       {settingsOpen && (
         <Settings
+          dictionaries={dictionaries}
           autoCollapse={autoCollapse}
           visibleKanjiCount={visibleKanjiCount}
           onAutoCollapse={setAutoCollapse}

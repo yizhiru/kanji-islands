@@ -343,3 +343,26 @@ test('removes a kanji branch and its detached words with undo and redo', async (
   await page.getByRole('button', { name: '展开汉字発', exact: true }).click();
   await expect(page.getByRole('button', { name: '删除汉字発及其分支', exact: true })).toBeVisible();
 });
+
+test('keeps standard readings and meanings for a pending textbook word across filters', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await page.getByRole('combobox', { name: '输入起始词' }).fill('緑化');
+  await page.getByRole('button', { name: '开始探索', exact: true }).click();
+  const reading = page.getByLabel('平假名读音', { exact: true });
+  await expect(reading).toHaveText('りょっか / りょくか');
+  const meanings = await page.locator('.meaning-section').innerText();
+  await expect(page.locator('.word-references')).toContainText('未匹配标日课次');
+
+  await page.getByRole('button', { name: '标日', exact: true }).click();
+  for (const lesson of ['', '中级:19', '初级:1']) {
+    await page.getByRole('combobox', { name: '筛选课次' }).selectOption(lesson);
+    await expect(reading).toHaveText('りょっか / りょくか');
+    await expect(page.getByRole('button', { name: '朗读りょっか', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: '朗读りょくか', exact: true })).toBeVisible();
+    await expect(page.locator('.meaning-section')).toHaveText(meanings, { useInnerText: true });
+    await expect(page.locator('.word-references')).toContainText('该词不在当前筛选范围内');
+    await expect(page.getByLabel('课次符号说明', { exact: true })).toHaveCount(0);
+  }
+});

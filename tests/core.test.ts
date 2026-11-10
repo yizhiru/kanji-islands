@@ -352,3 +352,55 @@ describe('production vocabulary integrity', () => {
       expect(e.meanings_scope).toBe('lemma');
   });
 });
+
+describe('explicit verb pairs', () => {
+  it('requires matching readings, transitivity and current scope', async () => {
+    const { verbPairsFor } = await import('../src/core/verbPairs');
+    const auto = entry('開く', [source('初级', 1)], 'あく');
+    const transitive = entry('開ける', [source('中级', 1)], 'あける');
+    auto.senses[0].pos = ['vi'];
+    transitive.senses[0].pos = ['vt'];
+    const makeVocab = () =>
+      new Vocabulary({
+        version: 1,
+        metadata: {
+          entryCount: 2,
+          pendingGroups: 0,
+          sourceHash: '',
+          chineseVersion: '',
+          englishVersion: '',
+        },
+        entries: [auto, transitive],
+      });
+    let vocab = makeVocab();
+    expect(verbPairsFor(vocab, vocab.get(wordId('開く')), all)).toHaveLength(1);
+    expect(verbPairsFor(vocab, vocab.get(wordId('開ける')), all)).toHaveLength(1);
+    expect(verbPairsFor(vocab, vocab.get(wordId('開く')), beginner)).toHaveLength(0);
+    auto.reading_hiragana = 'ひらく';
+    vocab = makeVocab();
+    expect(verbPairsFor(vocab, vocab.get(wordId('開く')), all)).toHaveLength(0);
+    auto.reading_hiragana = 'あく';
+    transitive.senses[0].pos = ['vi'];
+    vocab = makeVocab();
+    expect(verbPairsFor(vocab, vocab.get(wordId('開く')), all)).toHaveLength(0);
+  });
+});
+
+describe('notebook candidate ordering', () => {
+  it('promotes saved words before batching and preserves default order within groups', () => {
+    const vocab = fixture(Array.from({ length: 20 }, (_, i) => entry(`発${i}`)));
+    const baseline = vocab.related('発', all, wordId('発0'));
+    const saved = new Set(baseline.slice(-2).map((word) => word.id));
+    const preferred = vocab.related('発', all, wordId('発0'), saved);
+    expect(preferred.map((word) => word.id)).toEqual([
+      ...baseline.filter((word) => saved.has(word.id)).map((word) => word.id),
+      ...baseline.filter((word) => !saved.has(word.id)).map((word) => word.id),
+    ]);
+    const expanded = expandNetwork(startNetwork(wordId('発0')), '発', vocab, all, saved);
+    for (const id of saved) expect(expanded.words).toContain(id);
+    expect(vocab.related('発', all, wordId('発0'))).toEqual(baseline);
+    expect(vocab.related('発', { scope: 'intermediate', lesson: '' }, undefined, saved)).toEqual(
+      [],
+    );
+  });
+});

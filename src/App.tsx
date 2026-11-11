@@ -102,7 +102,8 @@ function About({ vocab, onClose }: { vocab: Vocabulary; onClose: () => void }) {
       </p>
       <p>支持在设置中导入本地 Yomitan 词典；不内置或自动下载明镜。每种语言的释义均标注实际来源。</p>
       <p>
-        词网不会保存学习记录，刷新后清空；生词本和用户词典保存在本机。朗读使用本机日语合成语音。
+        词网不会保存学习记录，刷新后清空；生词本和用户词典保存在本机。朗读支持本机 VOICEVOX
+        或系统日语语音。
       </p>
       <p>
         内置词典派生数据：CC BY-SA 4.0。署名：greyindex、Stephen Kraus / Jitendex、EDRDG /
@@ -509,7 +510,6 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
             vocab={vocab}
             network={network}
             filter={filter}
-            onExpand={expand}
             onSelect={select}
             onNotify={notify}
             speech={speech}
@@ -574,6 +574,7 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
       {settingsOpen && (
         <Settings
           dictionaries={dictionaries}
+          speech={speech}
           autoCollapse={autoCollapse}
           visibleKanjiCount={visibleKanjiCount}
           onAutoCollapse={setAutoCollapse}

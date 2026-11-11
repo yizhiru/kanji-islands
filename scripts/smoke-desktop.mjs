@@ -1,16 +1,20 @@
 import { _electron as electron } from 'playwright';
 import assert from 'node:assert/strict';
 import path from 'node:path';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 
 const env = { ...process.env };
 delete env.ELECTRON_RUN_AS_NODE;
 delete env.KANJI_DEV_URL;
+const profile = await mkdtemp(path.join(tmpdir(), 'kanji-desktop-test-'));
+const profileArg = `--user-data-dir=${profile}`;
 const options = process.env.KANJI_PACKAGED_EXECUTABLE
-  ? { executablePath: path.resolve(process.env.KANJI_PACKAGED_EXECUTABLE), args: [], env }
-  : { args: ['.'], env };
-const desktop = await electron.launch(options);
+  ? { executablePath: path.resolve(process.env.KANJI_PACKAGED_EXECUTABLE), args: [profileArg], env }
+  : { args: ['.', profileArg], env };
+let desktop;
 try {
+  desktop = await electron.launch(options);
   const page = await desktop.firstWindow();
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
@@ -38,6 +42,8 @@ try {
   await page.getByRole('button', { name: '关闭设置', exact: true }).click();
   assert.match(page.url(), /^islands:\/\/app\/index\.html$/);
   assert.deepEqual(await page.evaluate(() => Object.keys(window.islands)), [
+    'voicevoxStatus',
+    'synthesizeVoicevox',
     'openSource',
     'copyText',
     'openDictionary',
@@ -181,5 +187,6 @@ try {
   );
   console.log('Desktop smoke test passed:', versions);
 } finally {
-  await desktop.close();
+  await desktop?.close();
+  await rm(profile, { recursive: true, force: true });
 }

@@ -75,12 +75,13 @@ test('searches real words, accepts custom seeds, and changes scope and lesson', 
   await expect(page.getByText('自定义起点 · 词库暂未收录')).toBeVisible();
   await expect(page.getByLabel('平假名读音', { exact: true })).toHaveText('词库中暂无读音');
   await page.getByRole('button', { name: '展开汉字発', exact: true }).click();
-  expect(await page.getByTestId('word-node').count()).toBeGreaterThan(1);
+  await expect.poll(() => page.getByTestId('word-node').count()).toBeGreaterThan(1);
   await page.getByRole('button', { name: '标日', exact: true }).click();
   await expect(page.getByTestId('word-node')).toHaveCount(1);
   await page.getByRole('combobox', { name: '筛选课次' }).selectOption('初级:28');
   await page.getByRole('button', { name: '通过発展开关联词', exact: true }).click();
-  await expect(page.getByRole('button', { name: '选中词汇発音', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: '查看关联词発音', exact: true }).click();
+  await expect(page.locator('[data-testid="word-node"][data-word="発音"]')).toBeVisible();
 });
 
 test('does not persist exploration or write learning records and works without external requests', async ({
@@ -95,7 +96,7 @@ test('does not persist exploration or write learning records and works without e
   });
   await page.goto('/');
   await page.getByRole('button', { name: '展开汉字発', exact: true }).click();
-  expect(await page.getByTestId('word-node').count()).toBeGreaterThan(1);
+  await expect.poll(() => page.getByTestId('word-node').count()).toBeGreaterThan(1);
   expect(await page.evaluate(() => Object.keys(localStorage))).toEqual([]);
   expect(await page.evaluate(() => Object.keys(sessionStorage))).toEqual([]);
   await page.reload();
@@ -157,7 +158,7 @@ test('remains usable at narrow widths without horizontal overflow', async ({ pag
   await expect(page.getByRole('heading', { name: '発表', exact: true })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.getByRole('button', { name: '展开汉字発', exact: true }).click();
-  expect(await page.getByTestId('word-node').count()).toBeGreaterThan(1);
+  await expect.poll(() => page.getByTestId('word-node').count()).toBeGreaterThan(1);
 });
 
 test('searches the standard dictionary and keeps textbook-only filters', async ({ page }) => {

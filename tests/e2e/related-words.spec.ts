@@ -45,27 +45,22 @@ test.beforeEach(async ({ page }) => {
   await page.goto('/');
 });
 
-test('continued expansion grows the sidebar and undo restores its previous batch', async ({
-  page,
-}) => {
+test('sidebar expansion reveals candidates without adding them to the graph', async ({ page }) => {
   await page.getByRole('combobox', { name: '输入起始词' }).fill('発00');
   await page.getByRole('button', { name: '开始探索', exact: true }).click();
   const related = page.locator('.related-list .related-word');
+  const nodes = page.getByTestId('word-node');
   await expect(related).toHaveCount(12);
+  await page.getByRole('button', { name: '通过発展开关联词', exact: true }).click();
+  await expect(related).toHaveCount(20);
+  await expect(nodes).toHaveCount(1);
   const expand = page.locator('.expand-more');
-  await expand.click();
-  await expand.click();
-  await expect(related).toHaveCount(16);
-  await expect(related.nth(15)).toContainText('已在网络');
-  await page.getByRole('button', { name: '撤回上一步', exact: true }).click();
-  await expect(related).toHaveCount(12);
-  await page.getByRole('button', { name: '重做', exact: true }).click();
-  await expect(related).toHaveCount(16);
-  await expand.click();
-  await expect(related).toHaveCount(24);
   await expand.click();
   await expect(related).toHaveCount(25);
   await expect(expand).toBeDisabled();
+  await expect(nodes).toHaveCount(1);
+  await related.last().click();
+  await expect(nodes).toHaveCount(2);
 });
 
 test('shows reading-qualified verb pairs in both directions and opens the counterpart', async ({

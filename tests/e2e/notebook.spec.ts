@@ -27,7 +27,8 @@ test('persists notebook words, promotes candidates and removes saved words', asy
     '查看关联词発音',
   );
   await page.getByRole('button', { name: '通过発展开关联词', exact: true }).click();
-  await expect(page.getByRole('button', { name: '选中词汇発音', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: '查看关联词発音', exact: true }).click();
+  await expect(page.locator('[data-testid="word-node"][data-word="発音"]')).toBeVisible();
   await page.getByRole('button', { name: '生词本 · 1', exact: true }).click();
   await notebook.getByRole('button', { name: '删除生词発音' }).click();
   await expect(notebook.getByText('生词本还是空的，添加一个单词开始积累吧。')).toBeVisible();

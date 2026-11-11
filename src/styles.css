@@ -1813,3 +1813,19 @@ button:hover:not(:disabled) {
   align-items: center;
   gap: 6px;
 }
+
+.voicevox-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.voicevox-credit {
+  display: block;
+  color: var(--muted);
+}
+.example-play {
+  display: inline-flex;
+  vertical-align: middle;
+  margin-inline-start: 6px;
+}

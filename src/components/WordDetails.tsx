@@ -1,7 +1,7 @@
 import { ArrowUpRight, BookOpen, Eye, EyeOff, GitBranch, Plus } from 'lucide-react';
 import { useEffect, useId, useState } from 'react';
 import type { Filter, Network } from '../core/types';
-import { BATCH_SIZE, MAX_WORDS } from '../core/network';
+import { BATCH_SIZE } from '../core/network';
 import { entriesFor, referencesFor, Vocabulary } from '../core/vocabulary';
 import { verbPairsFor } from '../core/verbPairs';
 import { EntryMeanings } from './EntryMeanings';
@@ -26,7 +26,6 @@ interface Props {
   dictionaries: DictionaryInfo[];
   network: Network;
   filter: Filter;
-  onExpand: (k: string) => void;
   onSelect: (id: string) => void;
   onNotify: (message: string) => void;
   speech: PronunciationController;
@@ -42,7 +41,6 @@ export function WordDetails({
   dictionaries,
   network,
   filter,
-  onExpand,
   onSelect,
   onNotify,
   speech,
@@ -58,6 +56,7 @@ export function WordDetails({
   const entries = word.entries;
   const scopedEntries = entriesFor(word, filter);
   const [chosenKanji, setChosenKanji] = useState('');
+  const [relatedPage, setRelatedPage] = useState({ key: '', limit: 12 });
   useEffect(() => {
     const latest = network.expansions.at(-1);
     if (latest && word.kanji.includes(latest.kanji)) setChosenKanji(latest.kanji);
@@ -66,8 +65,17 @@ export function WordDetails({
   const related = active
     ? vocab.related(active, filter, word.id, relatedSort === 'notebook' ? notebook : undefined)
     : [];
-  const expansionLimit = network.expansions.find((e) => e.kanji === active)?.limit ?? 0;
-  const relatedLimit = Math.max(12, expansionLimit);
+  const relatedKey = (kanji: string) =>
+    JSON.stringify([word.id, filter.scope, filter.lesson, kanji]);
+  const relatedLimit = active && relatedPage.key === relatedKey(active) ? relatedPage.limit : 12;
+  const showMoreRelated = (kanji: string, total: number) => {
+    const key = relatedKey(kanji);
+    setChosenKanji(kanji);
+    setRelatedPage((page) => ({
+      key,
+      limit: Math.min(total, (page.key === key ? page.limit : 12) + BATCH_SIZE),
+    }));
+  };
   const verbPairs = verbPairsFor(vocab, word, filter);
   const references = textbookReferences(referencesFor(scopedEntries, filter));
   return (
@@ -149,11 +157,8 @@ export function WordDetails({
                   key={k}
                   className={`kanji-choice ${active === k ? 'active' : ''}`}
                   aria-label={`通过${k}展开关联词`}
-                  disabled={!count || network.words.length >= MAX_WORDS}
-                  onClick={() => {
-                    setChosenKanji(k);
-                    onExpand(k);
-                  }}
+                  disabled={!count}
+                  onClick={() => showMoreRelated(k, count)}
                   title={count ? `${count} 个关联词，点击展开` : '当前范围没有其他关联词'}
                 >
                   <span lang="ja">{k}</span>
@@ -199,7 +204,12 @@ export function WordDetails({
                   <span>以下为原形释义；实际含义需结合活用。</span>
                 </div>
               )}
-              <EntryMeanings word={word.text} entry={entry} dictionaries={dictionaries} />
+              <EntryMeanings
+                word={word.text}
+                entry={entry}
+                dictionaries={dictionaries}
+                speech={speech}
+              />
             </div>
           ))
         )}
@@ -287,12 +297,11 @@ export function WordDetails({
             </div>
             <button
               className="expand-more"
-              onClick={() => onExpand(active)}
-              disabled={network.words.length >= MAX_WORDS || expansionLimit >= related.length}
+              onClick={() => showMoreRelated(active, related.length)}
+              disabled={relatedLimit >= related.length}
             >
               <Plus size={14} />
-              {network.expansions.some((e) => e.kanji === active) ? '继续展开' : '展开'}「{active}
-              」的关联词 <small>每次最多 {BATCH_SIZE} 个</small>
+              继续展开「{active}」的关联词 <small>每次最多 {BATCH_SIZE} 个</small>
             </button>
           </>
         ) : (

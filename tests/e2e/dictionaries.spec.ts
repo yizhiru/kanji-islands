@@ -19,6 +19,14 @@ function glossary(word: string, ja: string, zh: string, types = '名') {
         node('def1', [
           node('num', ['①']),
           node('def2', [ja, { tag: 'span', lang: 'zh', content: zh }]),
+          ...(word === '発表' && ja === '発表の日本語説明。'
+            ? [
+                node('exam', [
+                  '結果を発表する。',
+                  { tag: 'span', lang: 'zh', content: '公布结果。' },
+                ]),
+              ]
+            : []),
         ]),
       ]),
     },
@@ -122,6 +130,8 @@ test('imports locally, uses language priorities in both scopes, persists, disabl
   const meanings = page.locator('.meaning-section');
   await expect(meanings).toContainText('导入的中文释义。');
   await expect(meanings).toContainText('発表の日本語説明。');
+  await expect(meanings).toContainText('結果を発表する。');
+  await expect(meanings).not.toContainText('公布结果。');
   await expect(meanings).not.toContainText('内置中文発表');
   await expect(meanings).not.toContainText('错误读音不能出现');
   await expect(meanings).toContainText('builtin English 発表');

@@ -1,10 +1,12 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { X } from 'lucide-react';
 import type { DictionaryController } from '../core/dictionaries/useDictionaries';
+import type { PronunciationController } from '../core/usePronunciation';
 import { MAX_WORDS } from '../core/network';
 
 interface Props {
   dictionaries: DictionaryController;
+  speech: PronunciationController;
   autoCollapse: boolean;
   visibleKanjiCount: number;
   onAutoCollapse: (enabled: boolean) => void;
@@ -14,6 +16,7 @@ interface Props {
 
 export function Settings({
   dictionaries,
+  speech,
   autoCollapse,
   visibleKanjiCount,
   onAutoCollapse,
@@ -88,6 +91,38 @@ export function Settings({
           个汉字
         </label>
         <p>默认保留 2 个。当前词、共用词和必要连接始终保留；关闭自动折叠可显示全部词网。</p>
+      </section>
+      <section className="settings-section" aria-label="日语朗读">
+        <h3>日语朗读</h3>
+        {speech.voicevox === 'desktop-only' ? (
+          <p>网页版使用系统日语语音。桌面版可连接本机 VOICEVOX。</p>
+        ) : (
+          <>
+            <p>下载适合系统的版本，启动 VOICEVOX 后点「检测连接」。普通电脑可先选 CPU 版。</p>
+            <div className="voicevox-actions">
+              <a href="https://voicevox.hiroshiba.jp/" target="_blank" rel="noreferrer">
+                下载 VOICEVOX
+              </a>
+              <a href="https://voicevox.hiroshiba.jp/how_to_use/" target="_blank" rel="noreferrer">
+                安装指南
+              </a>
+              <button
+                className="text-button"
+                disabled={speech.voicevox === 'checking'}
+                onClick={() => void speech.checkVoicevox()}
+              >
+                检测连接
+              </button>
+            </div>
+            <p role="status">
+              {speech.voicevox === 'ready'
+                ? '已连接 · VOICEVOX:四国めたん'
+                : speech.voicevox === 'checking'
+                  ? '正在检测 VOICEVOX…'
+                  : '未连接。已安装的系统日语语音仍可用于朗读。'}
+            </p>
+          </>
+        )}
       </section>
       <section className="settings-section" aria-label="用户词典">
         <h3>用户词典</h3>

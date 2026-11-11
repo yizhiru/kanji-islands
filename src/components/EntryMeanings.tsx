@@ -1,4 +1,6 @@
+import { Volume2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import type { PronunciationController } from '../core/usePronunciation';
 import type { Entry } from '../core/types';
 import { hasLanguage, lookupDictionaries } from '../core/dictionaries/storage';
 import type { DictionaryInfo, DictionaryMatch } from '../core/dictionaries/types';
@@ -6,9 +8,11 @@ import type { DictionaryInfo, DictionaryMatch } from '../core/dictionaries/types
 function ImportedLanguage({
   matches,
   language,
+  speech,
 }: {
   matches: DictionaryMatch[];
   language: 'zh' | 'ja';
+  speech: PronunciationController;
 }) {
   return (
     <div className="imported-definitions">
@@ -19,7 +23,7 @@ function ImportedLanguage({
           </p>
           {match.via && <p className="sense-note">{match.via}；以下保留目标词条的解释和限制。</p>}
           {match.entry.blocks
-            .filter((b) => !!b[language])
+            .filter((b) => b[language] && (language === 'ja' || b.kind !== 'example'))
             .map((block, i, blocks) => (
               <div className={`imported-block imported-${block.kind}`} key={i}>
                 {block.context && (i === 0 || block.context !== blocks[i - 1].context) && (
@@ -30,6 +34,17 @@ function ImportedLanguage({
                 <p>
                   {block.kind === 'definition' && block.label && <b>{block.label} </b>}
                   {block[language]}
+                  {language === 'ja' && block.kind === 'example' && (
+                    <button
+                      className="text-button example-play"
+                      aria-label={`朗读例句 ${block.ja}`}
+                      title={speech.canPlay ? '朗读例句' : '请在设置中查看朗读方式'}
+                      disabled={!speech.canPlay}
+                      onClick={() => speech.play(block.ja)}
+                    >
+                      <Volume2 size={14} aria-hidden="true" />
+                    </button>
+                  )}
                 </p>
               </div>
             ))}
@@ -43,10 +58,12 @@ export function EntryMeanings({
   word,
   entry,
   dictionaries,
+  speech,
 }: {
   word: string;
   entry: Entry;
   dictionaries: DictionaryInfo[];
+  speech: PronunciationController;
 }) {
   const queryKey = `${entry.id}:${word}:${dictionaries.map((d) => `${d.id}:${d.enabled}`).join(',')}`;
   const [state, setState] = useState<{ key: string; matches: DictionaryMatch[]; error?: string }>({
@@ -94,7 +111,7 @@ export function EntryMeanings({
           </span>
         </summary>
         {chinese.length ? (
-          <ImportedLanguage matches={chinese} language="zh" />
+          <ImportedLanguage matches={chinese} language="zh" speech={speech} />
         ) : (
           <>
             <ol className="sense-list">
@@ -120,7 +137,7 @@ export function EntryMeanings({
               {japanese[0].dictionary.title}
             </span>
           </summary>
-          <ImportedLanguage matches={japanese} language="ja" />
+          <ImportedLanguage matches={japanese} language="ja" speech={speech} />
         </details>
       )}
       <details className="meaning-language" lang="en" open>

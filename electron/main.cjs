@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, Menu, protocol, net, clipboard, shell } = require('electron');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
+const voicevox = require('./voicevox.cjs');
 
 protocol.registerSchemesAsPrivileged([
   { scheme: 'islands', privileges: { standard: true, secure: true, supportFetchAPI: true } },
@@ -28,14 +29,16 @@ function createWindow() {
     },
   });
   mainWindow.once('ready-to-show', () => mainWindow.show());
-  const dictionaryHelpURLs = new Set([
+  const helpURLs = new Set([
     'https://yomidevs.github.io/wiktionary-to-yomitan/download/',
     'https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use',
     'https://jitendex.org/pages/downloads.html',
     'https://jitendex.org/pages/legal.html',
+    'https://voicevox.hiroshiba.jp/',
+    'https://voicevox.hiroshiba.jp/how_to_use/',
   ]);
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    if (dictionaryHelpURLs.has(url)) shell.openExternal(url).catch(() => {});
+    if (helpURLs.has(url)) shell.openExternal(url).catch(() => {});
     return { action: 'deny' };
   });
   mainWindow.webContents.on('will-navigate', (event, url) => {
@@ -89,6 +92,14 @@ app.whenReady().then(() => {
     if (event.sender !== mainWindow?.webContents) throw new Error('Unknown sender');
     if (typeof text !== 'string' || !text || text.length > 256) throw new Error('Invalid text');
     clipboard.writeText(text);
+  });
+  ipcMain.handle('voicevox:status', (event) => {
+    if (event.sender !== mainWindow?.webContents) throw new Error('Unknown sender');
+    return voicevox.isAvailable();
+  });
+  ipcMain.handle('voicevox:synthesize', (event, text) => {
+    if (event.sender !== mainWindow?.webContents) throw new Error('Unknown sender');
+    return voicevox.synthesize(text);
   });
   ipcMain.handle('dictionary:open', async (event, word, reading) => {
     if (event.sender !== mainWindow?.webContents) throw new Error('Unknown sender');

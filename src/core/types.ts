@@ -81,6 +81,8 @@ export interface Network {
   expansions: Expansion[];
 }
 export interface AppBridge {
+  voicevoxStatus: () => Promise<boolean>;
+  synthesizeVoicevox: (text: string) => Promise<ArrayBuffer>;
   openSource: (level: Level, page: number) => Promise<void>;
   copyText: (text: string) => Promise<void>;
   openDictionary: (word: string, reading: string) => Promise<void>;

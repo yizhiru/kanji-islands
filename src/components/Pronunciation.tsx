@@ -14,7 +14,7 @@ export function Pronunciation({
   onNotify: (message: string) => void;
   speech: PronunciationController;
 }) {
-  const { voice, speaking, play } = speech;
+  const { canPlay, voicevox, speaking, play } = speech;
   const helpID = useId();
   const help = useRef<HTMLDivElement>(null);
   const pinned = useRef(false);
@@ -37,13 +37,9 @@ export function Pronunciation({
           <button
             key={reading}
             className="text-button"
-            disabled={!voice}
+            disabled={!canPlay}
             aria-label={`朗读${reading}`}
-            title={
-              voice
-                ? '使用本机日语语音朗读假名'
-                : '请先在系统设置中安装日语语音，或打开词典查看读音'
-            }
+            title={canPlay ? '朗读假名' : '请在设置中查看朗读方式'}
             onClick={() => play(reading)}
           >
             <Volume2 size={14} /> {speaking === reading ? '正在朗读' : '朗读'}
@@ -104,15 +100,23 @@ export function Pronunciation({
             <Info size={15} />
           </button>
           <p id={helpID} className="pronunciation-note" role="tooltip" hidden={!helpOpen}>
-            {voice
-              ? '系统合成语音，仅供读音参考。'
-              : readings.length
-                ? '本机未检测到日语语音，可安装后朗读。'
-                : ''}
+            {voicevox === 'ready'
+              ? 'VOICEVOX 合成语音，仅供读音参考。'
+              : canPlay
+                ? '系统合成语音，仅供读音参考。'
+                : readings.length
+                  ? '本机未检测到日语语音，可安装后朗读。'
+                  : ''}
             词典需联网，真人音频以收录为准。
           </p>
         </div>
       </div>
+      {voicevox === 'ready' && <small className="voicevox-credit">VOICEVOX:四国めたん</small>}
+      {voicevox === 'unavailable' && !canPlay && (
+        <a href="https://voicevox.hiroshiba.jp/" target="_blank" rel="noreferrer">
+          下载 VOICEVOX
+        </a>
+      )}
     </div>
   );
 }

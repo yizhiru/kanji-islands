@@ -42,19 +42,22 @@ const term = (
 ) => [word, reading, '', '', 0, glossary(word, ja, zh, types), seq, ''];
 const pack = (rows: unknown[], name = title) =>
   Buffer.from(
-    zipSync({
-      'index.json': strToU8(
-        JSON.stringify({
-          title: name,
-          revision: 'test-1',
-          format: 3,
-          sequenced: true,
-          sourceLanguage: 'ja',
-          targetLanguage: 'zh',
-        }),
-      ),
-      'term_bank_1.json': strToU8(JSON.stringify(rows)),
-    }),
+    zipSync(
+      {
+        'index.json': strToU8(
+          JSON.stringify({
+            title: name,
+            revision: 'test-1',
+            format: 3,
+            sequenced: true,
+            sourceLanguage: 'ja',
+            targetLanguage: 'zh',
+          }),
+        ),
+        'term_bank_1.json': strToU8(JSON.stringify(rows)),
+      },
+      { mtime: new Date(2020, 0, 1) },
+    ),
   );
 const standardPack = () =>
   pack([

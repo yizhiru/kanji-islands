@@ -17,7 +17,7 @@ function glossary(word: string, ja: string, zh: string, types = '名') {
       content: node('mjrhsjcd-entry', [
         node('head', [word, node('type', [types])]),
         node('def1', [
-          node('num', ['①']),
+          node('num', [word === '発展' ? '◯ ' : '①']),
           node('def2', [ja, { tag: 'span', lang: 'zh', content: zh }]),
           ...(word === '発表' && ja === '発表の日本語説明。'
             ? [
@@ -28,6 +28,27 @@ function glossary(word: string, ja: string, zh: string, types = '名') {
               ]
             : []),
         ]),
+        ...(word === '発表' && ja === '発表の日本語説明。'
+          ? [
+              node('def1', [
+                node('num', ['②']),
+                node('def2', [
+                  '第二の説明。',
+                  { tag: 'span', lang: 'zh', content: '第二个释义。' },
+                ]),
+                {
+                  tag: 'span',
+                  content: [
+                    '用法说明',
+                    node('exam', [
+                      '第二の例文。',
+                      { tag: 'span', lang: 'zh', content: '第二个例句。' },
+                    ]),
+                  ],
+                },
+              ]),
+            ]
+          : []),
       ]),
     },
   ];
@@ -134,15 +155,29 @@ test('imports locally, uses language priorities in both scopes, persists, disabl
   await expect(meanings).toContainText('导入的中文释义。');
   await expect(meanings).toContainText('発表の日本語説明。');
   await expect(meanings).toContainText('結果を発表する。');
-  await expect(meanings).not.toContainText('公布结果。');
+  const senses = meanings.locator('.imported-sense');
+  await expect(senses).toHaveCount(2);
+  await expect(senses.locator('.imported-sense-title')).toHaveText(['释义 1', '释义 2']);
+  await expect(meanings).not.toContainText(/①|②/);
+  await expect(senses.nth(0).locator('.imported-definition > p')).toHaveText([
+    '発表の日本語説明。',
+    '导入的中文释义。',
+  ]);
+  await expect(senses.nth(0).locator('.imported-example > p')).toHaveText([
+    '結果を発表する。',
+    '公布结果。',
+  ]);
+  await expect(senses.nth(1).locator('.imported-example > p')).toHaveText([
+    '第二の例文。',
+    '第二个例句。',
+  ]);
   await expect(meanings).not.toContainText('内置中文発表');
   await expect(meanings).not.toContainText('错误读音不能出现');
   await expect(meanings).toContainText('builtin English 発表');
-  await expect(meanings.locator('h4')).toHaveText(['中文释义', '日文释义', '英文释义']);
+  await expect(meanings.locator('h4')).toHaveText(['词典释义', '英文释义']);
   await expect(meanings.locator('.definition-source').first()).toContainText(title);
   for (const [language, text] of [
-    ['中文释义', '导入的中文释义。'],
-    ['日文释义', '発表の日本語説明。'],
+    ['词典释义', '导入的中文释义。'],
     ['英文释义', 'builtin English 発表'],
   ]) {
     const summary = meanings.locator('summary').filter({ hasText: language });
@@ -165,11 +200,15 @@ test('imports locally, uses language priorities in both scopes, persists, disabl
   await expect(meanings).toContainText('発音の日本語説明。');
   await select(page, '発展');
   await expect(meanings).toContainText('仅有中文释义。');
+  await expect(meanings.locator('.imported-sense-title')).toHaveCount(0);
+  await expect(meanings).not.toContainText('◯');
   await expect(meanings.getByRole('heading', { name: '日文释义' })).toHaveCount(0);
   await select(page, '研究する');
   await expect(meanings).toContainText('研究的中文说明。');
   await expect(meanings).toContainText('サ变词「研究」');
   await page.reload();
+  await expect(meanings).toContainText('研究的中文说明。');
+  await select(page, '発表');
   await expect(meanings).toContainText('导入的中文释义。');
   await settings(page);
   await page.getByRole('checkbox', { name: `启用词典${title}` }).uncheck();
@@ -272,10 +311,18 @@ test('chooses sources per language and follows only unambiguous explicit referen
   const meanings = page.locator('.meaning-section');
   await expect(meanings).toContainText('第一本的中文');
   await expect(meanings).toContainText('第二本的日文');
-  await expect(meanings.locator('[lang="zh-CN"] .definition-source')).toContainText(title);
-  await expect(meanings.locator('.meaning-language[lang="ja"] .definition-source')).toContainText(
-    '第二本词典',
-  );
+  await expect(
+    meanings
+      .locator('.meaning-language')
+      .filter({ hasText: '第一本的中文' })
+      .locator('.definition-source'),
+  ).toHaveText(title);
+  await expect(
+    meanings
+      .locator('.meaning-language')
+      .filter({ hasText: '第二本的日文' })
+      .locator('.definition-source'),
+  ).toHaveText('第二本词典');
   await select(page, '土曜日');
   await expect(meanings).toContainText('参照「土曜」');
   await expect(meanings).toContainText('星期六。');

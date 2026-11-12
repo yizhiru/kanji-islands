@@ -1,3 +1,4 @@
+import { isMeikyo, MeikyoMeanings } from './MeikyoMeanings';
 import { Volume2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { PronunciationController } from '../core/usePronunciation';
@@ -96,6 +97,12 @@ export function EntryMeanings({
   };
   const chinese = choose('zh'),
     japanese = choose('ja');
+  const structured = [chinese, japanese].filter((selected) =>
+    selected.some((match) => isMeikyo(match.entry)),
+  );
+  const structuredIds = new Set(structured.map((selected) => selected[0].dictionary.id));
+  const hasStructured = (selected: DictionaryMatch[]) =>
+    selected.length > 0 && structuredIds.has(selected[0].dictionary.id);
   return (
     <>
       {state.key === queryKey && state.error && (
@@ -103,33 +110,45 @@ export function EntryMeanings({
           {state.error}
         </p>
       )}
-      <details className="meaning-language" lang="zh-CN" open>
-        <summary>
-          <h4>中文释义</h4>
-          <span className="definition-source" lang="zh-CN">
-            {chinese.length ? chinese[0].dictionary.title : 'Jitendex 中文版'}
-          </span>
-        </summary>
-        {chinese.length ? (
-          <ImportedLanguage matches={chinese} language="zh" speech={speech} />
-        ) : (
-          <>
-            <ol className="sense-list">
-              {entry.senses.map((sense) => (
-                <li key={sense.id}>
-                  <div className="chinese-gloss">
-                    {sense.zh.join('；') || '暂无可靠对应的中文释义，请参阅英文。'}
-                  </div>
-                  {sense.notes_zh.length > 0 && (
-                    <div className="sense-note">{sense.notes_zh.join('；')}</div>
-                  )}
-                </li>
-              ))}
-            </ol>
-          </>
-        )}
-      </details>
-      {japanese.length > 0 && (
+      {[...structuredIds].map((id) => (
+        <MeikyoMeanings
+          key={id}
+          matches={matches.filter(
+            (match) =>
+              match.dictionary.id === id && (chinese.includes(match) || japanese.includes(match)),
+          )}
+          speech={speech}
+        />
+      ))}
+      {!hasStructured(chinese) && (
+        <details className="meaning-language" lang="zh-CN" open>
+          <summary>
+            <h4>中文释义</h4>
+            <span className="definition-source" lang="zh-CN">
+              {chinese.length ? chinese[0].dictionary.title : 'Jitendex 中文版'}
+            </span>
+          </summary>
+          {chinese.length ? (
+            <ImportedLanguage matches={chinese} language="zh" speech={speech} />
+          ) : (
+            <>
+              <ol className="sense-list">
+                {entry.senses.map((sense) => (
+                  <li key={sense.id}>
+                    <div className="chinese-gloss">
+                      {sense.zh.join('；') || '暂无可靠对应的中文释义，请参阅英文。'}
+                    </div>
+                    {sense.notes_zh.length > 0 && (
+                      <div className="sense-note">{sense.notes_zh.join('；')}</div>
+                    )}
+                  </li>
+                ))}
+              </ol>
+            </>
+          )}
+        </details>
+      )}
+      {japanese.length > 0 && !hasStructured(japanese) && (
         <details className="meaning-language" lang="ja" open>
           <summary>
             <h4>日文释义</h4>

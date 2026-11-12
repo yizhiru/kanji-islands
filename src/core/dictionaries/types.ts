@@ -4,6 +4,7 @@ export interface DictionaryBlock {
   en: string;
   kind: 'definition' | 'example' | 'note';
   context: string;
+  sense?: number;
   label: string;
 }
 export interface DictionaryEntry {
@@ -11,6 +12,7 @@ export interface DictionaryEntry {
   heading: string;
   pos: string[];
   blocks: DictionaryBlock[];
+  format?: 'meikyo';
 }
 export interface DictionaryTerm {
   dictionaryId: string;

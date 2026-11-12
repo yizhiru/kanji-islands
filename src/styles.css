@@ -1829,3 +1829,46 @@ button:hover:not(:disabled) {
   vertical-align: middle;
   margin-inline-start: 6px;
 }
+
+.imported-senses {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.imported-sense {
+  padding: 12px 0;
+}
+.imported-sense + .imported-sense {
+  border-top: 1px solid #dce3d3;
+}
+.imported-translation {
+  color: #465740;
+  font-size: 13px;
+}
+
+.imported-sense-title,
+.imported-example-title,
+.imported-writing {
+  color: #49613d;
+  font-size: 12px;
+  font-weight: 650;
+}
+.imported-sense-title {
+  margin: 0 0 8px;
+}
+.imported-sense .imported-original {
+  color: #243023;
+  font-size: 15px;
+  font-weight: 500;
+}
+.imported-sense .imported-example {
+  background: #f4f6ef;
+  padding: 6px 10px;
+  margin-left: 8px;
+}
+.imported-sense .imported-example .imported-original {
+  font-size: 13px;
+}
+.imported-sense .imported-example .imported-translation {
+  font-size: 12px;
+}

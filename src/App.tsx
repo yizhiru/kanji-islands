@@ -28,6 +28,7 @@ import {
   removeExpansion,
   startNetwork,
 } from './core/network';
+import { HISTORY_LIMIT, loadExploration, saveExploration } from './core/explorationHistory';
 import { Notebook } from './components/Notebook';
 import { useNotebook } from './core/notebook';
 import { usePronunciation } from './core/usePronunciation';
@@ -45,11 +46,6 @@ import { WordDetails } from './components/WordDetails';
 import { useDictionaries } from './core/dictionaries/useDictionaries';
 import { Settings } from './components/Settings';
 
-interface Timeline {
-  present: Network;
-  past: Network[];
-  future: Network[];
-}
 const scopeNames: Record<Scope, string> = {
   all: '标准词库',
   textbook: '标日',
@@ -101,10 +97,7 @@ function About({ vocab, onClose }: { vocab: Vocabulary; onClose: () => void }) {
         <b>日文：</b>来自用户导入的词典。<b>英文：</b>Jitendex / JMdict。
       </p>
       <p>支持在设置中导入本地 Yomitan 词典；不内置或自动下载明镜。每种语言的释义均标注实际来源。</p>
-      <p>
-        词网不会保存学习记录，刷新后清空；生词本和用户词典保存在本机。朗读支持本机 VOICEVOX
-        或系统日语语音。
-      </p>
+      <p>上次的词网、生词本和用户词典保存在本机。朗读支持本机 VOICEVOX 或系统日语语音。</p>
       <p>
         内置词典派生数据：CC BY-SA 4.0。署名：greyindex、Stephen Kraus / Jitendex、EDRDG /
         JMdict。应用代码：MIT。用户词典遵循各自许可。
@@ -129,12 +122,12 @@ function About({ vocab, onClose }: { vocab: Vocabulary; onClose: () => void }) {
 }
 
 function Explorer({ vocab }: { vocab: Vocabulary }) {
-  const [filter, setFilter] = useState<Filter>({ scope: 'all', lesson: '' });
-  const [timeline, setTimeline] = useState<Timeline>(() => ({
-    present: startNetwork(wordId('発表')),
-    past: [],
-    future: [],
-  }));
+  const [initial] = useState(loadExploration);
+  const [filter, setFilter] = useState(initial.filter);
+  const [timeline, setTimeline] = useState(initial.timeline);
+  useEffect(() => {
+    saveExploration({ filter, timeline });
+  }, [filter, timeline]);
   const network = timeline.present;
   const [query, setQuery] = useState('');
   const [focused, setFocused] = useState(false);
@@ -160,7 +153,11 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
     setTimeline((current) =>
       JSON.stringify(next) === JSON.stringify(current.present)
         ? current
-        : { present: next, past: [...current.past, current.present].slice(-60), future: [] },
+        : {
+            present: next,
+            past: [...current.past, current.present].slice(-HISTORY_LIMIT),
+            future: [],
+          },
     );
   const notify = useCallback((value: string) => setMessage(value), []);
   const notebook = useNotebook(notify);

@@ -60,7 +60,8 @@ export function parseGlossary(
   const defaultLanguage = meikyo || nodes.some((n) => n.lang === 'zh') ? 'ja' : targetLanguage;
   const blocks: DictionaryBlock[] = [];
   let context = '',
-    label = '';
+    label = '',
+    sense = 0;
   const add = (n: Node, type: DictionaryBlock['kind']) => {
     const pair = split(n, defaultLanguage);
     if (pair.ja || pair.zh || pair.en) {
@@ -70,34 +71,45 @@ export function parseGlossary(
         ...pair,
         kind: type,
         context,
+        ...(meikyo ? { sense } : {}),
         label: [label, writing].filter(Boolean).join(' '),
       });
     }
   };
   if (meikyo) {
-    for (const n of nodes) {
-      if (kind(n) === 'def0') {
-        context = text(n);
-        label = '';
-      }
-      if (kind(n) === 'def1') {
-        const children = Array.isArray(n.content) ? n.content : [];
-        const num = children.find((c) => record(c) && kind(c) === 'num');
-        label = text(num);
-      }
-      if (['def2', 'def2_first'].includes(kind(n))) add(n, 'definition');
-      if (kind(n) === 'exam') add(n, 'example');
-      if (kind(n) === 'def1') {
-        const children = Array.isArray(n.content) ? n.content : [];
-        // Keep usage, spelling, supplemental and cross-reference notes outside the main definition.
-        const notes = children.filter(
-          (c) =>
-            !(
-              record(c) &&
-              (['num', 'def2', 'def2_first', 'exam'].includes(kind(c)) || c.tag === 'br')
-            ),
-        );
-        if (notes.length) add(notes, 'note');
+    for (const n of nodes.filter((node) => kind(node) === 'mjrhsjcd-entry')) {
+      context = '';
+      label = '';
+      for (const child of Array.isArray(n.content) ? n.content : [n.content]) {
+        if (!record(child)) continue;
+        if (kind(child) === 'def0') context = text(child);
+        if (kind(child) !== 'def1') continue;
+        sense++;
+        const parts = Array.isArray(child.content) ? child.content : [child.content];
+        label = text(parts.find((part) => record(part) && kind(part) === 'num')).trim();
+        let notes: Node[] = [];
+        const addPart = (part: Node) => {
+          const type = record(part) ? kind(part) : '';
+          if (type === 'num' || (record(part) && part.tag === 'br')) return;
+          if (type === 'def2' || type === 'def2_first' || type === 'exam') {
+            add(notes, 'note');
+            notes = [];
+            add(part as Node, type === 'exam' ? 'example' : 'definition');
+          } else if (
+            record(part) &&
+            part.lang === undefined &&
+            [...walk(content(part))].some((node) =>
+              ['def2', 'def2_first', 'exam'].includes(kind(node)),
+            )
+          ) {
+            const nested = content(part);
+            for (const item of Array.isArray(nested) ? nested : [nested]) addPart(item);
+          } else {
+            notes.push(part);
+          }
+        };
+        for (const part of parts) addPart(part as Node);
+        add(notes, 'note');
       }
     }
   } else {
@@ -111,6 +123,7 @@ export function parseGlossary(
       .join(' / '),
     pos: [...new Set(nodes.filter((n) => kind(n) === 'type').map(text))],
     blocks,
+    ...(meikyo ? { format: 'meikyo' as const } : {}),
   };
 }
 

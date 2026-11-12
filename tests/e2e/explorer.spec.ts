@@ -84,7 +84,7 @@ test('searches real words, accepts custom seeds, and changes scope and lesson', 
   await expect(page.locator('[data-testid="word-node"][data-word="発音"]')).toBeVisible();
 });
 
-test('does not persist exploration or write learning records and works without external requests', async ({
+test('restores the last exploration and undo history without external requests', async ({
   page,
 }) => {
   const external: string[] = [];
@@ -95,19 +95,29 @@ test('does not persist exploration or write learning records and works without e
     } else await route.continue();
   });
   await page.goto('/');
+  await expect(page.getByRole('heading', { name: '発表', exact: true })).toBeVisible();
+  const textbook = page.getByRole('button', { name: '标日', exact: true });
+  await textbook.click();
   await page.getByRole('button', { name: '展开汉字発', exact: true }).click();
   await expect.poll(() => page.getByTestId('word-node').count()).toBeGreaterThan(1);
-  expect(await page.evaluate(() => Object.keys(localStorage))).toEqual([]);
-  expect(await page.evaluate(() => Object.keys(sessionStorage))).toEqual([]);
+  const expandedCount = await page.getByTestId('word-node').count();
+  await page.getByRole('button', { name: '选中词汇発音', exact: true }).click();
   await page.reload();
-  await expect(page.getByTestId('word-node')).toHaveCount(1);
+  await expect(textbook).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('heading', { name: '発音', exact: true })).toBeVisible();
+  await expect(page.getByTestId('word-node')).toHaveCount(expandedCount);
+  await page.getByRole('button', { name: '撤回上一步', exact: true }).click();
+  await expect(page.getByRole('heading', { name: '発表', exact: true })).toBeVisible();
+  await page.reload();
+  await page.getByRole('button', { name: '重做', exact: true }).click();
+  await expect(page.getByRole('heading', { name: '発音', exact: true })).toBeVisible();
   expect(external).toEqual([]);
 });
 
 test('shows dictionary credits and labels inflected meanings', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: '词库与来源', exact: true }).click();
-  await expect(page.getByRole('dialog')).toContainText('不会保存学习记录');
+  await expect(page.getByRole('dialog')).toContainText('上次的词网');
   await page.getByRole('button', { name: '查看完整署名与许可' }).click();
   await expect(page.locator('.license-text')).toContainText('CC BY-SA 4.0');
   await page.getByRole('button', { name: '关闭词库说明' }).click();

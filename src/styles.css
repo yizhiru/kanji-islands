@@ -1872,3 +1872,20 @@ button:hover:not(:disabled) {
 .imported-sense .imported-example .imported-translation {
   font-size: 12px;
 }
+
+.notebook-backup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  margin: 8px 0;
+}
+.notebook-backup-actions button {
+  min-height: 36px;
+  color: #465740;
+}
+.notebook-backup-actions button:disabled {
+  opacity: 0.55;
+}
+.notebook-backup-feedback {
+  overflow-wrap: anywhere;
+}

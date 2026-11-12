@@ -559,6 +559,7 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
           vocab={vocab}
           words={notebook.words}
           onRemove={notebook.toggle}
+          onImport={notebook.merge}
           onSelect={(id) => {
             start(vocab.get(id).text);
             setNotebookOpen(false);

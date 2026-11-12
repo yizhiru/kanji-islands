@@ -1,21 +1,53 @@
 import { useEffect, useRef, useState } from 'react';
-import { X } from 'lucide-react';
+import { Download, Upload, X } from 'lucide-react';
+import { MAX_BACKUP_BYTES, parseNotebookBackup, serializeNotebook } from '../core/notebook';
 import type { Vocabulary } from '../core/vocabulary';
 
 export function Notebook({
   vocab,
   words,
   onRemove,
+  onImport,
   onSelect,
   onClose,
 }: {
   vocab: Vocabulary;
   words: ReadonlySet<string>;
   onRemove: (id: string) => void;
+  onImport: (ids: string[]) => number;
   onSelect: (id: string) => void;
   onClose: () => void;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
+  const fileInput = useRef<HTMLInputElement>(null);
+  const [importing, setImporting] = useState(false);
+  const [feedback, setFeedback] = useState<{ text: string; error?: boolean }>();
+  const importBackup = async (file: File) => {
+    setImporting(true);
+    setFeedback(undefined);
+    try {
+      if (file.size > MAX_BACKUP_BYTES) throw new Error('备份文件超过 10 MB，请检查所选文件。');
+      const added = onImport(parseNotebookBackup(await file.text()));
+      setFeedback({ text: added ? `已导入 ${added} 个生词。` : '没有新增生词。' });
+    } catch (error) {
+      setFeedback({
+        text: error instanceof Error ? error.message : '无法导入备份，请重试。',
+        error: true,
+      });
+    } finally {
+      setImporting(false);
+    }
+  };
+  const exportBackup = () => {
+    const url = URL.createObjectURL(
+      new Blob([serializeNotebook(words)], { type: 'application/json' }),
+    );
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'kanji-islands-notebook.json';
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
   const [query, setQuery] = useState('');
   useEffect(() => {
     dialog.current?.showModal();
@@ -55,6 +87,36 @@ export function Notebook({
         value={query}
         onChange={(event) => setQuery(event.target.value)}
       />
+      <div className="notebook-backup-actions">
+        <input
+          ref={fileInput}
+          type="file"
+          accept=".json,application/json"
+          aria-label="选择生词备份文件"
+          hidden
+          onChange={(event) => {
+            const file = event.currentTarget.files?.[0];
+            event.currentTarget.value = '';
+            if (file) void importBackup(file);
+          }}
+        />
+        <button
+          type="button"
+          className="text-button"
+          disabled={importing}
+          onClick={() => fileInput.current?.click()}
+        >
+          <Upload size={15} aria-hidden="true" /> {importing ? '正在导入…' : '导入生词'}
+        </button>
+        <button type="button" className="text-button" disabled={!words.size} onClick={exportBackup}>
+          <Download size={15} aria-hidden="true" /> 导出生词
+        </button>
+      </div>
+      {feedback && (
+        <p className="notebook-backup-feedback" role={feedback.error ? 'alert' : 'status'}>
+          {feedback.text}
+        </p>
+      )}
       {!matches.length && (
         <p>{words.size ? '没有匹配的生词。' : '生词本还是空的，添加一个单词开始积累吧。'}</p>
       )}

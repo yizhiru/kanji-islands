@@ -117,7 +117,6 @@ try {
     (count) => document.querySelectorAll('[data-testid="word-node"]').length === count,
     fullCount,
   );
-  assert.deepEqual(await page.evaluate(() => Object.keys(localStorage)), []);
   const pdfWindow = desktop.waitForEvent('window');
   await page.evaluate(() => window.islands.openSource('初级', 1));
   const viewer = await pdfWindow;
@@ -150,8 +149,11 @@ try {
     expandedCount,
   );
   await page.reload();
-  await page.getByTestId('word-node').waitFor();
-  assert.equal(await page.getByTestId('word-node').count(), 1);
+  await page.waitForFunction(
+    (count) => document.querySelectorAll('[data-testid="word-node"]').length === count,
+    expandedCount,
+  );
+  assert.equal(await page.getByRole('heading', { name: '発音', exact: true }).count(), 1);
   assert.deepEqual(errors, []);
   assert(!requests.some((url) => /^https?:/.test(url)));
   const versions = await desktop.evaluate(({ app }) => ({
@@ -175,7 +177,7 @@ try {
           'reading and automatic speech are enabled by default in one toolbar group',
           'automatic folding is configurable in settings and defaults to two recent characters',
           'local PDF',
-          'no persisted exploration',
+          'restore expanded exploration after reload',
           'native clipboard from cards and details',
           'allowlisted dictionary opener',
           'remove kanji branch and detached descendants, then undo',

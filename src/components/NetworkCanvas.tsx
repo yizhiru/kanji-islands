@@ -164,11 +164,13 @@ export function NetworkCanvas({
         e.currentTarget.setPointerCapture(e.pointerId);
       }}
       onPointerMove={(e) => {
-        if (drag.current)
+        const currentDrag = drag.current;
+        const { clientX, clientY } = e;
+        if (currentDrag)
           setCamera((c) => ({
             ...c,
-            x: drag.current!.initialX + e.clientX - drag.current!.x,
-            y: drag.current!.initialY + e.clientY - drag.current!.y,
+            x: currentDrag.initialX + clientX - currentDrag.x,
+            y: currentDrag.initialY + clientY - currentDrag.y,
           }));
       }}
       onPointerUp={() => {

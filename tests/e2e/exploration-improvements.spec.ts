@@ -74,6 +74,32 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
+test('keeps the network visible when a drag ends before its position update', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await page.goto('/');
+  const canvas = page.getByTestId('network-canvas');
+  await expect(page.getByTestId('word-node')).toHaveCount(1);
+  const before = await canvas.locator('svg > g').getAttribute('transform');
+  await canvas.evaluate((element) => {
+    // Synthetic pointer events cannot acquire native capture; dispatch them in
+    // one task to exercise a queued position update after pointerup.
+    element.setPointerCapture = () => {};
+    for (const [type, x, y] of [
+      ['pointerdown', 300, 300],
+      ['pointermove', 350, 350],
+      ['pointerup', 350, 350],
+    ] as const) {
+      element.dispatchEvent(
+        new PointerEvent(type, { bubbles: true, pointerId: 1, clientX: x, clientY: y }),
+      );
+    }
+  });
+  await expect(canvas.locator('svg > g')).not.toHaveAttribute('transform', before!);
+  await expect(page.getByTestId('word-node')).toHaveCount(1);
+  expect(errors).toEqual([]);
+});
+
 test('selects card borders and blank space, reads automatically, and preserves copy and expansion actions', async ({
   page,
   context,

@@ -24,6 +24,30 @@ try {
   page.on('request', (request) => requests.push(request.url()));
   await page.getByTestId('word-node').waitFor();
   assert.equal(await page.title(), '汉字岛');
+  // Dispatch a complete drag in one task so React processes the position
+  // update after pointerup has cleared the active drag.
+  const canvas = page.getByTestId('network-canvas');
+  const transform = await canvas.locator('svg > g').getAttribute('transform');
+  await canvas.evaluate((element) => {
+    element.setPointerCapture = () => {};
+    for (const [type, x, y] of [
+      ['pointerdown', 300, 300],
+      ['pointermove', 350, 350],
+      ['pointerup', 350, 350],
+    ]) {
+      element.dispatchEvent(
+        new PointerEvent(type, { bubbles: true, pointerId: 1, clientX: x, clientY: y }),
+      );
+    }
+  });
+  await page.waitForFunction(
+    (before) =>
+      document
+        .querySelector('[data-testid="network-canvas"] svg > g')
+        ?.getAttribute('transform') !== before &&
+      !!document.querySelector('[data-testid="word-node"]'),
+    transform,
+  );
   assert.equal(await page.getByLabel('平假名读音', { exact: true }).textContent(), 'はっぴょう');
   assert.equal(
     await page.getByRole('button', { name: '显示读音', exact: true }).getAttribute('aria-pressed'),
@@ -262,6 +286,7 @@ try {
           'allowlisted dictionary opener',
           'remove kanji branch and detached descendants, then undo',
           '160-word network expansion, limit, folding, unfolding and reload',
+          'rapid drag and release keeps the network visible',
         ],
       },
       null,

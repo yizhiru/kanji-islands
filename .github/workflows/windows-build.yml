@@ -82,7 +82,7 @@ jobs:
         run: node scripts/verify-packaged-resources.mjs release/win-unpacked/resources/app.asar
 
       - name: Launch packaged Windows app
-        timeout-minutes: 5
+        timeout-minutes: 10
         env:
           KANJI_PACKAGED_EXECUTABLE: ${{ github.workspace }}\release\win-unpacked\汉字岛.exe
         run: npm run test:desktop

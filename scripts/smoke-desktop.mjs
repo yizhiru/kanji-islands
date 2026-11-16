@@ -13,9 +13,10 @@ const options = process.env.KANJI_PACKAGED_EXECUTABLE
   ? { executablePath: path.resolve(process.env.KANJI_PACKAGED_EXECUTABLE), args: [profileArg], env }
   : { args: ['.', profileArg], env };
 let desktop;
+let page;
 try {
   desktop = await electron.launch(options);
-  const page = await desktop.firstWindow();
+  page = await desktop.firstWindow();
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
   const requests = [];
@@ -154,6 +155,85 @@ try {
     expandedCount,
   );
   assert.equal(await page.getByRole('heading', { name: '発音', exact: true }).count(), 1);
+
+  // Add another character branch from a visible word, then grow the real
+  // network to the application limit with folding disabled.
+  await page.getByRole('button', { name: '设置', exact: true }).click();
+  await page.getByRole('switch', { name: '自动折叠', exact: true }).uncheck();
+  await page.getByRole('button', { name: '关闭设置', exact: true }).click();
+  const branch = await page.getByTestId('word-node').evaluateAll((nodes) => {
+    for (const node of nodes) {
+      const word = node.getAttribute('data-word');
+      const kanji = [...word].find((c) => /\p{Unified_Ideograph}/u.test(c) && !'発音'.includes(c));
+      if (kanji && word !== '発表') return { word, kanji };
+    }
+    return null;
+  });
+  assert(branch, 'expected a visible word with another character');
+  await page.getByRole('button', { name: `选中词汇${branch.word}`, exact: true }).click();
+  await page.getByRole('button', { name: `展开汉字${branch.kanji}`, exact: true }).click();
+  await page
+    .getByRole('button', { name: `继续展开共用汉字${branch.kanji}`, exact: true })
+    .waitFor();
+  const stat = page.getByTestId('network-stat');
+  const wordCount = async () => Number((await stat.textContent()).match(/(\d+) 个词/)[1]);
+  let count = await wordCount();
+  for (let batch = 0; count < 160 && batch < 25; batch++) {
+    const previous = count;
+    await page.getByRole('button', { name: '继续展开共用汉字発', exact: true }).click();
+    await page.waitForFunction(
+      (before) => {
+        const text = document.querySelector('[data-testid="network-stat"]')?.textContent ?? '';
+        return Number(text.match(/(\d+) 个词/)?.[1]) > before;
+      },
+      previous,
+      { timeout: 30000 },
+    );
+    count = await wordCount();
+  }
+  assert.equal(count, 160, 'large network should reach the word limit');
+  await page.waitForFunction(
+    () => document.querySelectorAll('[data-testid="word-node"]').length === 160,
+    null,
+    { timeout: 30000 },
+  );
+  await page.getByRole('button', { name: '继续展开共用汉字発', exact: true }).click();
+  await page.getByText('当前网络已有 160 个词，可以从新词重新开始探索。').waitFor();
+
+  await page.getByRole('button', { name: '设置', exact: true }).click();
+  await page.getByRole('switch', { name: '自动折叠', exact: true }).check();
+  await collapseCount.fill('1');
+  await page.getByRole('button', { name: '关闭设置', exact: true }).click();
+  await page.waitForFunction(
+    () => document.querySelectorAll('[data-testid="word-node"]').length < 160,
+    null,
+    { timeout: 30000 },
+  );
+  assert.equal(await wordCount(), 160, 'folding must preserve the complete network');
+  await page.getByRole('button', { name: '设置', exact: true }).click();
+  await page.getByRole('switch', { name: '自动折叠', exact: true }).uncheck();
+  await page.getByRole('button', { name: '关闭设置', exact: true }).click();
+  await page.waitForFunction(
+    () => document.querySelectorAll('[data-testid="word-node"]').length === 160,
+    null,
+    { timeout: 30000 },
+  );
+  await page.reload();
+  await page.waitForFunction(
+    () => document.querySelector('[data-testid="network-stat"]')?.textContent?.includes('160 个词'),
+    null,
+    { timeout: 60000 },
+  );
+  await page.getByRole('button', { name: '设置', exact: true }).click();
+  await page.getByRole('switch', { name: '自动折叠', exact: true }).uncheck();
+  await page.getByRole('button', { name: '关闭设置', exact: true }).click();
+  await page.waitForFunction(
+    () => document.querySelectorAll('[data-testid="word-node"]').length === 160,
+    null,
+    { timeout: 60000 },
+  );
+  assert.equal(await wordCount(), 160, 'large network should survive reload');
+  assert.equal(await page.getByRole('heading', { name: '発表', exact: true }).count(), 1);
   assert.deepEqual(errors, []);
   assert(!requests.some((url) => /^https?:/.test(url)));
   const versions = await desktop.evaluate(({ app }) => ({
@@ -181,6 +261,7 @@ try {
           'native clipboard from cards and details',
           'allowlisted dictionary opener',
           'remove kanji branch and detached descendants, then undo',
+          '160-word network expansion, limit, folding, unfolding and reload',
         ],
       },
       null,
@@ -188,6 +269,14 @@ try {
     ),
   );
   console.log('Desktop smoke test passed:', versions);
+} catch (error) {
+  if (page && !page.isClosed()) {
+    await mkdir('output/app', { recursive: true });
+    await page
+      .screenshot({ path: 'output/app/desktop-failure.png', timeout: 5000 })
+      .catch(() => {});
+  }
+  throw error;
 } finally {
   await desktop?.close();
   await rm(profile, { recursive: true, force: true });

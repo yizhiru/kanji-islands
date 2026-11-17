@@ -376,6 +376,11 @@ button:hover:not(:disabled) {
 .reading-toggle.active {
   color: #44633f;
 }
+.reading-toggle kbd {
+  font: inherit;
+  font-size: 10px;
+  color: #7e8976;
+}
 .network-canvas {
   position: relative;
   flex: 1;
@@ -541,13 +546,9 @@ button:hover:not(:disabled) {
   overflow-wrap: anywhere;
   text-align: center;
 }
-.word-node:hover .node-reading,
-.word-node:focus-within .node-reading,
 .word-node.show-reading .node-reading {
   display: block;
 }
-.word-node:hover .node-reference,
-.word-node:focus-within .node-reference,
 .word-node.show-reading .node-reference {
   display: none;
 }

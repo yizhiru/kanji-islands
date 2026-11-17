@@ -247,7 +247,7 @@ export function NetworkCanvas({
               >
                 <div
                   className={`word-node ${selected ? 'is-selected' : ''} ${node.root ? 'is-root' : ''} ${showReading ? 'show-reading' : ''}`}
-                  title={reading || '词库中暂无读音'}
+                  title={showReading ? reading || '词库中暂无读音' : undefined}
                   style={{ fontSize: [...node.text].length > 8 ? 17 : 25 }}
                   data-testid="word-node"
                   data-word={node.text}

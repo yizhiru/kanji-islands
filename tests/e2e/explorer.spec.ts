@@ -31,7 +31,7 @@ test('expands a word into a multi-hop network, shows selected readings, and supp
   expect(errors).toEqual([]);
 });
 
-test('reveals card readings on hover and focus while details stay visible independently', async ({
+test('hides card readings on hover and focus while details stay visible independently', async ({
   page,
 }) => {
   await page.goto('/');
@@ -42,17 +42,16 @@ test('reveals card readings on hover and focus while details stay visible indepe
   await page.getByRole('button', { name: '显示读音', exact: true }).click();
   await expect(root.locator('.node-reading')).toBeHidden();
   await root.hover();
-  await expect(root.locator('.node-reading')).toBeVisible();
-  await expect(root.locator('.node-reading')).toHaveText('はっぴょう');
+  await expect(root.locator('.node-reading')).toBeHidden();
+  await expect(root).not.toHaveAttribute('title', 'はっぴょう');
   await page.getByRole('heading', { name: '词汇成岛，汉字相连。' }).hover();
   await expect(root.locator('.node-reading')).toBeHidden();
   await page.getByRole('button', { name: '展开汉字発', exact: true }).focus();
-  await expect(root.locator('.node-reading')).toBeVisible();
+  await expect(root.locator('.node-reading')).toBeHidden();
   await page.getByRole('button', { name: '展开汉字発', exact: true }).click();
   const card = page.locator('[data-word="発音"]');
   await card.hover();
-  await expect(card.locator('.node-reading')).toBeVisible();
-  await expect(card.locator('.node-reading')).toHaveText('はつおん');
+  await expect(card.locator('.node-reading')).toBeHidden();
   await page.getByRole('button', { name: '选中词汇発音', exact: true }).click();
   await expect(page.getByLabel('平假名读音', { exact: true })).toHaveText('はつおん');
   await page.getByRole('button', { name: '显示读音', exact: true }).click();
@@ -60,6 +59,59 @@ test('reveals card readings on hover and focus while details stay visible indepe
   await page.getByRole('button', { name: '显示读音', exact: true }).click();
   await expect(root.locator('.node-reading')).toBeHidden();
   await expect(page.getByLabel('平假名读音', { exact: true })).toHaveText('はつおん');
+});
+
+test('persists display settings and toggles card readings with Alt+R', async ({ page }) => {
+  await page.goto('/');
+  const toggle = page.getByRole('button', { name: '显示读音', exact: true });
+  const card = page.getByTestId('word-node').first();
+  await expect(toggle).toHaveAttribute('aria-keyshortcuts', 'Alt+R');
+  await page.getByRole('button', { name: '设置', exact: true }).click();
+  await page.getByRole('spinbutton', { name: '自动折叠保留汉字数' }).fill('1');
+  await page.getByRole('switch', { name: '自动折叠' }).uncheck();
+  await page.keyboard.press('Alt+r');
+  await expect(page.locator('.reading-toggle').first()).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: '关闭设置', exact: true }).click();
+  await page.keyboard.press('Alt+r');
+  await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+  await expect(card.locator('.node-reading')).toBeHidden();
+  await page.reload();
+  await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+  await expect(card.locator('.node-reading')).toBeHidden();
+  await page.getByRole('button', { name: '设置', exact: true }).click();
+  await expect(page.getByRole('switch', { name: '自动折叠' })).not.toBeChecked();
+  await expect(page.getByRole('spinbutton', { name: '自动折叠保留汉字数' })).toHaveValue('1');
+  await page.getByRole('switch', { name: '自动折叠' }).check();
+  await page.getByRole('button', { name: '关闭设置', exact: true }).click();
+  const input = page.getByRole('combobox', { name: '输入起始词' });
+  await input.focus();
+  await page.keyboard.press('Alt+r');
+  await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+  await input.blur();
+  await page.keyboard.press('Alt+r');
+  await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+  await expect(card.locator('.node-reading')).toBeVisible();
+  await page.reload();
+  await page.getByRole('button', { name: '设置', exact: true }).click();
+  await expect(page.getByRole('switch', { name: '自动折叠' })).toBeChecked();
+  await expect(page.getByRole('spinbutton', { name: '自动折叠保留汉字数' })).toHaveValue('1');
+});
+
+test('falls back to display defaults when stored settings are invalid', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      'kanji-islands.display-settings.v1',
+      JSON.stringify({ autoCollapse: 'false', visibleKanjiCount: 9999, showReading: null }),
+    );
+  });
+  await page.goto('/');
+  await expect(page.getByRole('button', { name: '显示读音', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await page.getByRole('button', { name: '设置', exact: true }).click();
+  await expect(page.getByRole('switch', { name: '自动折叠' })).toBeChecked();
+  await expect(page.getByRole('spinbutton', { name: '自动折叠保留汉字数' })).toHaveValue('2');
 });
 
 test('searches real words, accepts custom seeds, and changes scope and lesson', async ({

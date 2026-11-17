@@ -29,6 +29,7 @@ import {
   startNetwork,
 } from './core/network';
 import { HISTORY_LIMIT, loadExploration, saveExploration } from './core/explorationHistory';
+import { loadDisplaySettings, saveDisplaySettings } from './core/displaySettings';
 import { Notebook } from './components/Notebook';
 import { useNotebook } from './core/notebook';
 import { usePronunciation } from './core/usePronunciation';
@@ -123,6 +124,7 @@ function About({ vocab, onClose }: { vocab: Vocabulary; onClose: () => void }) {
 
 function Explorer({ vocab }: { vocab: Vocabulary }) {
   const [initial] = useState(loadExploration);
+  const [initialDisplay] = useState(loadDisplaySettings);
   const [filter, setFilter] = useState(initial.filter);
   const [timeline, setTimeline] = useState(initial.timeline);
   useEffect(() => {
@@ -132,11 +134,14 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
   const [query, setQuery] = useState('');
   const [focused, setFocused] = useState(false);
   const [suggestionIndex, setSuggestionIndex] = useState(-1);
-  const [showReading, setShowReading] = useState(true);
+  const [showReading, setShowReading] = useState(initialDisplay.showReading);
   const [autoPlay, setAutoPlay] = useState(true);
   const [speechRequest, setSpeechRequest] = useState(0);
-  const [autoCollapse, setAutoCollapse] = useState(true);
-  const [visibleKanjiCount, setVisibleKanjiCount] = useState(2);
+  const [autoCollapse, setAutoCollapse] = useState(initialDisplay.autoCollapse);
+  const [visibleKanjiCount, setVisibleKanjiCount] = useState(initialDisplay.visibleKanjiCount);
+  useEffect(() => {
+    saveDisplaySettings({ autoCollapse, visibleKanjiCount, showReading });
+  }, [autoCollapse, visibleKanjiCount, showReading]);
   const [detailsCollapsed, setDetailsCollapsed] = useState(false);
   const [about, setAbout] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -183,6 +188,21 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault();
         input.current?.focus();
+      } else if (
+        event.altKey &&
+        !event.ctrlKey &&
+        !event.metaKey &&
+        !event.shiftKey &&
+        event.code === 'KeyR' &&
+        !event.repeat &&
+        !(
+          event.target instanceof HTMLElement &&
+          (event.target.isContentEditable ||
+            event.target.closest('input, textarea, select, [contenteditable]'))
+        )
+      ) {
+        event.preventDefault();
+        setShowReading((value) => !value);
       }
     };
     window.addEventListener('keydown', shortcut);
@@ -416,12 +436,15 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
                 <div className="reading-controls" role="group" aria-label="读音与朗读">
                   <button
                     className={`reading-toggle ${showReading ? 'active' : ''}`}
+                    aria-label="显示读音"
                     aria-pressed={showReading}
-                    title={showReading ? '关闭词卡常显读音' : '开启词卡常显读音'}
+                    aria-keyshortcuts="Alt+R"
+                    title={`${showReading ? '隐藏' : '显示'}词卡读音（Alt+R）`}
                     onClick={() => setShowReading((v) => !v)}
                   >
                     {showReading ? <Eye size={15} /> : <EyeOff size={15} />}
                     显示读音
+                    <kbd aria-hidden="true">Alt R</kbd>
                   </button>
                   <button
                     className={`reading-toggle ${autoPlay ? 'active' : ''}`}

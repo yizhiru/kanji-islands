@@ -293,6 +293,28 @@ try {
       2,
     ),
   );
+  await page.keyboard.press('Alt+r');
+  assert.equal(
+    await page.getByRole('button', { name: '显示读音', exact: true }).getAttribute('aria-pressed'),
+    'false',
+  );
+  await desktop.close();
+  desktop = await electron.launch(options);
+  page = await desktop.firstWindow();
+  await page.getByTestId('word-node').first().waitFor({ timeout: 60000 });
+  assert.equal(
+    await page.getByRole('button', { name: '显示读音', exact: true }).getAttribute('aria-pressed'),
+    'false',
+  );
+  await page.getByRole('button', { name: '设置', exact: true }).click();
+  assert.equal(
+    await page.getByRole('switch', { name: '自动折叠', exact: true }).isChecked(),
+    false,
+  );
+  assert.equal(
+    await page.getByRole('spinbutton', { name: '自动折叠保留汉字数' }).inputValue(),
+    '1',
+  );
   console.log('Desktop smoke test passed:', versions);
 } catch (error) {
   if (page && !page.isClosed()) {

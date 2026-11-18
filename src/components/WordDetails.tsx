@@ -56,7 +56,7 @@ export function WordDetails({
   const entries = word.entries;
   const scopedEntries = entriesFor(word, filter);
   const [chosenKanji, setChosenKanji] = useState('');
-  const [relatedPage, setRelatedPage] = useState({ key: '', limit: 12 });
+  const [relatedPages, setRelatedPages] = useState<Record<string, number>>({});
   useEffect(() => {
     const latest = network.expansions.at(-1);
     if (latest && word.kanji.includes(latest.kanji)) setChosenKanji(latest.kanji);
@@ -65,15 +65,14 @@ export function WordDetails({
   const related = active
     ? vocab.related(active, filter, word.id, relatedSort === 'notebook' ? notebook : undefined)
     : [];
-  const relatedKey = (kanji: string) =>
-    JSON.stringify([word.id, filter.scope, filter.lesson, kanji]);
-  const relatedLimit = active && relatedPage.key === relatedKey(active) ? relatedPage.limit : 12;
+  const relatedKey = (kanji: string) => JSON.stringify([filter.scope, filter.lesson, kanji]);
+  const relatedLimit = active ? (relatedPages[relatedKey(active)] ?? 12) : 12;
   const showMoreRelated = (kanji: string, total: number) => {
     const key = relatedKey(kanji);
     setChosenKanji(kanji);
-    setRelatedPage((page) => ({
-      key,
-      limit: Math.min(total, (page.key === key ? page.limit : 12) + BATCH_SIZE),
+    setRelatedPages((pages) => ({
+      ...pages,
+      [key]: Math.min(total, (pages[key] ?? 12) + BATCH_SIZE),
     }));
   };
   const verbPairs = verbPairsFor(vocab, word, filter);

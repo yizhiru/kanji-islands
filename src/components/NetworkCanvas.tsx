@@ -9,7 +9,7 @@ import {
   forceY,
 } from 'd3-force';
 import type { SimulationNodeDatum } from 'd3-force';
-import { LocateFixed, Minus, Plus, Move, X } from 'lucide-react';
+import { Bookmark, LocateFixed, Minus, Plus, Move, X } from 'lucide-react';
 import { graphOf } from '../core/network';
 import type { Filter, Network } from '../core/types';
 import { entriesFor, referencesFor, Vocabulary } from '../core/vocabulary';
@@ -20,6 +20,8 @@ interface Props {
   network: Network;
   filter: Filter;
   showReading: boolean;
+  notebookWords: ReadonlySet<string>;
+  onRemoveSaved: (id: string) => void;
   onSelect: (id: string) => void;
   onExpand: (kanji: string) => void;
   onHub: (kanji: string) => void;
@@ -42,6 +44,8 @@ export function NetworkCanvas({
   network,
   filter,
   showReading,
+  notebookWords,
+  onRemoveSaved,
   onSelect,
   onExpand,
   onHub,
@@ -255,6 +259,19 @@ export function NetworkCanvas({
                     if (!(event.target as Element).closest('button')) onSelect(node.id);
                   }}
                 >
+                  {notebookWords.has(node.id) && (
+                    <button
+                      className="notebook-marker"
+                      title="已加入生词本 · 点击移出"
+                      aria-label={`将${word.text}移出生词本`}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onRemoveSaved(node.id);
+                      }}
+                    >
+                      <Bookmark size={17} fill="currentColor" aria-hidden="true" />
+                    </button>
+                  )}
                   <CopyButton
                     text={node.text}
                     label={`复制词卡单词${node.text}`}

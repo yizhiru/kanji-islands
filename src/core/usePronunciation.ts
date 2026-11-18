@@ -62,6 +62,12 @@ export function usePronunciation(
     };
   }, [word, readingKey, stopAudio]);
 
+  const stop = useCallback(() => {
+    speechID.current++;
+    stopAudio();
+    setSpeaking('');
+  }, [stopAudio]);
+
   const play = useCallback(
     (reading = readings[0], automatic = false) => {
       if (!reading) {
@@ -157,6 +163,7 @@ export function usePronunciation(
     checkVoicevox,
     canPlay: voicevox === 'ready' || !!voice,
     speaking,
+    stop,
     play,
   };
 }

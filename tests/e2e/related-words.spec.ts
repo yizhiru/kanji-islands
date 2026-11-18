@@ -61,6 +61,12 @@ test('sidebar expansion reveals candidates without adding them to the graph', as
   await expect(nodes).toHaveCount(1);
   await related.last().click();
   await expect(nodes).toHaveCount(2);
+  await expect(related).toHaveCount(25);
+  await page.getByRole('button', { name: '撤回上一步', exact: true }).click();
+  await expect(page.getByRole('heading', { name: '発00', exact: true })).toBeVisible();
+  await expect(related).toHaveCount(25);
+  await page.getByRole('button', { name: '重做', exact: true }).click();
+  await expect(related).toHaveCount(25);
 });
 
 test('shows reading-qualified verb pairs in both directions and opens the counterpart', async ({

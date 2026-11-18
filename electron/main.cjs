@@ -30,6 +30,7 @@ function createWindow() {
   });
   mainWindow.once('ready-to-show', () => mainWindow.show());
   const helpURLs = new Set([
+    'https://shikken.app/en/jlpt-n2-vocabulary-list/',
     'https://yomidevs.github.io/wiktionary-to-yomitan/download/',
     'https://foundation.wikimedia.org/wiki/Policy:Terms_of_Use',
     'https://jitendex.org/pages/downloads.html',

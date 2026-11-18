@@ -1890,3 +1890,231 @@ button:hover:not(:disabled) {
 .notebook-backup-feedback {
   overflow-wrap: anywhere;
 }
+
+.notebook-marker {
+  position: absolute;
+  inset: 0 auto auto 4px;
+  display: grid;
+  place-items: start center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  color: #ab632f;
+}
+.notebook-marker:hover {
+  color: #79401d;
+}
+.toast-undo {
+  pointer-events: auto;
+  text-decoration: underline;
+  color: white;
+}
+.toast-undo:hover:not(:disabled) {
+  color: var(--accent);
+}
+.notebook-backup-actions .practice-entry {
+  color: white;
+  margin-right: auto;
+}
+.practice-dialog {
+  margin: 0;
+  inset: 0;
+  max-width: none;
+  max-height: none;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #f6f5f0;
+  color: var(--ink);
+  padding: clamp(16px, 4vw, 52px);
+}
+.practice-layout {
+  margin-inline: auto;
+  max-width: 900px;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.practice-header,
+.practice-actions,
+.practice-reveal,
+.practice-feedback {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.practice-header,
+.practice-actions {
+  justify-content: space-between;
+}
+.practice-header h2 {
+  font-size: clamp(20px, 3vw, 30px);
+}
+.practice-header > span {
+  color: #58684f;
+  font-variant-numeric: tabular-nums;
+}
+.practice-progress {
+  width: 100%;
+  height: 4px;
+  margin: 20px 0;
+  accent-color: #748d65;
+  border: 0;
+}
+.practice-progress::-webkit-progress-bar {
+  background: #e2e5da;
+  border-radius: 4px;
+}
+.practice-progress::-webkit-progress-value {
+  background: #748d65;
+  border-radius: 4px;
+}
+.practice-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  padding-block: 18px;
+}
+.practice-card {
+  width: 100%;
+  min-height: clamp(240px, 45vh, 480px);
+  border: 1px solid #d6dccb;
+  border-radius: 12px;
+  background: var(--paper);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 16px;
+  padding: clamp(20px, 4vw, 48px);
+  overflow-wrap: anywhere;
+}
+.practice-word {
+  max-width: 100%;
+  font-family: 'Hiragino Mincho ProN', 'Yu Mincho', 'Songti SC', serif;
+  font-size: clamp(42px, 7vw, 84px);
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.practice-word svg {
+  margin-left: 8px;
+  color: var(--green);
+}
+.practice-hint,
+.practice-kana {
+  color: #58684f;
+}
+.practice-kana {
+  font-size: 22px;
+}
+.practice-meaning {
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  line-height: 1.7;
+}
+.practice-feedback {
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.practice-actions {
+  border-top: 1px solid var(--line);
+  padding-top: 18px;
+}
+.practice-actions > :only-child {
+  margin-left: auto;
+}
+.practice-actions .text-button,
+.practice-feedback .text-button {
+  min-height: 36px;
+  color: var(--green);
+}
+.library-field {
+  display: grid;
+  gap: 7px;
+  margin: 20px 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.library-field select {
+  width: 100%;
+  padding: 10px;
+  color: var(--ink);
+  border: 1px solid #c6cec2;
+  border-radius: 6px;
+  background: var(--paper);
+  font-weight: 400;
+}
+.library-note {
+  font-size: 12px;
+  line-height: 1.7;
+  color: #5d6c60;
+}
+.library-start {
+  margin-top: 15px;
+}
+.library-import {
+  border-top: 1px solid var(--line);
+  margin-top: 22px;
+  padding-top: 16px;
+}
+.library-import h3 {
+  font-size: 15px;
+  margin-bottom: 5px;
+}
+.library-tools,
+.library-delete {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
+}
+.library-tools a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  text-decoration: none;
+}
+.library-tools :is(.text-button, .secondary-button),
+.library-delete .text-button {
+  color: var(--green);
+}
+.library-delete p,
+.library-error {
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.library-error {
+  margin-top: 10px;
+  color: #883d2f;
+}
+.practice-header h2 {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.practice-header > span,
+.practice-header > button {
+  flex-shrink: 0;
+}
+@media (max-width: 480px) {
+  .site-header,
+  .header-actions {
+    gap: 10px;
+  }
+  .site-header {
+    padding-inline: 10px;
+  }
+  .header-actions .about-button,
+  .brand {
+    gap: 4px;
+    white-space: nowrap;
+  }
+  .practice-header {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}

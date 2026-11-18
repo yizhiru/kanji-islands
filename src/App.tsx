@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowRight,
   BookOpen,
@@ -46,6 +46,8 @@ import { NetworkCanvas } from './components/NetworkCanvas';
 import { WordDetails } from './components/WordDetails';
 import { useDictionaries } from './core/dictionaries/useDictionaries';
 import { Settings } from './components/Settings';
+
+const PracticeLibrary = lazy(() => import('./components/PracticeLibrary'));
 
 const scopeNames: Record<Scope, string> = {
   all: '标准词库',
@@ -164,10 +166,15 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
             future: [],
           },
     );
-  const notify = useCallback((value: string) => setMessage(value), []);
+  const [removedWord, setRemovedWord] = useState<string | null>(null);
+  const notify = useCallback((value: string) => {
+    setRemovedWord(null);
+    setMessage(value);
+  }, []);
   const notebook = useNotebook(notify);
   const dictionaries = useDictionaries(notify);
   const [notebookOpen, setNotebookOpen] = useState(false);
+  const [libraryOpen, setLibraryOpen] = useState(false);
   const [relatedSort, setRelatedSort] = useState<'default' | 'notebook'>('default');
   const selectedWord = vocab.get(network.selected);
   const speech = usePronunciation(
@@ -296,6 +303,9 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
         </a>
         <h1 className="header-tagline">词汇成岛，汉字相连。</h1>
         <div className="header-actions">
+          <button className="about-button" onClick={() => setLibraryOpen(true)}>
+            词本练习
+          </button>
           <button className="about-button" onClick={() => setNotebookOpen(true)}>
             生词本 · {notebook.words.size}
           </button>
@@ -511,6 +521,13 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
             <NetworkCanvas
               vocab={vocab}
               network={visibleNetwork}
+              notebookWords={notebook.words}
+              onRemoveSaved={(id) => {
+                if (notebook.setSaved(id, false)) {
+                  setMessage(`已将「${vocab.get(id).text}」移出生词本`);
+                  setRemovedWord(id);
+                }
+              }}
               filter={filter}
               showReading={showReading}
               onSelect={select}
@@ -574,14 +591,41 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
           <>
             <Check size={16} />
             {message}
+            {removedWord && !notebook.words.has(removedWord) && (
+              <button
+                className="toast-undo"
+                onClick={() => {
+                  if (notebook.setSaved(removedWord, true)) notify('已恢复到生词本');
+                }}
+              >
+                撤回
+              </button>
+            )}
           </>
         )}
       </div>
+      {libraryOpen && (
+        <Suspense fallback={null}>
+          <PracticeLibrary
+            words={notebook.words}
+            setSaved={notebook.setSaved}
+            vocab={vocab}
+            speech={speech}
+            message={message}
+            onNotify={notify}
+            onClose={() => setLibraryOpen(false)}
+          />
+        </Suspense>
+      )}
       {notebookOpen && (
         <Notebook
           vocab={vocab}
           words={notebook.words}
           onRemove={notebook.toggle}
+          setSaved={notebook.setSaved}
+          speech={speech}
+          message={message}
+          onNotify={notify}
           onImport={notebook.merge}
           onSelect={(id) => {
             start(vocab.get(id).text);

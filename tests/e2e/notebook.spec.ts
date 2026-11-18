@@ -78,3 +78,71 @@ test('exports a backup and imports it without replacing existing words', async (
   await expect(notebook.getByRole('button', { name: '探索生词発音' })).toBeVisible();
   await expect(notebook.getByRole('button', { name: '探索生词発表' })).toBeVisible();
 });
+
+test('practices saved words without autoplay, reveals answers and undoes the final removal', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.addInitScript(() => {
+    Object.defineProperty(window, 'speechSynthesis', {
+      value: {
+        getVoices: () => [{ lang: 'ja-JP', localService: true }],
+        cancel() {},
+        addEventListener() {},
+        removeEventListener() {},
+        speak(utterance: SpeechSynthesisUtterance) {
+          document.documentElement.dataset.spoken = utterance.text;
+        },
+      },
+    });
+    Object.defineProperty(window, 'SpeechSynthesisUtterance', {
+      value: class {
+        constructor(public text: string) {}
+      },
+    });
+  });
+  await page.goto('/');
+  await page.getByRole('button', { name: '加入生词本', exact: true }).click();
+  await page.getByRole('button', { name: '生词本 · 1' }).click();
+  await page.getByRole('button', { name: '开始练习' }).click();
+  const practice = page.getByRole('dialog', { name: '生词练习', exact: true });
+  await expect(practice).toBeVisible();
+  expect(await practice.boundingBox()).toMatchObject({ x: 0, y: 0, width: 390, height: 844 });
+  await expect(page.locator('html')).not.toHaveAttribute('data-spoken');
+  await expect(practice.getByText('はっぴょう')).toHaveCount(0);
+  await practice.getByRole('button', { name: '朗读発表' }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-spoken', 'はっぴょう');
+  await expect(practice.getByText('はっぴょう')).toHaveCount(0);
+  await practice.getByRole('button', { name: '显示假名' }).click();
+  await expect(practice.getByText('はっぴょう')).toBeVisible();
+  await practice.getByRole('button', { name: '显示释义' }).click();
+  await expect(practice.locator('.practice-meaning')).toContainText(/.+/);
+  await practice.getByRole('button', { name: '移出生词本' }).click();
+  await expect(practice.getByRole('heading', { name: '本轮练习完成' })).toBeVisible();
+  await practice.getByRole('button', { name: '撤回移除' }).click();
+  await expect(practice.getByRole('button', { name: '朗读発表' })).toBeVisible();
+  await expect(practice.getByText('はっぴょう')).toHaveCount(0);
+  await page.keyboard.press('Escape');
+  await expect(practice).toHaveCount(0);
+  await expect(page.getByRole('button', { name: '探索生词発表' })).toBeVisible();
+  await page.getByRole('button', { name: '关闭生词本' }).click();
+  await page.reload();
+  await expect(page.getByRole('button', { name: '将発表移出生词本' })).toBeVisible();
+});
+
+test('removes and restores a bookmarked island without changing the current selection', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: '加入生词本', exact: true }).click();
+  await page.getByRole('button', { name: '展开汉字発', exact: true }).click();
+  await page.getByRole('button', { name: '选中词汇発音', exact: true }).click();
+  const marker = page.getByRole('button', { name: '将発表移出生词本' });
+  await marker.click();
+  await expect(marker).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: '発音', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: '撤回', exact: true }).click();
+  await expect(marker).toBeVisible();
+  await page.getByRole('button', { name: '生词本 · 1' }).click();
+  await expect(page.getByRole('button', { name: '探索生词発表' })).toBeVisible();
+});

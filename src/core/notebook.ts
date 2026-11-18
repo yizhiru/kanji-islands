@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { normalize, wordId } from './vocabulary';
+import { useMemo, useState } from 'react';
+import { normalize, type Vocabulary, wordId } from './vocabulary';
 
 const BACKUP_FORMAT = 'kanji-islands-notebook';
 export const MAX_BACKUP_BYTES = 10 * 1024 * 1024;
@@ -30,6 +30,18 @@ export function parseNotebookBackup(source: string): string[] {
 }
 
 const STORAGE_KEY = 'kanji-islands.notebook.v1';
+
+export function useNotebookPracticeBook(words: ReadonlySet<string>, vocab: Vocabulary) {
+  return useMemo(
+    () => ({
+      id: 'notebook',
+      name: '我的生词本',
+      cards: [...words].map((id) => ({ word: vocab.get(id).text })),
+    }),
+    [words, vocab],
+  );
+}
+
 function readWords(): Set<string> {
   try {
     const stored: unknown = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]');
@@ -53,16 +65,19 @@ export function useNotebook(onNotify: (message: string) => void) {
       throw new Error('生词本保存失败，请检查本地存储空间。');
     }
   };
-  const toggle = (id: string) => {
+  const setSaved = (id: string, saved: boolean) => {
     const next = new Set(words);
-    if (next.has(id)) next.delete(id);
-    else next.add(id);
+    if (saved) next.add(id);
+    else next.delete(id);
     try {
       save(next);
+      return true;
     } catch (error) {
       onNotify((error as Error).message);
+      return false;
     }
   };
+  const toggle = (id: string) => setSaved(id, !words.has(id));
   const merge = (imported: string[]) => {
     // Read again after the file finishes loading to include recent changes.
     const merged = readWords();
@@ -71,5 +86,5 @@ export function useNotebook(onNotify: (message: string) => void) {
     save(merged);
     return merged.size - before;
   };
-  return { words, toggle, merge };
+  return { words, toggle, setSaved, merge };
 }

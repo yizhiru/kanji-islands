@@ -1,12 +1,23 @@
 import { useEffect, useRef, useState } from 'react';
-import { Download, Upload, X } from 'lucide-react';
-import { MAX_BACKUP_BYTES, parseNotebookBackup, serializeNotebook } from '../core/notebook';
-import type { Vocabulary } from '../core/vocabulary';
+import { BookOpen, Download, Upload, X } from 'lucide-react';
+import {
+  MAX_BACKUP_BYTES,
+  parseNotebookBackup,
+  serializeNotebook,
+  useNotebookPracticeBook,
+} from '../core/notebook';
+import { type Vocabulary, wordId } from '../core/vocabulary';
+import { NotebookPractice } from './NotebookPractice';
+import type { PronunciationController } from '../core/usePronunciation';
 
 export function Notebook({
   vocab,
   words,
   onRemove,
+  setSaved,
+  speech,
+  message,
+  onNotify,
   onImport,
   onSelect,
   onClose,
@@ -14,12 +25,18 @@ export function Notebook({
   vocab: Vocabulary;
   words: ReadonlySet<string>;
   onRemove: (id: string) => void;
+  setSaved: (id: string, saved: boolean) => boolean;
+  speech: PronunciationController;
+  message: string;
+  onNotify: (message: string) => void;
   onImport: (ids: string[]) => number;
   onSelect: (id: string) => void;
   onClose: () => void;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
+  const [practicing, setPracticing] = useState(false);
+  const { cards } = useNotebookPracticeBook(words, vocab);
   const [importing, setImporting] = useState(false);
   const [feedback, setFeedback] = useState<{ text: string; error?: boolean }>();
   const importBackup = async (file: File) => {
@@ -71,7 +88,9 @@ export function Notebook({
       ref={dialog}
       className="settings-dialog notebook-dialog"
       aria-label="生词本"
-      onCancel={onClose}
+      onCancel={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
     >
       <div className="modal-heading">
         <h2>生词本 · {words.size}</h2>
@@ -88,6 +107,18 @@ export function Notebook({
         onChange={(event) => setQuery(event.target.value)}
       />
       <div className="notebook-backup-actions">
+        <button
+          type="button"
+          className="primary-button practice-entry"
+          disabled={!words.size || importing}
+          onClick={() => {
+            onNotify('');
+            speech.stop();
+            setPracticing(true);
+          }}
+        >
+          <BookOpen size={16} aria-hidden="true" /> 开始练习
+        </button>
         <input
           ref={fileInput}
           type="file"
@@ -145,6 +176,19 @@ export function Notebook({
           </div>
         ))}
       </div>
+      {practicing && (
+        <NotebookPractice
+          title="生词练习"
+          returnLabel="返回生词本"
+          cards={cards}
+          vocab={vocab}
+          speech={speech}
+          message={message}
+          onSetRemoved={(card, removed) => setSaved(wordId(card.word), !removed)}
+          onNotify={onNotify}
+          onClose={() => setPracticing(false)}
+        />
+      )}
     </dialog>
   );
 }

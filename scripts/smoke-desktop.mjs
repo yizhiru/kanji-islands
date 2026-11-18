@@ -24,6 +24,24 @@ try {
   page.on('request', (request) => requests.push(request.url()));
   await page.getByTestId('word-node').waitFor();
   assert.equal(await page.title(), '汉字岛');
+  await page.getByRole('button', { name: '词本练习', exact: true }).click();
+  await page.getByRole('button', { name: '开始练习', exact: true }).click();
+  const practice = page.getByRole('dialog', { name: 'N2 核心词汇', exact: true });
+  await practice.getByText('第 1 组 · 1 / 20').waitFor();
+  await practice.getByRole('button', { name: '退出练习' }).click();
+  await page.getByLabel('选择练习词本文件').setInputFiles('public/practice-example.csv');
+  await page
+    .getByLabel('选择词本')
+    .locator('option:checked')
+    .filter({ hasText: 'practice-example' })
+    .waitFor({ state: 'attached' });
+  await page.getByRole('button', { name: '开始练习', exact: true }).click();
+  await page
+    .getByRole('dialog', { name: 'practice-example' })
+    .getByText('第 1 组 · 1 / 2')
+    .waitFor();
+  await page.getByRole('button', { name: '退出练习' }).click();
+  await page.getByRole('button', { name: '关闭词本练习' }).click();
   // Dispatch a complete drag in one task so React processes the position
   // update after pointerup has cleared the active drag.
   const canvas = page.getByTestId('network-canvas');
@@ -277,6 +295,7 @@ try {
         passed: [
           'context isolation',
           'offline vocabulary',
+          'offline Shikken practice and local CSV practice',
           'two-hop expansion',
           'reading and automatic speech are enabled by default in one toolbar group',
           'automatic folding is configurable in settings and defaults to two recent characters',

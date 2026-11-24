@@ -21,8 +21,8 @@ try {
   await page.screenshot({ path: 'output/app/lesson-symbols.png', fullPage: true });
   await page.getByRole('heading', { name: '词汇成岛，汉字相连。' }).hover();
   await page.getByRole('button', { name: '展开汉字発', exact: true }).click();
-  await page.getByRole('button', { name: '选中词汇発音', exact: true }).click();
-  await page.getByRole('button', { name: '展开汉字音', exact: true }).click();
+  await page.getByRole('button', { name: '选中词汇発電', exact: true }).click();
+  await page.getByRole('button', { name: '展开汉字電', exact: true }).click();
   await page.getByRole('button', { name: '适应全部节点', exact: true }).click();
   await page.locator('.toast.visible').waitFor({ state: 'hidden' });
   await page.screenshot({ path: 'output/app/network.png', fullPage: true });

@@ -1,0 +1,18 @@
+{
+  "reazon/decoder-epoch-99-avg-1.int8.onnx": "8f0bff94d38797b03b762634ed03211a8e303d06cc4603cdd0cf4199d6eb1485",
+  "reazon/encoder-epoch-99-avg-1.int8.onnx": "2c7bd08a8a99f9ddd0d9e458456577b1f6279214e51426f114f9eced44c54e1d",
+  "reazon/joiner-epoch-99-avg-1.int8.onnx": "49cc7ea1d3d35a40a27442db5e89996da64bf0e683a903dce76e99e57a12e4de",
+  "reazon/tokens.txt": "2c3ac659818a48a0c04010e0593bbc4d7c8a24a054340b01131499c05fd52def",
+  "small/config.json": "b55496ac7940a7ae47d2c01eab40edfd8701feec1229d9cce3b40014383fb828",
+  "small/model.bin": "3e305921506d8872816023e4c273e75d2419fb89b24da97b4fe7bce14170d671",
+  "small/tokenizer.json": "fb7b63191e9bb045082c79fd742a3106a12c99513ab30df4a0d47fa6cb6fd0ab",
+  "small/vocabulary.txt": "34ce3fe1c5041027b3f8d42912270993f986dbc4bb34cf27f951e34a1e453913",
+  "tts/0.vvm": "917e592cae92a02fb7668bd9e168df4e39c8ab2f5302c2be71906c70ec4e2df2",
+  "tts/jf_alpha.bin": "56b479360aad9f367aeb8cef908f9201cf48b4555e488c5f4590c9dfcd978bb6",
+  "tts/kokoro.onnx": "8fbea51ea711f2af382e88c833d9e288c6dc82ce5e98421ea61c058ce21a34cb",
+  "tts/open_jtalk_dic.tar.gz": "fe6ba0e43542cef98339abdffd903e062008ea170b04e7e2a35da805902f382a",
+  "tts/tokenizer.json": "77a02c8e164413299b4b4c403b14f8e0e1c1b727db4d46a09d6327b861060a34",
+  "tts/utmos22_strong.onnx": "ece7ddb0999d0f12ffe8d7586b3618b8b6fa89269b5152288e4440d686409f69",
+  "tts/voicevox-runtime.tgz": "96d7ea1928a0a15485492d37621387df50f40a792e2a6817d4df73ecd18571f2",
+  "tts/voicevox_core-0.16.3-cp310-abi3-macosx_11_0_arm64.whl": "8702717529257ba4e46379e9dd3a7145c831d397c467cd1770be249032d9edda"
+}

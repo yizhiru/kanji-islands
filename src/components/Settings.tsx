@@ -2,11 +2,14 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { X } from 'lucide-react';
 import type { DictionaryController } from '../core/dictionaries/useDictionaries';
 import type { PronunciationController } from '../core/usePronunciation';
+import type { SpeechEngine } from '../core/types';
 import { MAX_WORDS } from '../core/network';
 
 interface Props {
   dictionaries: DictionaryController;
   speech: PronunciationController;
+  showPartOfSpeech: boolean;
+  onShowPartOfSpeech: (enabled: boolean) => void;
   autoCollapse: boolean;
   visibleKanjiCount: number;
   onAutoCollapse: (enabled: boolean) => void;
@@ -17,6 +20,8 @@ interface Props {
 export function Settings({
   dictionaries,
   speech,
+  showPartOfSpeech,
+  onShowPartOfSpeech,
   autoCollapse,
   visibleKanjiCount,
   onAutoCollapse,
@@ -26,6 +31,7 @@ export function Settings({
   const dialog = useRef<HTMLDialogElement>(null);
   const titleId = useId();
   const helpId = useId();
+  const posHelpId = useId();
   const [countInput, setCountInput] = useState(String(visibleKanjiCount));
   useEffect(() => {
     dialog.current?.showModal();
@@ -58,6 +64,20 @@ export function Settings({
       </div>
       <section className="settings-section" aria-label="词网显示">
         <h3>词网显示</h3>
+        <label className="settings-toggle">
+          <span>显示词性角标</span>
+          <input
+            type="checkbox"
+            role="switch"
+            aria-describedby={posHelpId}
+            checked={showPartOfSpeech}
+            onChange={(event) => onShowPartOfSpeech(event.target.checked)}
+          />
+        </label>
+        <p id={posHelpId}>
+          词卡右下角显示「名」「五段」「い形」等简称。词性取自内置 Jitendex 词库中的 JMdict
+          义项标注。
+        </p>
         <label className="settings-toggle">
           <span>自动折叠</span>
           <input
@@ -95,32 +115,95 @@ export function Settings({
       <section className="settings-section" aria-label="日语朗读">
         <h3>日语朗读</h3>
         {speech.voicevox === 'desktop-only' ? (
-          <p>网页版使用系统日语语音。桌面版可连接本机 VOICEVOX。</p>
+          <p>网页版使用系统日语语音。{speech.systemVoiceName || '未检测到本机日语语音。'}</p>
         ) : (
           <>
-            <p>下载适合系统的版本，启动 VOICEVOX 后点「检测连接」。普通电脑可先选 CPU 版。</p>
-            <div className="voicevox-actions">
-              <a href="https://voicevox.hiroshiba.jp/" target="_blank" rel="noreferrer">
-                下载 VOICEVOX
-              </a>
-              <a href="https://voicevox.hiroshiba.jp/how_to_use/" target="_blank" rel="noreferrer">
-                安装指南
-              </a>
-              <button
-                className="text-button"
-                disabled={speech.voicevox === 'checking'}
-                onClick={() => void speech.checkVoicevox()}
+            <label className="speech-engine-choice">
+              <span>朗读引擎</span>
+              <select
+                value={speech.engine}
+                onChange={(event) => speech.setEngine(event.target.value as SpeechEngine)}
               >
-                检测连接
-              </button>
-            </div>
-            <p role="status">
-              {speech.voicevox === 'ready'
-                ? '已连接 · VOICEVOX:四国めたん'
-                : speech.voicevox === 'checking'
-                  ? '正在检测 VOICEVOX…'
-                  : '未连接。已安装的系统日语语音仍可用于朗读。'}
-            </p>
+                <option value="system">系统日语语音</option>
+                <option value="voicevox">VOICEVOX · 四国めたん</option>
+                {window.islands?.synthesizeLocal && (
+                  <>
+                    <option value="kokoro">Kokoro · jf_alpha</option>
+                    <option value="openjtalk">Open JTalk · Mei</option>
+                  </>
+                )}
+              </select>
+            </label>
+            {speech.localStatus ? (
+              <>
+                <p role="status">
+                  {speech.downloadMessage ||
+                    (speech.localStatus.state === 'ready'
+                      ? '语音资源已就绪，可离线朗读。'
+                      : speech.localStatus.state === 'error'
+                        ? speech.localStatus.message
+                        : `首次朗读将下载约 ${speech.engine === 'kokoro' ? '373' : '25'} MB 的语音资源，之后可离线使用。`)}
+                </p>
+                {speech.localStatus.state === 'downloading' && (
+                  <progress
+                    className="speech-progress"
+                    aria-label="语音资源下载进度"
+                    value={speech.localStatus.done}
+                    max={speech.localStatus.total}
+                  />
+                )}
+                <button
+                  className="text-button"
+                  disabled={!!speech.downloadMessage || !!speech.speaking}
+                  onClick={() => speech.play('日本語を勉強しています。')}
+                >
+                  {speech.localStatus.state === 'missing'
+                    ? '下载并试听'
+                    : speech.localStatus.state === 'error'
+                      ? '重试并试听'
+                      : '试听'}
+                </button>
+                {speech.engine === 'openjtalk' && (
+                  <p>HTS Voice “Mei” · Nagoya Institute of Technology · CC BY 3.0</p>
+                )}
+              </>
+            ) : speech.engine === 'system' ? (
+              <p>
+                {speech.systemVoiceName
+                  ? `本机日语语音：${speech.systemVoiceName}`
+                  : '未检测到本机日语语音。可选择 Kokoro 或 Open JTalk 下载离线语音。'}
+              </p>
+            ) : (
+              <>
+                <p>启动本机 VOICEVOX 后检测连接。连接失败时会尝试已安装的系统日语语音。</p>
+                <div className="voicevox-actions">
+                  <a href="https://voicevox.hiroshiba.jp/" target="_blank" rel="noreferrer">
+                    下载 VOICEVOX
+                  </a>
+                  <a
+                    href="https://voicevox.hiroshiba.jp/how_to_use/"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    安装指南
+                  </a>
+                  <button
+                    className="text-button"
+                    disabled={speech.voicevox === 'checking'}
+                    onClick={() => void speech.checkVoicevox()}
+                  >
+                    检测连接
+                  </button>
+                </div>
+                <p role="status">
+                  {speech.voicevox === 'ready'
+                    ? '已连接 · VOICEVOX:四国めたん'
+                    : speech.voicevox === 'checking'
+                      ? '正在检测 VOICEVOX…'
+                      : '未连接。已安装的系统日语语音仍可用于朗读。'}
+                </p>
+              </>
+            )}
           </>
         )}
       </section>

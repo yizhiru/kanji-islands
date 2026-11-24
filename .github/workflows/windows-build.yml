@@ -34,6 +34,12 @@ jobs:
           node-version: '24'
           cache: npm
 
+      - name: Set up Python for the bundled speech runtime
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+          architecture: x64
+
       - name: Check resource configuration
         env:
           DATA_ASSET: ${{ vars.WINDOWS_BUILD_DATA_ASSET_ID }}
@@ -86,6 +92,12 @@ jobs:
         env:
           KANJI_PACKAGED_EXECUTABLE: ${{ github.workspace }}\release\win-unpacked\汉字岛.exe
         run: npm run test:desktop
+
+      - name: Verify on-demand speech and offline reuse
+        timeout-minutes: 15
+        env:
+          KANJI_PACKAGED_EXECUTABLE: ${{ github.workspace }}\release\win-unpacked\汉字岛.exe
+        run: npm run test:speech
 
       - name: Write installer checksums
         run: |

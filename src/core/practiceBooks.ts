@@ -1,4 +1,5 @@
-import { hiragana, type Vocabulary, wordId } from './vocabulary';
+import { hiragana, wordId } from './japaneseText';
+import type { Vocabulary } from './vocabulary';
 
 export interface PracticeCard {
   word: string;

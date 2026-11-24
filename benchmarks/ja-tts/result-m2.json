@@ -1,0 +1,6387 @@
+{
+  "setup": {
+    "voicevox": {
+      "load_s": 4.045056832999762,
+      "first_request_s": 0.5982383750001645
+    },
+    "kokoro": {
+      "load_s": 0.8194972090000192,
+      "first_request_s": 0.7157079159997011
+    },
+    "openjtalk": {
+      "load_s": 6.708000000799075e-06,
+      "first_request_s": 0.0400405000000319
+    }
+  },
+  "prompts": [
+    {
+      "id": "w001",
+      "group": "word",
+      "display": "揚げる",
+      "text": "あげる",
+      "spoken_kana": "あげる",
+      "results": {
+        "voicevox": [
+          {
+            "seconds": 0.29967337500011126,
+            "audio_s": 0.64
+          },
+          {
+            "seconds": 0.3034532910000962,
+            "audio_s": 0.64
+          },
+          {
+            "seconds": 0.312645916999827,
+            "audio_s": 0.64
+          }
+        ],
+        "kokoro": [
+          {
+            "seconds": 0.33137624999972104,
+            "audio_s": 1.5
+          },
+          {
+            "seconds": 0.3960703339998872,
+            "audio_s": 1.5
+          },
+          {
+            "seconds": 0.349293958999624,
+            "audio_s": 1.5
+          }
+        ],
+        "openjtalk": [
+          {
+            "seconds": 0.014815375000125641,
+            "audio_s": 1.12
+          },
+          {
+            "seconds": 0.02114770900016083,
+            "audio_s": 1.12
+          },
+          {
+            "seconds": 0.015086791000157973,
+            "audio_s": 1.12
+          }
+        ]
+      },
+      "reference_phones": [
+        "a",
+        "g",
+        "e",
+        "r",
+        "u"
+      ],
+      "checks": {
+        "voicevox": {
+          "reazon": {
+            "text": "あげる",
+            "phones": [
+              "a",
+              "g",
+              "e",
+              "r",
+              "u"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "あげる",
+            "phones": [
+              "a",
+              "g",
+              "e",
+              "r",
+              "u"
+            ],
+            "edits": 0
+          }
+        },
+        "kokoro": {
+          "reazon": {
+            "text": "あげる",
+            "phones": [
+              "a",
+              "g",
+              "e",
+              "r",
+              "u"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "あげる",
+            "phones": [
+              "a",
+              "g",
+              "e",
+              "r",
+              "u"
+            ],
+            "edits": 0
+          }
+        },
+        "openjtalk": {
+          "reazon": {
+            "text": "あける",
+            "phones": [
+              "a",
+              "k",
+              "e",
+              "r",
+              "u"
+            ],
+            "edits": 1
+          },
+          "whisper_small": {
+            "text": "あげる",
+            "phones": [
+              "a",
+              "g",
+              "e",
+              "r",
+              "u"
+            ],
+            "edits": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "w005",
+      "group": "word",
+      "display": "お願いします",
+      "text": "おねがいします",
+      "spoken_kana": "おねがいします",
+      "results": {
+        "voicevox": [
+          {
+            "seconds": 0.39638224999998783,
+            "audio_s": 1.1946666666666668
+          },
+          {
+            "seconds": 0.42610641600003873,
+            "audio_s": 1.1946666666666668
+          },
+          {
+            "seconds": 0.4310372089998964,
+            "audio_s": 1.1946666666666668
+          }
+        ],
+        "kokoro": [
+          {
+            "seconds": 0.44253024999989066,
+            "audio_s": 1.95
+          },
+          {
+            "seconds": 0.43766979100018943,
+            "audio_s": 1.95
+          },
+          {
+            "seconds": 0.4634307080000326,
+            "audio_s": 1.95
+          }
+        ],
+        "openjtalk": [
+          {
+            "seconds": 0.019706542000221816,
+            "audio_s": 1.46
+          },
+          {
+            "seconds": 0.028961084000002302,
+            "audio_s": 1.46
+          },
+          {
+            "seconds": 0.02003354099997523,
+            "audio_s": 1.46
+          }
+        ]
+      },
+      "reference_phones": [
+        "o",
+        "n",
+        "e",
+        "g",
+        "a",
+        "i",
+        "sh",
+        "i",
+        "m",
+        "a",
+        "s",
+        "u"
+      ],
+      "checks": {
+        "voicevox": {
+          "reazon": {
+            "text": "お願いします",
+            "phones": [
+              "o",
+              "n",
+              "e",
+              "g",
+              "a",
+              "i",
+              "sh",
+              "i",
+              "m",
+              "a",
+              "s",
+              "u"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "お願いします",
+            "phones": [
+              "o",
+              "n",
+              "e",
+              "g",
+              "a",
+              "i",
+              "sh",
+              "i",
+              "m",
+              "a",
+              "s",
+              "u"
+            ],
+            "edits": 0
+          }
+        },
+        "kokoro": {
+          "reazon": {
+            "text": "お願いします",
+            "phones": [
+              "o",
+              "n",
+              "e",
+              "g",
+              "a",
+              "i",
+              "sh",
+              "i",
+              "m",
+              "a",
+              "s",
+              "u"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "お願いします",
+            "phones": [
+              "o",
+              "n",
+              "e",
+              "g",
+              "a",
+              "i",
+              "sh",
+              "i",
+              "m",
+              "a",
+              "s",
+              "u"
+            ],
+            "edits": 0
+          }
+        },
+        "openjtalk": {
+          "reazon": {
+            "text": "お願いします",
+            "phones": [
+              "o",
+              "n",
+              "e",
+              "g",
+              "a",
+              "i",
+              "sh",
+              "i",
+              "m",
+              "a",
+              "s",
+              "u"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "お願いします",
+            "phones": [
+              "o",
+              "n",
+              "e",
+              "g",
+              "a",
+              "i",
+              "sh",
+              "i",
+              "m",
+              "a",
+              "s",
+              "u"
+            ],
+            "edits": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "w010",
+      "group": "word",
+      "display": "止まる",
+      "text": "とどまる",
+      "spoken_kana": "とどまる",
+      "results": {
+        "voicevox": [
+          {
+            "seconds": 0.3117873330002112,
+            "audio_s": 0.8106666666666666
+          },
+          {
+            "seconds": 0.4739437499997621,
+            "audio_s": 0.8106666666666666
+          },
+          {
+            "seconds": 0.3450837089999368,
+            "audio_s": 0.8106666666666666
+          }
+        ],
+        "kokoro": [
+          {
+            "seconds": 0.3496621250001226,
+            "audio_s": 1.5
+          },
+          {
+            "seconds": 0.35285774999965724,
+            "audio_s": 1.5
+          },
+          {
+            "seconds": 0.3499682090000533,
+            "audio_s": 1.5
+          }
+        ],
+        "openjtalk": [
+          {
+            "seconds": 0.017194916999869747,
+            "audio_s": 1.27
+          },
+          {
+            "seconds": 0.019390083999951457,
+            "audio_s": 1.27
+          },
+          {
+            "seconds": 0.01688170799980071,
+            "audio_s": 1.27
+          }
+        ]
+      },
+      "reference_phones": [
+        "t",
+        "o",
+        "d",
+        "o",
+        "m",
+        "a",
+        "r",
+        "u"
+      ],
+      "checks": {
+        "voicevox": {
+          "reazon": {
+            "text": "とどまる",
+            "phones": [
+              "t",
+              "o",
+              "d",
+              "o",
+              "m",
+              "a",
+              "r",
+              "u"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "とどまる",
+            "phones": [
+              "t",
+              "o",
+              "d",
+              "o",
+              "m",
+              "a",
+              "r",
+              "u"
+            ],
+            "edits": 0
+          }
+        },
+        "kokoro": {
+          "reazon": {
+            "text": "とどまる",
+            "phones": [
+              "t",
+              "o",
+              "d",
+              "o",
+              "m",
+              "a",
+              "r",
+              "u"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "とどまる",
+            "phones": [
+              "t",
+              "o",
+              "d",
+              "o",
+              "m",
+              "a",
+              "r",
+              "u"
+            ],
+            "edits": 0
+          }
+        },
+        "openjtalk": {
+          "reazon": {
+            "text": "とどまる",
+            "phones": [
+              "t",
+              "o",
+              "d",
+              "o",
+              "m",
+              "a",
+              "r",
+              "u"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "とどまる",
+            "phones": [
+              "t",
+              "o",
+              "d",
+              "o",
+              "m",
+              "a",
+              "r",
+              "u"
+            ],
+            "edits": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "w014",
+      "group": "word",
+      "display": "少なくとも",
+      "text": "すくなくとも",
+      "spoken_kana": "すくなくとも",
+      "results": {
+        "voicevox": [
+          {
+            "seconds": 0.39432674999989104,
+            "audio_s": 1.088
+          },
+          {
+            "seconds": 0.41315933299983953,
+            "audio_s": 1.088
+          },
+          {
+            "seconds": 0.4373520839999401,
+            "audio_s": 1.088
+          }
+        ],
+        "kokoro": [
+          {
+            "seconds": 0.45448308400000315,
+            "audio_s": 2.025
+          },
+          {
+            "seconds": 0.5164737500003866,
+            "audio_s": 2.025
+          },
+          {
+            "seconds": 0.47367637500019555,
+            "audio_s": 2.025
+          }
+        ],
+        "openjtalk": [
+          {
+            "seconds": 0.022720082999967417,
+            "audio_s": 1.7
+          },
+          {
+            "seconds": 0.023954499999945256,
+            "audio_s": 1.7
+          },
+          {
+            "seconds": 0.022695084000133647,
+            "audio_s": 1.7
+          }
+        ]
+      },
+      "reference_phones": [
+        "s",
+        "u",
+        "k",
+        "u",
+        "n",
+        "a",
+        "k",
+        "u",
+        "t",
+        "o",
+        "m",
+        "o"
+      ],
+      "checks": {
+        "voicevox": {
+          "reazon": {
+            "text": "少なくとも",
+            "phones": [
+              "s",
+              "u",
+              "k",
+              "u",
+              "n",
+              "a",
+              "k",
+              "u",
+              "t",
+              "o",
+              "m",
+              "o"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "少なくとも",
+            "phones": [
+              "s",
+              "u",
+              "k",
+              "u",
+              "n",
+              "a",
+              "k",
+              "u",
+              "t",
+              "o",
+              "m",
+              "o"
+            ],
+            "edits": 0
+          }
+        },
+        "kokoro": {
+          "reazon": {
+            "text": "少なくとも",
+            "phones": [
+              "s",
+              "u",
+              "k",
+              "u",
+              "n",
+              "a",
+              "k",
+              "u",
+              "t",
+              "o",
+              "m",
+              "o"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "少なくとも",
+            "phones": [
+              "s",
+              "u",
+              "k",
+              "u",
+              "n",
+              "a",
+              "k",
+              "u",
+              "t",
+              "o",
+              "m",
+              "o"
+            ],
+            "edits": 0
+          }
+        },
+        "openjtalk": {
+          "reazon": {
+            "text": "少なくとも",
+            "phones": [
+              "s",
+              "u",
+              "k",
+              "u",
+              "n",
+              "a",
+              "k",
+              "u",
+              "t",
+              "o",
+              "m",
+              "o"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "少なくとも",
+            "phones": [
+              "s",
+              "u",
+              "k",
+              "u",
+              "n",
+              "a",
+              "k",
+              "u",
+              "t",
+              "o",
+              "m",
+              "o"
+            ],
+            "edits": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "w021",
+      "group": "word",
+      "display": "従姉妹",
+      "text": "いとこ",
+      "spoken_kana": "いとこ",
+      "results": {
+        "voicevox": [
+          {
+            "seconds": 0.3133926670002438,
+            "audio_s": 0.7466666666666667
+          },
+          {
+            "seconds": 0.3344473340002878,
+            "audio_s": 0.7466666666666667
+          },
+          {
+            "seconds": 0.3605646670002898,
+            "audio_s": 0.7466666666666667
+          }
+        ],
+        "kokoro": [
+          {
+            "seconds": 0.34065154100017025,
+            "audio_s": 1.175
+          },
+          {
+            "seconds": 0.273961583000073,
+            "audio_s": 1.175
+          },
+          {
+            "seconds": 0.28909779200012053,
+            "audio_s": 1.175
+          }
+        ],
+        "openjtalk": [
+          {
+            "seconds": 0.01666133299977446,
+            "audio_s": 1.265
+          },
+          {
+            "seconds": 0.01717691699968782,
+            "audio_s": 1.265
+          },
+          {
+            "seconds": 0.016804459000013594,
+            "audio_s": 1.265
+          }
+        ]
+      },
+      "reference_phones": [
+        "i",
+        "t",
+        "o",
+        "k",
+        "o"
+      ],
+      "checks": {
+        "voicevox": {
+          "reazon": {
+            "text": "いとこ",
+            "phones": [
+              "i",
+              "t",
+              "o",
+              "k",
+              "o"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "糸子",
+            "phones": [
+              "i",
+              "t",
+              "o",
+              "k",
+              "o"
+            ],
+            "edits": 0
+          }
+        },
+        "kokoro": {
+          "reazon": {
+            "text": "いとこ",
+            "phones": [
+              "i",
+              "t",
+              "o",
+              "k",
+              "o"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "いいとこ",
+            "phones": [
+              "i",
+              "i",
+              "t",
+              "o",
+              "k",
+              "o"
+            ],
+            "edits": 1
+          }
+        },
+        "openjtalk": {
+          "reazon": {
+            "text": "いとこ",
+            "phones": [
+              "i",
+              "t",
+              "o",
+              "k",
+              "o"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "いとこ",
+            "phones": [
+              "i",
+              "t",
+              "o",
+              "k",
+              "o"
+            ],
+            "edits": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "w025",
+      "group": "word",
+      "display": "アイデア",
+      "text": "アイデア",
+      "spoken_kana": "アイデア",
+      "results": {
+        "voicevox": [
+          {
+            "seconds": 0.33725933299956523,
+            "audio_s": 0.8106666666666666
+          },
+          {
+            "seconds": 0.36264383299976544,
+            "audio_s": 0.8106666666666666
+          },
+          {
+            "seconds": 0.3423640420000993,
+            "audio_s": 0.8106666666666666
+          }
+        ],
+        "kokoro": [
+          {
+            "seconds": 0.32628845899989756,
+            "audio_s": 1.475
+          },
+          {
+            "seconds": 0.3360075410000718,
+            "audio_s": 1.475
+          },
+          {
+            "seconds": 0.34519170800012944,
+            "audio_s": 1.475
+          }
+        ],
+        "openjtalk": [
+          {
+            "seconds": 0.017101124999953754,
+            "audio_s": 1.26
+          },
+          {
+            "seconds": 0.01778083399995012,
+            "audio_s": 1.26
+          },
+          {
+            "seconds": 0.01665070899980492,
+            "audio_s": 1.26
+          }
+        ]
+      },
+      "reference_phones": [
+        "a",
+        "i",
+        "d",
+        "e",
+        "a"
+      ],
+      "checks": {
+        "voicevox": {
+          "reazon": {
+            "text": "アイデア",
+            "phones": [
+              "a",
+              "i",
+              "d",
+              "e",
+              "a"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "アイデア",
+            "phones": [
+              "a",
+              "i",
+              "d",
+              "e",
+              "a"
+            ],
+            "edits": 0
+          }
+        },
+        "kokoro": {
+          "reazon": {
+            "text": "アイデア",
+            "phones": [
+              "a",
+              "i",
+              "d",
+              "e",
+              "a"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "アイデア",
+            "phones": [
+              "a",
+              "i",
+              "d",
+              "e",
+              "a"
+            ],
+            "edits": 0
+          }
+        },
+        "openjtalk": {
+          "reazon": {
+            "text": "あいちゃん",
+            "phones": [
+              "a",
+              "i",
+              "ch",
+              "a",
+              "N"
+            ],
+            "edits": 3
+          },
+          "whisper_small": {
+            "text": "相手は",
+            "phones": [
+              "a",
+              "i",
+              "t",
+              "e",
+              "w",
+              "a"
+            ],
+            "edits": 2
+          }
+        }
+      }
+    },
+    {
+      "id": "w030",
+      "group": "word",
+      "display": "生ずる",
+      "text": "しょうずる",
+      "spoken_kana": "しょうずる",
+      "results": {
+        "voicevox": [
+          {
+            "seconds": 0.4378895410000041,
+            "audio_s": 0.8213333333333334
+          },
+          {
+            "seconds": 0.3494459169996844,
+            "audio_s": 0.8213333333333334
+          },
+          {
+            "seconds": 0.3858868749998692,
+            "audio_s": 0.8213333333333334
+          }
+        ],
+        "kokoro": [
+          {
+            "seconds": 0.42922649999991336,
+            "audio_s": 1.625
+          },
+          {
+            "seconds": 0.5769723329999579,
+            "audio_s": 1.625
+          },
+          {
+            "seconds": 0.39371516699975473,
+            "audio_s": 1.625
+          }
+        ],
+        "openjtalk": [
+          {
+            "seconds": 0.018832250000286876,
+            "audio_s": 1.355
+          },
+          {
+            "seconds": 0.01859291699975074,
+            "audio_s": 1.355
+          },
+          {
+            "seconds": 0.018109915999957593,
+            "audio_s": 1.355
+          }
+        ]
+      },
+      "reference_phones": [
+        "sh",
+        "o",
+        "o",
+        "z",
+        "u",
+        "r",
+        "u"
+      ],
+      "checks": {
+        "voicevox": {
+          "reazon": {
+            "text": "ずる",
+            "phones": [
+              "z",
+              "u",
+              "r",
+              "u"
+            ],
+            "edits": 3
+          },
+          "whisper_small": {
+            "text": "小ずる",
+            "phones": [
+              "sh",
+              "o",
+              "o",
+              "z",
+              "u",
+              "r",
+              "u"
+            ],
+            "edits": 0
+          }
+        },
+        "kokoro": {
+          "reazon": {
+            "text": "翔鶴",
+            "phones": [
+              "sh",
+              "o",
+              "o",
+              "k",
+              "a",
+              "k",
+              "u"
+            ],
+            "edits": 3
+          },
+          "whisper_small": {
+            "text": "小ずる",
+            "phones": [
+              "sh",
+              "o",
+              "o",
+              "z",
+              "u",
+              "r",
+              "u"
+            ],
+            "edits": 0
+          }
+        },
+        "openjtalk": {
+          "reazon": {
+            "text": "そうずる",
+            "phones": [
+              "s",
+              "o",
+              "o",
+              "z",
+              "u",
+              "r",
+              "u"
+            ],
+            "edits": 1
+          },
+          "whisper_small": {
+            "text": "小ずる",
+            "phones": [
+              "sh",
+              "o",
+              "o",
+              "z",
+              "u",
+              "r",
+              "u"
+            ],
+            "edits": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "w033",
+      "group": "word",
+      "display": "シーツ",
+      "text": "シーツ",
+      "spoken_kana": "シーツ",
+      "results": {
+        "voicevox": [
+          {
+            "seconds": 0.30602429200007464,
+            "audio_s": 0.768
+          },
+          {
+            "seconds": 0.3495406249999178,
+            "audio_s": 0.768
+          },
+          {
+            "seconds": 0.3366754589997072,
+            "audio_s": 0.768
+          }
+        ],
+        "kokoro": [
+          {
+            "seconds": 0.32382291699968846,
+            "audio_s": 1.45
+          },
+          {
+            "seconds": 0.32413487499979965,
+            "audio_s": 1.45
+          },
+          {
+            "seconds": 0.3432794579998699,
+            "audio_s": 1.45
+          }
+        ],
+        "openjtalk": [
+          {
+            "seconds": 0.016616207999959443,
+            "audio_s": 1.26
+          },
+          {
+            "seconds": 0.017607417000363057,
+            "audio_s": 1.26
+          },
+          {
+            "seconds": 0.016604375000042637,
+            "audio_s": 1.26
+          }
+        ]
+      },
+      "reference_phones": [
+        "sh",
+        "i",
+        "i",
+        "ts",
+        "u"
+      ],
+      "checks": {
+        "voicevox": {
+          "reazon": {
+            "text": "シーツ",
+            "phones": [
+              "sh",
+              "i",
+              "i",
+              "ts",
+              "u"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "シーツ",
+            "phones": [
+              "sh",
+              "i",
+              "i",
+              "ts",
+              "u"
+            ],
+            "edits": 0
+          }
+        },
+        "kokoro": {
+          "reazon": {
+            "text": "シーズ",
+            "phones": [
+              "sh",
+              "i",
+              "i",
+              "z",
+              "u"
+            ],
+            "edits": 1
+          },
+          "whisper_small": {
+            "text": "シーズ",
+            "phones": [
+              "sh",
+              "i",
+              "i",
+              "z",
+              "u"
+            ],
+            "edits": 1
+          }
+        },
+        "openjtalk": {
+          "reazon": {
+            "text": "シーツ",
+            "phones": [
+              "sh",
+              "i",
+              "i",
+              "ts",
+              "u"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "シーツ",
+            "phones": [
+              "sh",
+              "i",
+              "i",
+              "ts",
+              "u"
+            ],
+            "edits": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "w036",
+      "group": "word",
+      "display": "漸く",
+      "text": "ようやく",
+      "spoken_kana": "ようやく",
+      "results": {
+        "voicevox": [
+          {
+            "seconds": 0.3214184160001423,
+            "audio_s": 0.8426666666666667
+          },
+          {
+            "seconds": 0.3607554589998472,
+            "audio_s": 0.8426666666666667
+          },
+          {
+            "seconds": 0.3782419160002064,
+            "audio_s": 0.8426666666666667
+          }
+        ],
+        "kokoro": [
+          {
+            "seconds": 0.2844721669998762,
+            "audio_s": 1.25
+          },
+          {
+            "seconds": 0.3034710830002041,
+            "audio_s": 1.25
+          },
+          {
+            "seconds": 0.29738575000010314,
+            "audio_s": 1.25
+          }
+        ],
+        "openjtalk": [
+          {
+            "seconds": 0.01783712500036927,
+            "audio_s": 1.315
+          },
+          {
+            "seconds": 0.01836924999997791,
+            "audio_s": 1.315
+          },
+          {
+            "seconds": 0.017684291000023222,
+            "audio_s": 1.315
+          }
+        ]
+      },
+      "reference_phones": [
+        "y",
+        "o",
+        "o",
+        "y",
+        "a",
+        "k",
+        "u"
+      ],
+      "checks": {
+        "voicevox": {
+          "reazon": {
+            "text": "ようやく",
+            "phones": [
+              "y",
+              "o",
+              "o",
+              "y",
+              "a",
+              "k",
+              "u"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "ようやく",
+            "phones": [
+              "y",
+              "o",
+              "o",
+              "y",
+              "a",
+              "k",
+              "u"
+            ],
+            "edits": 0
+          }
+        },
+        "kokoro": {
+          "reazon": {
+            "text": "ようやく",
+            "phones": [
+              "y",
+              "o",
+              "o",
+              "y",
+              "a",
+              "k",
+              "u"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "ようやく",
+            "phones": [
+              "y",
+              "o",
+              "o",
+              "y",
+              "a",
+              "k",
+              "u"
+            ],
+            "edits": 0
+          }
+        },
+        "openjtalk": {
+          "reazon": {
+            "text": "ようやく",
+            "phones": [
+              "y",
+              "o",
+              "o",
+              "y",
+              "a",
+              "k",
+              "u"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "ようやく",
+            "phones": [
+              "y",
+              "o",
+              "o",
+              "y",
+              "a",
+              "k",
+              "u"
+            ],
+            "edits": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "w037",
+      "group": "word",
+      "display": "蝋燭",
+      "text": "ろうそく",
+      "spoken_kana": "ろうそく",
+      "results": {
+        "voicevox": [
+          {
+            "seconds": 0.3376919579995956,
+            "audio_s": 0.832
+          },
+          {
+            "seconds": 0.3473647920000076,
+            "audio_s": 0.832
+          },
+          {
+            "seconds": 0.3569377499998154,
+            "audio_s": 0.832
+          }
+        ],
+        "kokoro": [
+          {
+            "seconds": 0.30101187499985826,
+            "audio_s": 1.325
+          },
+          {
+            "seconds": 0.30483970800014504,
+            "audio_s": 1.325
+          },
+          {
+            "seconds": 0.3196754589998818,
+            "audio_s": 1.325
+          }
+        ],
+        "openjtalk": [
+          {
+            "seconds": 0.018187957999998616,
+            "audio_s": 1.34
+          },
+          {
+            "seconds": 0.020503875000031258,
+            "audio_s": 1.34
+          },
+          {
+            "seconds": 0.01796608299991931,
+            "audio_s": 1.34
+          }
+        ]
+      },
+      "reference_phones": [
+        "r",
+        "o",
+        "o",
+        "s",
+        "o",
+        "k",
+        "u"
+      ],
+      "checks": {
+        "voicevox": {
+          "reazon": {
+            "text": "ろうそく",
+            "phones": [
+              "r",
+              "o",
+              "o",
+              "s",
+              "o",
+              "k",
+              "u"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "ろうそく",
+            "phones": [
+              "r",
+              "o",
+              "o",
+              "s",
+              "o",
+              "k",
+              "u"
+            ],
+            "edits": 0
+          }
+        },
+        "kokoro": {
+          "reazon": {
+            "text": "ろうそく",
+            "phones": [
+              "r",
+              "o",
+              "o",
+              "s",
+              "o",
+              "k",
+              "u"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "ろうそく",
+            "phones": [
+              "r",
+              "o",
+              "o",
+              "s",
+              "o",
+              "k",
+              "u"
+            ],
+            "edits": 0
+          }
+        },
+        "openjtalk": {
+          "reazon": {
+            "text": "ろうそく",
+            "phones": [
+              "r",
+              "o",
+              "o",
+              "s",
+              "o",
+              "k",
+              "u"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "要則",
+            "phones": [
+              "y",
+              "o",
+              "o",
+              "n",
+              "o",
+              "r",
+              "i"
+            ],
+            "edits": 4
+          }
+        }
+      }
+    },
+    {
+      "id": "w048",
+      "group": "word",
+      "display": "一旦",
+      "text": "いったん",
+      "spoken_kana": "いったん",
+      "results": {
+        "voicevox": [
+          {
+            "seconds": 0.32444095799974093,
+            "audio_s": 0.8106666666666666
+          },
+          {
+            "seconds": 0.3517673329997706,
+            "audio_s": 0.8106666666666666
+          },
+          {
+            "seconds": 0.348628958000063,
+            "audio_s": 0.8106666666666666
+          }
+        ],
+        "kokoro": [
+          {
+            "seconds": 0.26476845899969703,
+            "audio_s": 1.1
+          },
+          {
+            "seconds": 0.2543334160000086,
+            "audio_s": 1.1
+          },
+          {
+            "seconds": 0.29160129199999574,
+            "audio_s": 1.1
+          }
+        ],
+        "openjtalk": [
+          {
+            "seconds": 0.015135499999814783,
+            "audio_s": 1.135
+          },
+          {
+            "seconds": 0.01767691700024443,
+            "audio_s": 1.135
+          },
+          {
+            "seconds": 0.01622250000036729,
+            "audio_s": 1.135
+          }
+        ]
+      },
+      "reference_phones": [
+        "i",
+        "cl",
+        "t",
+        "a",
+        "N"
+      ],
+      "checks": {
+        "voicevox": {
+          "reazon": {
+            "text": "いったん",
+            "phones": [
+              "i",
+              "cl",
+              "t",
+              "a",
+              "N"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "いったん",
+            "phones": [
+              "i",
+              "cl",
+              "t",
+              "a",
+              "N"
+            ],
+            "edits": 0
+          }
+        },
+        "kokoro": {
+          "reazon": {
+            "text": "いいた",
+            "phones": [
+              "i",
+              "i",
+              "t",
+              "a"
+            ],
+            "edits": 2
+          },
+          "whisper_small": {
+            "text": "言いた",
+            "phones": [
+              "i",
+              "i",
+              "t",
+              "a"
+            ],
+            "edits": 2
+          }
+        },
+        "openjtalk": {
+          "reazon": {
+            "text": "いったん",
+            "phones": [
+              "i",
+              "cl",
+              "t",
+              "a",
+              "N"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "一旦",
+            "phones": [
+              "i",
+              "cl",
+              "t",
+              "a",
+              "N"
+            ],
+            "edits": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "w058",
+      "group": "word",
+      "display": "方針",
+      "text": "ほうしん",
+      "spoken_kana": "ほうしん",
+      "results": {
+        "voicevox": [
+          {
+            "seconds": 0.30713170799981526,
+            "audio_s": 0.7786666666666666
+          },
+          {
+            "seconds": 0.3472270000002027,
+            "audio_s": 0.7786666666666666
+          },
+          {
+            "seconds": 0.33946575000027224,
+            "audio_s": 0.7786666666666666
+          }
+        ],
+        "kokoro": [
+          {
+            "seconds": 0.29940833399996336,
+            "audio_s": 1.325
+          },
+          {
+            "seconds": 0.42201470800000607,
+            "audio_s": 1.325
+          },
+          {
+            "seconds": 0.34892870900011985,
+            "audio_s": 1.325
+          }
+        ],
+        "openjtalk": [
+          {
+            "seconds": 0.016812708000088605,
+            "audio_s": 1.235
+          },
+          {
+            "seconds": 0.01792162499987171,
+            "audio_s": 1.235
+          },
+          {
+            "seconds": 0.018381500000032247,
+            "audio_s": 1.235
+          }
+        ]
+      },
+      "reference_phones": [
+        "h",
+        "o",
+        "o",
+        "sh",
+        "i",
+        "N"
+      ],
+      "checks": {
+        "voicevox": {
+          "reazon": {
+            "text": "方針",
+            "phones": [
+              "h",
+              "o",
+              "o",
+              "sh",
+              "i",
+              "N"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "方針",
+            "phones": [
+              "h",
+              "o",
+              "o",
+              "sh",
+              "i",
+              "N"
+            ],
+            "edits": 0
+          }
+        },
+        "kokoro": {
+          "reazon": {
+            "text": "方針",
+            "phones": [
+              "h",
+              "o",
+              "o",
+              "sh",
+              "i",
+              "N"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "方針",
+            "phones": [
+              "h",
+              "o",
+              "o",
+              "sh",
+              "i",
+              "N"
+            ],
+            "edits": 0
+          }
+        },
+        "openjtalk": {
+          "reazon": {
+            "text": "ほうしん",
+            "phones": [
+              "h",
+              "o",
+              "o",
+              "sh",
+              "i",
+              "N"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "方針",
+            "phones": [
+              "h",
+              "o",
+              "o",
+              "sh",
+              "i",
+              "N"
+            ],
+            "edits": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "w061",
+      "group": "word",
+      "display": "基準",
+      "text": "きじゅん",
+      "spoken_kana": "きじゅん",
+      "results": {
+        "voicevox": [
+          {
+            "seconds": 0.3405488329999571,
+            "audio_s": 0.6826666666666666
+          },
+          {
+            "seconds": 0.3409205830002975,
+            "audio_s": 0.6826666666666666
+          },
+          {
+            "seconds": 0.3168398750003689,
+            "audio_s": 0.6826666666666666
+          }
+        ],
+        "kokoro": [
+          {
+            "seconds": 0.2685682920000545,
+            "audio_s": 1.175
+          },
+          {
+            "seconds": 0.26633124999989377,
+            "audio_s": 1.175
+          },
+          {
+            "seconds": 0.2839897500002735,
+            "audio_s": 1.175
+          }
+        ],
+        "openjtalk": [
+          {
+            "seconds": 0.014886957999806327,
+            "audio_s": 1.09
+          },
+          {
+            "seconds": 0.015153749999626598,
+            "audio_s": 1.09
+          },
+          {
+            "seconds": 0.014454625000325905,
+            "audio_s": 1.09
+          }
+        ]
+      },
+      "reference_phones": [
+        "k",
+        "i",
+        "j",
+        "u",
+        "N"
+      ],
+      "checks": {
+        "voicevox": {
+          "reazon": {
+            "text": "基準",
+            "phones": [
+              "k",
+              "i",
+              "j",
+              "u",
+              "N"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "基準",
+            "phones": [
+              "k",
+              "i",
+              "j",
+              "u",
+              "N"
+            ],
+            "edits": 0
+          }
+        },
+        "kokoro": {
+          "reazon": {
+            "text": "いい",
+            "phones": [
+              "i",
+              "i"
+            ],
+            "edits": 4
+          },
+          "whisper_small": {
+            "text": "いきじゅん",
+            "phones": [
+              "i",
+              "k",
+              "i",
+              "j",
+              "u",
+              "N"
+            ],
+            "edits": 1
+          }
+        },
+        "openjtalk": {
+          "reazon": {
+            "text": "基準",
+            "phones": [
+              "k",
+              "i",
+              "j",
+              "u",
+              "N"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "基準",
+            "phones": [
+              "k",
+              "i",
+              "j",
+              "u",
+              "N"
+            ],
+            "edits": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "w063",
+      "group": "word",
+      "display": "調整",
+      "text": "ちょうせい",
+      "spoken_kana": "ちょうせい",
+      "results": {
+        "voicevox": [
+          {
+            "seconds": 0.3130880829999114,
+            "audio_s": 0.8
+          },
+          {
+            "seconds": 0.3368789999999535,
+            "audio_s": 0.8
+          },
+          {
+            "seconds": 0.3878651249997347,
+            "audio_s": 0.8
+          }
+        ],
+        "kokoro": [
+          {
+            "seconds": 0.30806358300014836,
+            "audio_s": 1.375
+          },
+          {
+            "seconds": 0.41137841700037825,
+            "audio_s": 1.375
+          },
+          {
+            "seconds": 0.3235042500000418,
+            "audio_s": 1.375
+          }
+        ],
+        "openjtalk": [
+          {
+            "seconds": 0.01768220799976916,
+            "audio_s": 1.335
+          },
+          {
+            "seconds": 0.01842274999989968,
+            "audio_s": 1.335
+          },
+          {
+            "seconds": 0.017715625000164437,
+            "audio_s": 1.335
+          }
+        ]
+      },
+      "reference_phones": [
+        "ch",
+        "o",
+        "o",
+        "s",
+        "e",
+        "i"
+      ],
+      "checks": {
+        "voicevox": {
+          "reazon": {
+            "text": "一回",
+            "phones": [
+              "i",
+              "cl",
+              "k",
+              "a",
+              "i"
+            ],
+            "edits": 5
+          },
+          "whisper_small": {
+            "text": "調整",
+            "phones": [
+              "ch",
+              "o",
+              "o",
+              "s",
+              "e",
+              "e"
+            ],
+            "edits": 1
+          }
+        },
+        "kokoro": {
+          "reazon": {
+            "text": "情勢",
+            "phones": [
+              "j",
+              "o",
+              "o",
+              "s",
+              "e",
+              "e"
+            ],
+            "edits": 2
+          },
+          "whisper_small": {
+            "text": "情勢",
+            "phones": [
+              "j",
+              "o",
+              "o",
+              "s",
+              "e",
+              "e"
+            ],
+            "edits": 2
+          }
+        },
+        "openjtalk": {
+          "reazon": {
+            "text": "ちょうせい",
+            "phones": [
+              "ch",
+              "o",
+              "o",
+              "s",
+              "e",
+              "i"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "調整",
+            "phones": [
+              "ch",
+              "o",
+              "o",
+              "s",
+              "e",
+              "e"
+            ],
+            "edits": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "w086",
+      "group": "word",
+      "display": "うっかり",
+      "text": "うっかり",
+      "spoken_kana": "うっかり",
+      "results": {
+        "voicevox": [
+          {
+            "seconds": 0.32400425000014366,
+            "audio_s": 0.864
+          },
+          {
+            "seconds": 0.3603891669999939,
+            "audio_s": 0.864
+          },
+          {
+            "seconds": 0.35739108400002806,
+            "audio_s": 0.864
+          }
+        ],
+        "kokoro": [
+          {
+            "seconds": 0.2510003750003307,
+            "audio_s": 1.1
+          },
+          {
+            "seconds": 0.26077929199982464,
+            "audio_s": 1.1
+          },
+          {
+            "seconds": 0.26419858300005217,
+            "audio_s": 1.1
+          }
+        ],
+        "openjtalk": [
+          {
+            "seconds": 0.016874499999630643,
+            "audio_s": 1.23
+          },
+          {
+            "seconds": 0.016653166999731184,
+            "audio_s": 1.23
+          },
+          {
+            "seconds": 0.020713082999918697,
+            "audio_s": 1.23
+          }
+        ]
+      },
+      "reference_phones": [
+        "u",
+        "cl",
+        "k",
+        "a",
+        "r",
+        "i"
+      ],
+      "checks": {
+        "voicevox": {
+          "reazon": {
+            "text": "うっかり",
+            "phones": [
+              "u",
+              "cl",
+              "k",
+              "a",
+              "r",
+              "i"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "うっかり",
+            "phones": [
+              "u",
+              "cl",
+              "k",
+              "a",
+              "r",
+              "i"
+            ],
+            "edits": 0
+          }
+        },
+        "kokoro": {
+          "reazon": {
+            "text": "うっかり",
+            "phones": [
+              "u",
+              "cl",
+              "k",
+              "a",
+              "r",
+              "i"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "うかり",
+            "phones": [
+              "u",
+              "k",
+              "a",
+              "r",
+              "i"
+            ],
+            "edits": 1
+          }
+        },
+        "openjtalk": {
+          "reazon": {
+            "text": "うっかり",
+            "phones": [
+              "u",
+              "cl",
+              "k",
+              "a",
+              "r",
+              "i"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "ふっかり",
+            "phones": [
+              "f",
+              "u",
+              "cl",
+              "k",
+              "a",
+              "r",
+              "i"
+            ],
+            "edits": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "w112",
+      "group": "word",
+      "display": "率直",
+      "text": "そっちょく",
+      "spoken_kana": "そっちょく",
+      "results": {
+        "voicevox": [
+          {
+            "seconds": 0.33539474999997765,
+            "audio_s": 0.8853333333333333
+          },
+          {
+            "seconds": 0.360843916000249,
+            "audio_s": 0.8853333333333333
+          },
+          {
+            "seconds": 0.4041799579999861,
+            "audio_s": 0.8853333333333333
+          }
+        ],
+        "kokoro": [
+          {
+            "seconds": 0.29958216600016385,
+            "audio_s": 1.3
+          },
+          {
+            "seconds": 0.3189804579997144,
+            "audio_s": 1.3
+          },
+          {
+            "seconds": 0.3135518750000301,
+            "audio_s": 1.3
+          }
+        ],
+        "openjtalk": [
+          {
+            "seconds": 0.018335166999804642,
+            "audio_s": 1.37
+          },
+          {
+            "seconds": 0.023087999999916065,
+            "audio_s": 1.37
+          },
+          {
+            "seconds": 0.037273999999797525,
+            "audio_s": 1.37
+          }
+        ]
+      },
+      "reference_phones": [
+        "s",
+        "o",
+        "cl",
+        "ch",
+        "o",
+        "k",
+        "u"
+      ],
+      "checks": {
+        "voicevox": {
+          "reazon": {
+            "text": "率直",
+            "phones": [
+              "s",
+              "o",
+              "cl",
+              "ch",
+              "o",
+              "k",
+              "u"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "率直",
+            "phones": [
+              "s",
+              "o",
+              "cl",
+              "ch",
+              "o",
+              "k",
+              "u"
+            ],
+            "edits": 0
+          }
+        },
+        "kokoro": {
+          "reazon": {
+            "text": "村直",
+            "phones": [
+              "m",
+              "u",
+              "r",
+              "a",
+              "j",
+              "i",
+              "k",
+              "i"
+            ],
+            "edits": 7
+          },
+          "whisper_small": {
+            "text": "存直",
+            "phones": [
+              "s",
+              "o",
+              "N",
+              "j",
+              "i",
+              "k",
+              "i"
+            ],
+            "edits": 4
+          }
+        },
+        "openjtalk": {
+          "reazon": {
+            "text": "ちょく",
+            "phones": [
+              "ch",
+              "o",
+              "k",
+              "u"
+            ],
+            "edits": 3
+          },
+          "whisper_small": {
+            "text": "率直",
+            "phones": [
+              "s",
+              "o",
+              "cl",
+              "ch",
+              "o",
+              "k",
+              "u"
+            ],
+            "edits": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "s01",
+      "text": "電車は何時に出ますか。",
+      "spoken_kana": "デンシャワナンジニデマスカ",
+      "group": "sentence",
+      "display": "電車は何時に出ますか。",
+      "results": {
+        "voicevox": [
+          {
+            "seconds": 0.5451915000003282,
+            "audio_s": 1.9413333333333334
+          },
+          {
+            "seconds": 0.582991457999924,
+            "audio_s": 1.9413333333333334
+          },
+          {
+            "seconds": 0.6166947080000682,
+            "audio_s": 1.9413333333333334
+          }
+        ],
+        "kokoro": [
+          {
+            "seconds": 0.6351697079999212,
+            "audio_s": 2.85
+          },
+          {
+            "seconds": 0.7220517079999809,
+            "audio_s": 2.85
+          },
+          {
+            "seconds": 0.6628855000003568,
+            "audio_s": 2.85
+          }
+        ],
+        "openjtalk": [
+          {
+            "seconds": 0.03181612500020492,
+            "audio_s": 2.275
+          },
+          {
+            "seconds": 0.032482749999871885,
+            "audio_s": 2.275
+          },
+          {
+            "seconds": 0.03150904099993568,
+            "audio_s": 2.275
+          }
+        ]
+      },
+      "reference_phones": [
+        "d",
+        "e",
+        "N",
+        "sh",
+        "a",
+        "w",
+        "a",
+        "n",
+        "a",
+        "N",
+        "j",
+        "i",
+        "n",
+        "i",
+        "d",
+        "e",
+        "m",
+        "a",
+        "s",
+        "u",
+        "k",
+        "a"
+      ],
+      "checks": {
+        "voicevox": {
+          "reazon": {
+            "text": "電車は何時に出ますか",
+            "phones": [
+              "d",
+              "e",
+              "N",
+              "sh",
+              "a",
+              "w",
+              "a",
+              "n",
+              "a",
+              "N",
+              "j",
+              "i",
+              "n",
+              "i",
+              "d",
+              "e",
+              "m",
+              "a",
+              "s",
+              "u",
+              "k",
+              "a"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "電車は何時に出ますか",
+            "phones": [
+              "d",
+              "e",
+              "N",
+              "sh",
+              "a",
+              "w",
+              "a",
+              "n",
+              "a",
+              "N",
+              "j",
+              "i",
+              "n",
+              "i",
+              "d",
+              "e",
+              "m",
+              "a",
+              "s",
+              "u",
+              "k",
+              "a"
+            ],
+            "edits": 0
+          }
+        },
+        "kokoro": {
+          "reazon": {
+            "text": "電車は何時に出ますか",
+            "phones": [
+              "d",
+              "e",
+              "N",
+              "sh",
+              "a",
+              "w",
+              "a",
+              "n",
+              "a",
+              "N",
+              "j",
+              "i",
+              "n",
+              "i",
+              "d",
+              "e",
+              "m",
+              "a",
+              "s",
+              "u",
+              "k",
+              "a"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "電車は何時に出ますか?",
+            "phones": [
+              "d",
+              "e",
+              "N",
+              "sh",
+              "a",
+              "w",
+              "a",
+              "n",
+              "a",
+              "N",
+              "j",
+              "i",
+              "n",
+              "i",
+              "d",
+              "e",
+              "m",
+              "a",
+              "s",
+              "u",
+              "k",
+              "a"
+            ],
+            "edits": 0
+          }
+        },
+        "openjtalk": {
+          "reazon": {
+            "text": "電車は何時に出ますか",
+            "phones": [
+              "d",
+              "e",
+              "N",
+              "sh",
+              "a",
+              "w",
+              "a",
+              "n",
+              "a",
+              "N",
+              "j",
+              "i",
+              "n",
+              "i",
+              "d",
+              "e",
+              "m",
+              "a",
+              "s",
+              "u",
+              "k",
+              "a"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "電車は何時に出ますか?",
+            "phones": [
+              "d",
+              "e",
+              "N",
+              "sh",
+              "a",
+              "w",
+              "a",
+              "n",
+              "a",
+              "N",
+              "j",
+              "i",
+              "n",
+              "i",
+              "d",
+              "e",
+              "m",
+              "a",
+              "s",
+              "u",
+              "k",
+              "a"
+            ],
+            "edits": 0
+          }
+        }
+      },
+      "utmos": {
+        "voicevox": 3.2031779289245605,
+        "kokoro": 4.308829307556152,
+        "openjtalk": 2.361534595489502
+      }
+    },
+    {
+      "id": "s02",
+      "text": "今日は図書館で日本語を勉強します。",
+      "spoken_kana": "キョーワトショカンデニホンゴオベンキョーシマス",
+      "group": "sentence",
+      "display": "今日は図書館で日本語を勉強します。",
+      "results": {
+        "voicevox": [
+          {
+            "seconds": 0.7738478339997528,
+            "audio_s": 3.008
+          },
+          {
+            "seconds": 0.9691832499997872,
+            "audio_s": 3.008
+          },
+          {
+            "seconds": 1.055872041999919,
+            "audio_s": 3.008
+          }
+        ],
+        "kokoro": [
+          {
+            "seconds": 0.8754486670000006,
+            "audio_s": 3.925
+          },
+          {
+            "seconds": 1.0417706250000265,
+            "audio_s": 3.925
+          },
+          {
+            "seconds": 1.0614760829998886,
+            "audio_s": 3.925
+          }
+        ],
+        "openjtalk": [
+          {
+            "seconds": 0.04646879199981413,
+            "audio_s": 3.33
+          },
+          {
+            "seconds": 0.04872137499978635,
+            "audio_s": 3.33
+          },
+          {
+            "seconds": 0.046376790999602235,
+            "audio_s": 3.33
+          }
+        ]
+      },
+      "reference_phones": [
+        "ky",
+        "o",
+        "o",
+        "w",
+        "a",
+        "t",
+        "o",
+        "sh",
+        "o",
+        "k",
+        "a",
+        "N",
+        "d",
+        "e",
+        "n",
+        "i",
+        "h",
+        "o",
+        "N",
+        "g",
+        "o",
+        "o",
+        "b",
+        "e",
+        "N",
+        "ky",
+        "o",
+        "o",
+        "sh",
+        "i",
+        "m",
+        "a",
+        "s",
+        "u"
+      ],
+      "checks": {
+        "voicevox": {
+          "reazon": {
+            "text": "今日は図書館で日本語を勉強します",
+            "phones": [
+              "ky",
+              "o",
+              "o",
+              "w",
+              "a",
+              "t",
+              "o",
+              "sh",
+              "o",
+              "k",
+              "a",
+              "N",
+              "d",
+              "e",
+              "n",
+              "i",
+              "h",
+              "o",
+              "N",
+              "g",
+              "o",
+              "o",
+              "b",
+              "e",
+              "N",
+              "ky",
+              "o",
+              "o",
+              "sh",
+              "i",
+              "m",
+              "a",
+              "s",
+              "u"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "今日は図書館で日本語を勉強します",
+            "phones": [
+              "ky",
+              "o",
+              "o",
+              "w",
+              "a",
+              "t",
+              "o",
+              "sh",
+              "o",
+              "k",
+              "a",
+              "N",
+              "d",
+              "e",
+              "n",
+              "i",
+              "h",
+              "o",
+              "N",
+              "g",
+              "o",
+              "o",
+              "b",
+              "e",
+              "N",
+              "ky",
+              "o",
+              "o",
+              "sh",
+              "i",
+              "m",
+              "a",
+              "s",
+              "u"
+            ],
+            "edits": 0
+          }
+        },
+        "kokoro": {
+          "reazon": {
+            "text": "教は図書館で日本語を勉強します",
+            "phones": [
+              "ky",
+              "o",
+              "o",
+              "w",
+              "a",
+              "t",
+              "o",
+              "sh",
+              "o",
+              "k",
+              "a",
+              "N",
+              "d",
+              "e",
+              "n",
+              "i",
+              "h",
+              "o",
+              "N",
+              "g",
+              "o",
+              "o",
+              "b",
+              "e",
+              "N",
+              "ky",
+              "o",
+              "o",
+              "sh",
+              "i",
+              "m",
+              "a",
+              "s",
+              "u"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "今日は図書館で日本語を勉強します。",
+            "phones": [
+              "ky",
+              "o",
+              "o",
+              "w",
+              "a",
+              "t",
+              "o",
+              "sh",
+              "o",
+              "k",
+              "a",
+              "N",
+              "d",
+              "e",
+              "n",
+              "i",
+              "h",
+              "o",
+              "N",
+              "g",
+              "o",
+              "o",
+              "b",
+              "e",
+              "N",
+              "ky",
+              "o",
+              "o",
+              "sh",
+              "i",
+              "m",
+              "a",
+              "s",
+              "u"
+            ],
+            "edits": 0
+          }
+        },
+        "openjtalk": {
+          "reazon": {
+            "text": "きょうは図書館で日本語を勉強します",
+            "phones": [
+              "ky",
+              "o",
+              "o",
+              "w",
+              "a",
+              "t",
+              "o",
+              "sh",
+              "o",
+              "k",
+              "a",
+              "N",
+              "d",
+              "e",
+              "n",
+              "i",
+              "h",
+              "o",
+              "N",
+              "g",
+              "o",
+              "o",
+              "b",
+              "e",
+              "N",
+              "ky",
+              "o",
+              "o",
+              "sh",
+              "i",
+              "m",
+              "a",
+              "s",
+              "u"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "今日は図書館で日本語を勉強します",
+            "phones": [
+              "ky",
+              "o",
+              "o",
+              "w",
+              "a",
+              "t",
+              "o",
+              "sh",
+              "o",
+              "k",
+              "a",
+              "N",
+              "d",
+              "e",
+              "n",
+              "i",
+              "h",
+              "o",
+              "N",
+              "g",
+              "o",
+              "o",
+              "b",
+              "e",
+              "N",
+              "ky",
+              "o",
+              "o",
+              "sh",
+              "i",
+              "m",
+              "a",
+              "s",
+              "u"
+            ],
+            "edits": 0
+          }
+        }
+      },
+      "utmos": {
+        "voicevox": 3.180088520050049,
+        "kokoro": 3.81835675239563,
+        "openjtalk": 1.900878667831421
+      }
+    },
+    {
+      "id": "s03",
+      "text": "切符を二枚ください。",
+      "spoken_kana": "キップオニマイクダサイ",
+      "group": "sentence",
+      "display": "切符を二枚ください。",
+      "results": {
+        "voicevox": [
+          {
+            "seconds": 0.6935575829998015,
+            "audio_s": 1.6853333333333333
+          },
+          {
+            "seconds": 0.6436772080000992,
+            "audio_s": 1.6853333333333333
+          },
+          {
+            "seconds": 0.533705750000081,
+            "audio_s": 1.6853333333333333
+          }
+        ],
+        "kokoro": [
+          {
+            "seconds": 0.5479572079998434,
+            "audio_s": 2.5
+          },
+          {
+            "seconds": 0.5472046250001767,
+            "audio_s": 2.5
+          },
+          {
+            "seconds": 0.5743012910002108,
+            "audio_s": 2.5
+          }
+        ],
+        "openjtalk": [
+          {
+            "seconds": 0.030252915999881225,
+            "audio_s": 2.12
+          },
+          {
+            "seconds": 0.03127808399995047,
+            "audio_s": 2.12
+          },
+          {
+            "seconds": 0.02910333299996637,
+            "audio_s": 2.12
+          }
+        ]
+      },
+      "reference_phones": [
+        "k",
+        "i",
+        "cl",
+        "p",
+        "u",
+        "o",
+        "n",
+        "i",
+        "m",
+        "a",
+        "i",
+        "k",
+        "u",
+        "d",
+        "a",
+        "s",
+        "a",
+        "i"
+      ],
+      "checks": {
+        "voicevox": {
+          "reazon": {
+            "text": "切符を二枚ください",
+            "phones": [
+              "k",
+              "i",
+              "cl",
+              "p",
+              "u",
+              "o",
+              "n",
+              "i",
+              "m",
+              "a",
+              "i",
+              "k",
+              "u",
+              "d",
+              "a",
+              "s",
+              "a",
+              "i"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "キップオーニーマイクださい",
+            "phones": [
+              "k",
+              "i",
+              "cl",
+              "p",
+              "u",
+              "o",
+              "o",
+              "n",
+              "i",
+              "i",
+              "m",
+              "a",
+              "i",
+              "k",
+              "u",
+              "d",
+              "a",
+              "s",
+              "a",
+              "i"
+            ],
+            "edits": 2
+          }
+        },
+        "kokoro": {
+          "reazon": {
+            "text": "きっぷ王にマイください",
+            "phones": [
+              "k",
+              "i",
+              "cl",
+              "p",
+              "u",
+              "o",
+              "o",
+              "n",
+              "i",
+              "m",
+              "a",
+              "i",
+              "k",
+              "u",
+              "d",
+              "a",
+              "s",
+              "a",
+              "i"
+            ],
+            "edits": 1
+          },
+          "whisper_small": {
+            "text": "キップオーにマイクださい",
+            "phones": [
+              "k",
+              "i",
+              "cl",
+              "p",
+              "u",
+              "o",
+              "o",
+              "n",
+              "i",
+              "m",
+              "a",
+              "i",
+              "k",
+              "u",
+              "d",
+              "a",
+              "s",
+              "a",
+              "i"
+            ],
+            "edits": 1
+          }
+        },
+        "openjtalk": {
+          "reazon": {
+            "text": "切符を二枚ください",
+            "phones": [
+              "k",
+              "i",
+              "cl",
+              "p",
+              "u",
+              "o",
+              "n",
+              "i",
+              "m",
+              "a",
+              "i",
+              "k",
+              "u",
+              "d",
+              "a",
+              "s",
+              "a",
+              "i"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "キップを2枚ください",
+            "phones": [
+              "k",
+              "i",
+              "cl",
+              "p",
+              "u",
+              "o",
+              "n",
+              "i",
+              "m",
+              "a",
+              "i",
+              "k",
+              "u",
+              "d",
+              "a",
+              "s",
+              "a",
+              "i"
+            ],
+            "edits": 0
+          }
+        }
+      },
+      "utmos": {
+        "voicevox": 2.804075241088867,
+        "kokoro": 4.216795921325684,
+        "openjtalk": 2.4333035945892334
+      }
+    },
+    {
+      "id": "s04",
+      "text": "雨がやんだら、散歩に行きましょう。",
+      "spoken_kana": "アメガヤンダラサンポニイキマショー",
+      "group": "sentence",
+      "display": "雨がやんだら、散歩に行きましょう。",
+      "results": {
+        "voicevox": [
+          {
+            "seconds": 0.7443426250001721,
+            "audio_s": 2.9226666666666667
+          },
+          {
+            "seconds": 0.8361216670000431,
+            "audio_s": 2.9226666666666667
+          },
+          {
+            "seconds": 0.9642182910001793,
+            "audio_s": 2.9226666666666667
+          }
+        ],
+        "kokoro": [
+          {
+            "seconds": 0.7729298330000347,
+            "audio_s": 3.425
+          },
+          {
+            "seconds": 0.8549056669999118,
+            "audio_s": 3.425
+          },
+          {
+            "seconds": 1.1794571250002264,
+            "audio_s": 3.425
+          }
+        ],
+        "openjtalk": [
+          {
+            "seconds": 0.048969166000006226,
+            "audio_s": 3.425
+          },
+          {
+            "seconds": 0.04983437500004584,
+            "audio_s": 3.425
+          },
+          {
+            "seconds": 0.04746533300021838,
+            "audio_s": 3.425
+          }
+        ]
+      },
+      "reference_phones": [
+        "a",
+        "m",
+        "e",
+        "g",
+        "a",
+        "y",
+        "a",
+        "N",
+        "d",
+        "a",
+        "r",
+        "a",
+        "s",
+        "a",
+        "N",
+        "p",
+        "o",
+        "n",
+        "i",
+        "i",
+        "k",
+        "i",
+        "m",
+        "a",
+        "sh",
+        "o",
+        "o"
+      ],
+      "checks": {
+        "voicevox": {
+          "reazon": {
+            "text": "雨がやんだら散歩に行きましょう",
+            "phones": [
+              "a",
+              "m",
+              "e",
+              "g",
+              "a",
+              "y",
+              "a",
+              "N",
+              "d",
+              "a",
+              "r",
+              "a",
+              "s",
+              "a",
+              "N",
+              "p",
+              "o",
+              "n",
+              "i",
+              "i",
+              "k",
+              "i",
+              "m",
+              "a",
+              "sh",
+              "o",
+              "o"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "雨が止んだら3歩に行きましょう",
+            "phones": [
+              "a",
+              "m",
+              "e",
+              "g",
+              "a",
+              "y",
+              "a",
+              "N",
+              "d",
+              "a",
+              "r",
+              "a",
+              "s",
+              "a",
+              "N",
+              "p",
+              "o",
+              "n",
+              "i",
+              "i",
+              "k",
+              "i",
+              "m",
+              "a",
+              "sh",
+              "o",
+              "o"
+            ],
+            "edits": 0
+          }
+        },
+        "kokoro": {
+          "reazon": {
+            "text": "雨がやんだら散歩に行きましょう",
+            "phones": [
+              "a",
+              "m",
+              "e",
+              "g",
+              "a",
+              "y",
+              "a",
+              "N",
+              "d",
+              "a",
+              "r",
+              "a",
+              "s",
+              "a",
+              "N",
+              "p",
+              "o",
+              "n",
+              "i",
+              "i",
+              "k",
+              "i",
+              "m",
+              "a",
+              "sh",
+              "o",
+              "o"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "雨が止んだら散歩に行きましょう。",
+            "phones": [
+              "a",
+              "m",
+              "e",
+              "g",
+              "a",
+              "y",
+              "a",
+              "N",
+              "d",
+              "a",
+              "r",
+              "a",
+              "s",
+              "a",
+              "N",
+              "p",
+              "o",
+              "n",
+              "i",
+              "i",
+              "k",
+              "i",
+              "m",
+              "a",
+              "sh",
+              "o",
+              "o"
+            ],
+            "edits": 0
+          }
+        },
+        "openjtalk": {
+          "reazon": {
+            "text": "雨がやんだら散歩に行きましょう",
+            "phones": [
+              "a",
+              "m",
+              "e",
+              "g",
+              "a",
+              "y",
+              "a",
+              "N",
+              "d",
+              "a",
+              "r",
+              "a",
+              "s",
+              "a",
+              "N",
+              "p",
+              "o",
+              "n",
+              "i",
+              "i",
+              "k",
+              "i",
+              "m",
+              "a",
+              "sh",
+              "o",
+              "o"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "雨が止んだら散歩に行きましょう",
+            "phones": [
+              "a",
+              "m",
+              "e",
+              "g",
+              "a",
+              "y",
+              "a",
+              "N",
+              "d",
+              "a",
+              "r",
+              "a",
+              "s",
+              "a",
+              "N",
+              "p",
+              "o",
+              "n",
+              "i",
+              "i",
+              "k",
+              "i",
+              "m",
+              "a",
+              "sh",
+              "o",
+              "o"
+            ],
+            "edits": 0
+          }
+        }
+      },
+      "utmos": {
+        "voicevox": 3.0116045475006104,
+        "kokoro": 4.299838066101074,
+        "openjtalk": 2.2535533905029297
+      }
+    },
+    {
+      "id": "s05",
+      "text": "来月の三日に、新しい先生が来ます。",
+      "spoken_kana": "ライゲツノミッカニアタラシイセンセイガキマス",
+      "group": "sentence",
+      "display": "来月の三日に、新しい先生が来ます。",
+      "results": {
+        "voicevox": [
+          {
+            "seconds": 0.8947669590002079,
+            "audio_s": 3.552
+          },
+          {
+            "seconds": 0.9826399999997193,
+            "audio_s": 3.552
+          },
+          {
+            "seconds": 1.0157881250001992,
+            "audio_s": 3.552
+          }
+        ],
+        "kokoro": [
+          {
+            "seconds": 0.9813340000000608,
+            "audio_s": 4.375
+          },
+          {
+            "seconds": 1.018417750000026,
+            "audio_s": 4.375
+          },
+          {
+            "seconds": 1.177298915999927,
+            "audio_s": 4.375
+          }
+        ],
+        "openjtalk": [
+          {
+            "seconds": 0.05915908399992986,
+            "audio_s": 4.245
+          },
+          {
+            "seconds": 0.06063095799981966,
+            "audio_s": 4.245
+          },
+          {
+            "seconds": 0.059011082999859354,
+            "audio_s": 4.245
+          }
+        ]
+      },
+      "reference_phones": [
+        "r",
+        "a",
+        "i",
+        "g",
+        "e",
+        "ts",
+        "u",
+        "n",
+        "o",
+        "m",
+        "i",
+        "cl",
+        "k",
+        "a",
+        "n",
+        "i",
+        "a",
+        "t",
+        "a",
+        "r",
+        "a",
+        "sh",
+        "i",
+        "i",
+        "s",
+        "e",
+        "N",
+        "s",
+        "e",
+        "i",
+        "g",
+        "a",
+        "k",
+        "i",
+        "m",
+        "a",
+        "s",
+        "u"
+      ],
+      "checks": {
+        "voicevox": {
+          "reazon": {
+            "text": "来月の三日に新しい先生が来ます",
+            "phones": [
+              "r",
+              "a",
+              "i",
+              "g",
+              "e",
+              "ts",
+              "u",
+              "n",
+              "o",
+              "m",
+              "i",
+              "cl",
+              "k",
+              "a",
+              "n",
+              "i",
+              "a",
+              "t",
+              "a",
+              "r",
+              "a",
+              "sh",
+              "i",
+              "i",
+              "s",
+              "e",
+              "N",
+              "s",
+              "e",
+              "e",
+              "g",
+              "a",
+              "k",
+              "i",
+              "m",
+              "a",
+              "s",
+              "u"
+            ],
+            "edits": 1
+          },
+          "whisper_small": {
+            "text": "来月の3日に新しい先生が来ます",
+            "phones": [
+              "r",
+              "a",
+              "i",
+              "g",
+              "e",
+              "ts",
+              "u",
+              "n",
+              "o",
+              "m",
+              "i",
+              "cl",
+              "k",
+              "a",
+              "n",
+              "i",
+              "a",
+              "t",
+              "a",
+              "r",
+              "a",
+              "sh",
+              "i",
+              "i",
+              "s",
+              "e",
+              "N",
+              "s",
+              "e",
+              "e",
+              "g",
+              "a",
+              "k",
+              "i",
+              "m",
+              "a",
+              "s",
+              "u"
+            ],
+            "edits": 1
+          }
+        },
+        "kokoro": {
+          "reazon": {
+            "text": "来月の三日に新しい先生が来ます",
+            "phones": [
+              "r",
+              "a",
+              "i",
+              "g",
+              "e",
+              "ts",
+              "u",
+              "n",
+              "o",
+              "m",
+              "i",
+              "cl",
+              "k",
+              "a",
+              "n",
+              "i",
+              "a",
+              "t",
+              "a",
+              "r",
+              "a",
+              "sh",
+              "i",
+              "i",
+              "s",
+              "e",
+              "N",
+              "s",
+              "e",
+              "e",
+              "g",
+              "a",
+              "k",
+              "i",
+              "m",
+              "a",
+              "s",
+              "u"
+            ],
+            "edits": 1
+          },
+          "whisper_small": {
+            "text": "来月の3日に新しい先生が来ます",
+            "phones": [
+              "r",
+              "a",
+              "i",
+              "g",
+              "e",
+              "ts",
+              "u",
+              "n",
+              "o",
+              "m",
+              "i",
+              "cl",
+              "k",
+              "a",
+              "n",
+              "i",
+              "a",
+              "t",
+              "a",
+              "r",
+              "a",
+              "sh",
+              "i",
+              "i",
+              "s",
+              "e",
+              "N",
+              "s",
+              "e",
+              "e",
+              "g",
+              "a",
+              "k",
+              "i",
+              "m",
+              "a",
+              "s",
+              "u"
+            ],
+            "edits": 1
+          }
+        },
+        "openjtalk": {
+          "reazon": {
+            "text": "来月の三日に新しい先生が来ます",
+            "phones": [
+              "r",
+              "a",
+              "i",
+              "g",
+              "e",
+              "ts",
+              "u",
+              "n",
+              "o",
+              "m",
+              "i",
+              "cl",
+              "k",
+              "a",
+              "n",
+              "i",
+              "a",
+              "t",
+              "a",
+              "r",
+              "a",
+              "sh",
+              "i",
+              "i",
+              "s",
+              "e",
+              "N",
+              "s",
+              "e",
+              "e",
+              "g",
+              "a",
+              "k",
+              "i",
+              "m",
+              "a",
+              "s",
+              "u"
+            ],
+            "edits": 1
+          },
+          "whisper_small": {
+            "text": "来月の3日に新しい先生が来ます",
+            "phones": [
+              "r",
+              "a",
+              "i",
+              "g",
+              "e",
+              "ts",
+              "u",
+              "n",
+              "o",
+              "m",
+              "i",
+              "cl",
+              "k",
+              "a",
+              "n",
+              "i",
+              "a",
+              "t",
+              "a",
+              "r",
+              "a",
+              "sh",
+              "i",
+              "i",
+              "s",
+              "e",
+              "N",
+              "s",
+              "e",
+              "e",
+              "g",
+              "a",
+              "k",
+              "i",
+              "m",
+              "a",
+              "s",
+              "u"
+            ],
+            "edits": 1
+          }
+        }
+      },
+      "utmos": {
+        "voicevox": 3.039431571960449,
+        "kokoro": 4.0792951583862305,
+        "openjtalk": 2.37430477142334
+      }
+    },
+    {
+      "id": "s06",
+      "text": "この資料をコピーしてもいいですか。",
+      "spoken_kana": "コノシリョーオコピーシテモイイデスカ",
+      "group": "sentence",
+      "display": "この資料をコピーしてもいいですか。",
+      "results": {
+        "voicevox": [
+          {
+            "seconds": 0.6729388749999998,
+            "audio_s": 2.528
+          },
+          {
+            "seconds": 0.7527230419996158,
+            "audio_s": 2.528
+          },
+          {
+            "seconds": 0.8385887500003264,
+            "audio_s": 2.528
+          }
+        ],
+        "kokoro": [
+          {
+            "seconds": 0.7458101669999451,
+            "audio_s": 3.4
+          },
+          {
+            "seconds": 0.8375176250001459,
+            "audio_s": 3.4
+          },
+          {
+            "seconds": 0.8278775829999176,
+            "audio_s": 3.4
+          }
+        ],
+        "openjtalk": [
+          {
+            "seconds": 0.04702612500022951,
+            "audio_s": 2.935
+          },
+          {
+            "seconds": 0.041149582999878476,
+            "audio_s": 2.935
+          },
+          {
+            "seconds": 0.04068295800016131,
+            "audio_s": 2.935
+          }
+        ]
+      },
+      "reference_phones": [
+        "k",
+        "o",
+        "n",
+        "o",
+        "sh",
+        "i",
+        "ry",
+        "o",
+        "o",
+        "o",
+        "k",
+        "o",
+        "p",
+        "i",
+        "i",
+        "sh",
+        "i",
+        "t",
+        "e",
+        "m",
+        "o",
+        "i",
+        "i",
+        "d",
+        "e",
+        "s",
+        "u",
+        "k",
+        "a"
+      ],
+      "checks": {
+        "voicevox": {
+          "reazon": {
+            "text": "この資料をコピーしてもいいですか",
+            "phones": [
+              "k",
+              "o",
+              "n",
+              "o",
+              "sh",
+              "i",
+              "ry",
+              "o",
+              "o",
+              "o",
+              "k",
+              "o",
+              "p",
+              "i",
+              "i",
+              "sh",
+              "i",
+              "t",
+              "e",
+              "m",
+              "o",
+              "i",
+              "i",
+              "d",
+              "e",
+              "s",
+              "u",
+              "k",
+              "a"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "この資料をコピーしてもいいですか",
+            "phones": [
+              "k",
+              "o",
+              "n",
+              "o",
+              "sh",
+              "i",
+              "ry",
+              "o",
+              "o",
+              "o",
+              "k",
+              "o",
+              "p",
+              "i",
+              "i",
+              "sh",
+              "i",
+              "t",
+              "e",
+              "m",
+              "o",
+              "i",
+              "i",
+              "d",
+              "e",
+              "s",
+              "u",
+              "k",
+              "a"
+            ],
+            "edits": 0
+          }
+        },
+        "kokoro": {
+          "reazon": {
+            "text": "この資料をコピーしてもいいですか",
+            "phones": [
+              "k",
+              "o",
+              "n",
+              "o",
+              "sh",
+              "i",
+              "ry",
+              "o",
+              "o",
+              "o",
+              "k",
+              "o",
+              "p",
+              "i",
+              "i",
+              "sh",
+              "i",
+              "t",
+              "e",
+              "m",
+              "o",
+              "i",
+              "i",
+              "d",
+              "e",
+              "s",
+              "u",
+              "k",
+              "a"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "この資料をコピーしてもいいですか。",
+            "phones": [
+              "k",
+              "o",
+              "n",
+              "o",
+              "sh",
+              "i",
+              "ry",
+              "o",
+              "o",
+              "o",
+              "k",
+              "o",
+              "p",
+              "i",
+              "i",
+              "sh",
+              "i",
+              "t",
+              "e",
+              "m",
+              "o",
+              "i",
+              "i",
+              "d",
+              "e",
+              "s",
+              "u",
+              "k",
+              "a"
+            ],
+            "edits": 0
+          }
+        },
+        "openjtalk": {
+          "reazon": {
+            "text": "この資料をコピーしてもいいですか",
+            "phones": [
+              "k",
+              "o",
+              "n",
+              "o",
+              "sh",
+              "i",
+              "ry",
+              "o",
+              "o",
+              "o",
+              "k",
+              "o",
+              "p",
+              "i",
+              "i",
+              "sh",
+              "i",
+              "t",
+              "e",
+              "m",
+              "o",
+              "i",
+              "i",
+              "d",
+              "e",
+              "s",
+              "u",
+              "k",
+              "a"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "この資料をコピンしてもいいですか",
+            "phones": [
+              "k",
+              "o",
+              "n",
+              "o",
+              "sh",
+              "i",
+              "ry",
+              "o",
+              "o",
+              "o",
+              "k",
+              "o",
+              "p",
+              "i",
+              "N",
+              "sh",
+              "i",
+              "t",
+              "e",
+              "m",
+              "o",
+              "i",
+              "i",
+              "d",
+              "e",
+              "s",
+              "u",
+              "k",
+              "a"
+            ],
+            "edits": 1
+          }
+        }
+      },
+      "utmos": {
+        "voicevox": 3.2698092460632324,
+        "kokoro": 4.258481502532959,
+        "openjtalk": 1.790095567703247
+      }
+    },
+    {
+      "id": "s07",
+      "text": "旅行の前に、ホテルを予約しておきました。",
+      "spoken_kana": "リョコーノマエニホテルオヨヤクシテオキマシタ",
+      "group": "sentence",
+      "display": "旅行の前に、ホテルを予約しておきました。",
+      "results": {
+        "voicevox": [
+          {
+            "seconds": 0.8460402079999767,
+            "audio_s": 3.456
+          },
+          {
+            "seconds": 0.985440541999651,
+            "audio_s": 3.456
+          },
+          {
+            "seconds": 1.002494000000297,
+            "audio_s": 3.456
+          }
+        ],
+        "kokoro": [
+          {
+            "seconds": 1.069172792000245,
+            "audio_s": 4.1
+          },
+          {
+            "seconds": 1.0925132080001276,
+            "audio_s": 4.1
+          },
+          {
+            "seconds": 1.1218083750000005,
+            "audio_s": 4.1
+          }
+        ],
+        "openjtalk": [
+          {
+            "seconds": 0.0556090420000146,
+            "audio_s": 3.995
+          },
+          {
+            "seconds": 0.057988416999705805,
+            "audio_s": 3.995
+          },
+          {
+            "seconds": 0.05540820799978974,
+            "audio_s": 3.995
+          }
+        ]
+      },
+      "reference_phones": [
+        "ry",
+        "o",
+        "k",
+        "o",
+        "o",
+        "n",
+        "o",
+        "m",
+        "a",
+        "e",
+        "n",
+        "i",
+        "h",
+        "o",
+        "t",
+        "e",
+        "r",
+        "u",
+        "o",
+        "y",
+        "o",
+        "y",
+        "a",
+        "k",
+        "u",
+        "sh",
+        "i",
+        "t",
+        "e",
+        "o",
+        "k",
+        "i",
+        "m",
+        "a",
+        "sh",
+        "i",
+        "t",
+        "a"
+      ],
+      "checks": {
+        "voicevox": {
+          "reazon": {
+            "text": "旅行の前にホテルを予約しておきました",
+            "phones": [
+              "ry",
+              "o",
+              "k",
+              "o",
+              "o",
+              "n",
+              "o",
+              "m",
+              "a",
+              "e",
+              "n",
+              "i",
+              "h",
+              "o",
+              "t",
+              "e",
+              "r",
+              "u",
+              "o",
+              "y",
+              "o",
+              "y",
+              "a",
+              "k",
+              "u",
+              "sh",
+              "i",
+              "t",
+              "e",
+              "o",
+              "k",
+              "i",
+              "m",
+              "a",
+              "sh",
+              "i",
+              "t",
+              "a"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "旅行の前にホテルを予約しておきました",
+            "phones": [
+              "ry",
+              "o",
+              "k",
+              "o",
+              "o",
+              "n",
+              "o",
+              "m",
+              "a",
+              "e",
+              "n",
+              "i",
+              "h",
+              "o",
+              "t",
+              "e",
+              "r",
+              "u",
+              "o",
+              "y",
+              "o",
+              "y",
+              "a",
+              "k",
+              "u",
+              "sh",
+              "i",
+              "t",
+              "e",
+              "o",
+              "k",
+              "i",
+              "m",
+              "a",
+              "sh",
+              "i",
+              "t",
+              "a"
+            ],
+            "edits": 0
+          }
+        },
+        "kokoro": {
+          "reazon": {
+            "text": "旅行の前にホテルを予約しておきました",
+            "phones": [
+              "ry",
+              "o",
+              "k",
+              "o",
+              "o",
+              "n",
+              "o",
+              "m",
+              "a",
+              "e",
+              "n",
+              "i",
+              "h",
+              "o",
+              "t",
+              "e",
+              "r",
+              "u",
+              "o",
+              "y",
+              "o",
+              "y",
+              "a",
+              "k",
+              "u",
+              "sh",
+              "i",
+              "t",
+              "e",
+              "o",
+              "k",
+              "i",
+              "m",
+              "a",
+              "sh",
+              "i",
+              "t",
+              "a"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "美容校の前にホテルを予約しておきました。",
+            "phones": [
+              "b",
+              "i",
+              "y",
+              "o",
+              "o",
+              "k",
+              "o",
+              "o",
+              "n",
+              "o",
+              "m",
+              "a",
+              "e",
+              "n",
+              "i",
+              "h",
+              "o",
+              "t",
+              "e",
+              "r",
+              "u",
+              "o",
+              "y",
+              "o",
+              "y",
+              "a",
+              "k",
+              "u",
+              "sh",
+              "i",
+              "t",
+              "e",
+              "o",
+              "k",
+              "i",
+              "m",
+              "a",
+              "sh",
+              "i",
+              "t",
+              "a"
+            ],
+            "edits": 4
+          }
+        },
+        "openjtalk": {
+          "reazon": {
+            "text": "旅行の前にホテルを予約しておきました",
+            "phones": [
+              "ry",
+              "o",
+              "k",
+              "o",
+              "o",
+              "n",
+              "o",
+              "m",
+              "a",
+              "e",
+              "n",
+              "i",
+              "h",
+              "o",
+              "t",
+              "e",
+              "r",
+              "u",
+              "o",
+              "y",
+              "o",
+              "y",
+              "a",
+              "k",
+              "u",
+              "sh",
+              "i",
+              "t",
+              "e",
+              "o",
+              "k",
+              "i",
+              "m",
+              "a",
+              "sh",
+              "i",
+              "t",
+              "a"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "旅行の前にホテルを予約しておきました",
+            "phones": [
+              "ry",
+              "o",
+              "k",
+              "o",
+              "o",
+              "n",
+              "o",
+              "m",
+              "a",
+              "e",
+              "n",
+              "i",
+              "h",
+              "o",
+              "t",
+              "e",
+              "r",
+              "u",
+              "o",
+              "y",
+              "o",
+              "y",
+              "a",
+              "k",
+              "u",
+              "sh",
+              "i",
+              "t",
+              "e",
+              "o",
+              "k",
+              "i",
+              "m",
+              "a",
+              "sh",
+              "i",
+              "t",
+              "a"
+            ],
+            "edits": 0
+          }
+        }
+      },
+      "utmos": {
+        "voicevox": 2.8411755561828613,
+        "kokoro": 3.941866874694824,
+        "openjtalk": 1.7620880603790283
+      }
+    },
+    {
+      "id": "s08",
+      "text": "電池が切れたので、時計が止まりました。",
+      "spoken_kana": "デンチガキレタノデトケイガトマリマシタ",
+      "group": "sentence",
+      "display": "電池が切れたので、時計が止まりました。",
+      "results": {
+        "voicevox": [
+          {
+            "seconds": 0.8281491669999923,
+            "audio_s": 3.2426666666666666
+          },
+          {
+            "seconds": 0.8953752499996881,
+            "audio_s": 3.2426666666666666
+          },
+          {
+            "seconds": 1.0571329580002384,
+            "audio_s": 3.2426666666666666
+          }
+        ],
+        "kokoro": [
+          {
+            "seconds": 1.0717447500001072,
+            "audio_s": 4.0
+          },
+          {
+            "seconds": 0.9252469580001161,
+            "audio_s": 4.0
+          },
+          {
+            "seconds": 0.9279574579995824,
+            "audio_s": 4.0
+          }
+        ],
+        "openjtalk": [
+          {
+            "seconds": 0.053735417000098096,
+            "audio_s": 3.865
+          },
+          {
+            "seconds": 0.06136808299970653,
+            "audio_s": 3.865
+          },
+          {
+            "seconds": 0.053646291000404744,
+            "audio_s": 3.865
+          }
+        ]
+      },
+      "reference_phones": [
+        "d",
+        "e",
+        "N",
+        "ch",
+        "i",
+        "g",
+        "a",
+        "k",
+        "i",
+        "r",
+        "e",
+        "t",
+        "a",
+        "n",
+        "o",
+        "d",
+        "e",
+        "t",
+        "o",
+        "k",
+        "e",
+        "i",
+        "g",
+        "a",
+        "t",
+        "o",
+        "m",
+        "a",
+        "r",
+        "i",
+        "m",
+        "a",
+        "sh",
+        "i",
+        "t",
+        "a"
+      ],
+      "checks": {
+        "voicevox": {
+          "reazon": {
+            "text": "電池が切れたので時計が止まりました",
+            "phones": [
+              "d",
+              "e",
+              "N",
+              "ch",
+              "i",
+              "g",
+              "a",
+              "k",
+              "i",
+              "r",
+              "e",
+              "t",
+              "a",
+              "n",
+              "o",
+              "d",
+              "e",
+              "t",
+              "o",
+              "k",
+              "e",
+              "e",
+              "g",
+              "a",
+              "t",
+              "o",
+              "m",
+              "a",
+              "r",
+              "i",
+              "m",
+              "a",
+              "sh",
+              "i",
+              "t",
+              "a"
+            ],
+            "edits": 1
+          },
+          "whisper_small": {
+            "text": "レンチが切れたので時計が止まりました。",
+            "phones": [
+              "r",
+              "e",
+              "N",
+              "ch",
+              "i",
+              "g",
+              "a",
+              "k",
+              "i",
+              "r",
+              "e",
+              "t",
+              "a",
+              "n",
+              "o",
+              "d",
+              "e",
+              "t",
+              "o",
+              "k",
+              "e",
+              "e",
+              "g",
+              "a",
+              "t",
+              "o",
+              "m",
+              "a",
+              "r",
+              "i",
+              "m",
+              "a",
+              "sh",
+              "i",
+              "t",
+              "a"
+            ],
+            "edits": 2
+          }
+        },
+        "kokoro": {
+          "reazon": {
+            "text": "電池が切れたので時計が止まりました",
+            "phones": [
+              "d",
+              "e",
+              "N",
+              "ch",
+              "i",
+              "g",
+              "a",
+              "k",
+              "i",
+              "r",
+              "e",
+              "t",
+              "a",
+              "n",
+              "o",
+              "d",
+              "e",
+              "t",
+              "o",
+              "k",
+              "e",
+              "e",
+              "g",
+              "a",
+              "t",
+              "o",
+              "m",
+              "a",
+              "r",
+              "i",
+              "m",
+              "a",
+              "sh",
+              "i",
+              "t",
+              "a"
+            ],
+            "edits": 1
+          },
+          "whisper_small": {
+            "text": "電池が切れたので時計が止まりました。",
+            "phones": [
+              "d",
+              "e",
+              "N",
+              "ch",
+              "i",
+              "g",
+              "a",
+              "k",
+              "i",
+              "r",
+              "e",
+              "t",
+              "a",
+              "n",
+              "o",
+              "d",
+              "e",
+              "t",
+              "o",
+              "k",
+              "e",
+              "e",
+              "g",
+              "a",
+              "t",
+              "o",
+              "m",
+              "a",
+              "r",
+              "i",
+              "m",
+              "a",
+              "sh",
+              "i",
+              "t",
+              "a"
+            ],
+            "edits": 1
+          }
+        },
+        "openjtalk": {
+          "reazon": {
+            "text": "電池が切れたので時計が止まりました",
+            "phones": [
+              "d",
+              "e",
+              "N",
+              "ch",
+              "i",
+              "g",
+              "a",
+              "k",
+              "i",
+              "r",
+              "e",
+              "t",
+              "a",
+              "n",
+              "o",
+              "d",
+              "e",
+              "t",
+              "o",
+              "k",
+              "e",
+              "e",
+              "g",
+              "a",
+              "t",
+              "o",
+              "m",
+              "a",
+              "r",
+              "i",
+              "m",
+              "a",
+              "sh",
+              "i",
+              "t",
+              "a"
+            ],
+            "edits": 1
+          },
+          "whisper_small": {
+            "text": "電池が切れたので時計が止まりました。",
+            "phones": [
+              "d",
+              "e",
+              "N",
+              "ch",
+              "i",
+              "g",
+              "a",
+              "k",
+              "i",
+              "r",
+              "e",
+              "t",
+              "a",
+              "n",
+              "o",
+              "d",
+              "e",
+              "t",
+              "o",
+              "k",
+              "e",
+              "e",
+              "g",
+              "a",
+              "t",
+              "o",
+              "m",
+              "a",
+              "r",
+              "i",
+              "m",
+              "a",
+              "sh",
+              "i",
+              "t",
+              "a"
+            ],
+            "edits": 1
+          }
+        }
+      },
+      "utmos": {
+        "voicevox": 2.862243413925171,
+        "kokoro": 4.2479166984558105,
+        "openjtalk": 2.3680419921875
+      }
+    },
+    {
+      "id": "s09",
+      "text": "昨日買ったパンは、もう全部食べました。",
+      "spoken_kana": "キノーカッタパンワモーゼンブタベマシタ",
+      "group": "sentence",
+      "display": "昨日買ったパンは、もう全部食べました。",
+      "results": {
+        "voicevox": [
+          {
+            "seconds": 0.7994963330002065,
+            "audio_s": 3.136
+          },
+          {
+            "seconds": 0.8898192910000944,
+            "audio_s": 3.136
+          },
+          {
+            "seconds": 1.052866166000058,
+            "audio_s": 3.136
+          }
+        ],
+        "kokoro": [
+          {
+            "seconds": 0.8228802499997983,
+            "audio_s": 3.75
+          },
+          {
+            "seconds": 0.9855525840002883,
+            "audio_s": 3.75
+          },
+          {
+            "seconds": 0.8720557080000617,
+            "audio_s": 3.75
+          }
+        ],
+        "openjtalk": [
+          {
+            "seconds": 0.05588212500015288,
+            "audio_s": 3.79
+          },
+          {
+            "seconds": 0.053464291999716806,
+            "audio_s": 3.79
+          },
+          {
+            "seconds": 0.05337725000026694,
+            "audio_s": 3.79
+          }
+        ]
+      },
+      "reference_phones": [
+        "k",
+        "i",
+        "n",
+        "o",
+        "o",
+        "k",
+        "a",
+        "cl",
+        "t",
+        "a",
+        "p",
+        "a",
+        "N",
+        "w",
+        "a",
+        "m",
+        "o",
+        "o",
+        "z",
+        "e",
+        "N",
+        "b",
+        "u",
+        "t",
+        "a",
+        "b",
+        "e",
+        "m",
+        "a",
+        "sh",
+        "i",
+        "t",
+        "a"
+      ],
+      "checks": {
+        "voicevox": {
+          "reazon": {
+            "text": "買ったパンはもう全部食べました",
+            "phones": [
+              "k",
+              "a",
+              "cl",
+              "t",
+              "a",
+              "p",
+              "a",
+              "N",
+              "w",
+              "a",
+              "m",
+              "o",
+              "o",
+              "z",
+              "e",
+              "N",
+              "b",
+              "u",
+              "t",
+              "a",
+              "b",
+              "e",
+              "m",
+              "a",
+              "sh",
+              "i",
+              "t",
+              "a"
+            ],
+            "edits": 5
+          },
+          "whisper_small": {
+            "text": "昨日買ったパンはもう全部食べました",
+            "phones": [
+              "k",
+              "i",
+              "n",
+              "o",
+              "o",
+              "k",
+              "a",
+              "cl",
+              "t",
+              "a",
+              "p",
+              "a",
+              "N",
+              "w",
+              "a",
+              "m",
+              "o",
+              "o",
+              "z",
+              "e",
+              "N",
+              "b",
+              "u",
+              "t",
+              "a",
+              "b",
+              "e",
+              "m",
+              "a",
+              "sh",
+              "i",
+              "t",
+              "a"
+            ],
+            "edits": 0
+          }
+        },
+        "kokoro": {
+          "reazon": {
+            "text": "昨日買ったパンはもう全部食べました",
+            "phones": [
+              "k",
+              "i",
+              "n",
+              "o",
+              "o",
+              "k",
+              "a",
+              "cl",
+              "t",
+              "a",
+              "p",
+              "a",
+              "N",
+              "w",
+              "a",
+              "m",
+              "o",
+              "o",
+              "z",
+              "e",
+              "N",
+              "b",
+              "u",
+              "t",
+              "a",
+              "b",
+              "e",
+              "m",
+              "a",
+              "sh",
+              "i",
+              "t",
+              "a"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "昨日買ったパンはもう全部食べました",
+            "phones": [
+              "k",
+              "i",
+              "n",
+              "o",
+              "o",
+              "k",
+              "a",
+              "cl",
+              "t",
+              "a",
+              "p",
+              "a",
+              "N",
+              "w",
+              "a",
+              "m",
+              "o",
+              "o",
+              "z",
+              "e",
+              "N",
+              "b",
+              "u",
+              "t",
+              "a",
+              "b",
+              "e",
+              "m",
+              "a",
+              "sh",
+              "i",
+              "t",
+              "a"
+            ],
+            "edits": 0
+          }
+        },
+        "openjtalk": {
+          "reazon": {
+            "text": "きのう買った缶はもう全部食べました",
+            "phones": [
+              "k",
+              "i",
+              "n",
+              "o",
+              "o",
+              "k",
+              "a",
+              "cl",
+              "t",
+              "a",
+              "k",
+              "a",
+              "N",
+              "w",
+              "a",
+              "m",
+              "o",
+              "o",
+              "z",
+              "e",
+              "N",
+              "b",
+              "u",
+              "t",
+              "a",
+              "b",
+              "e",
+              "m",
+              "a",
+              "sh",
+              "i",
+              "t",
+              "a"
+            ],
+            "edits": 1
+          },
+          "whisper_small": {
+            "text": "昨日買った缶は、もう全部食べました。",
+            "phones": [
+              "k",
+              "i",
+              "n",
+              "o",
+              "o",
+              "k",
+              "a",
+              "cl",
+              "t",
+              "a",
+              "k",
+              "a",
+              "N",
+              "w",
+              "a",
+              "m",
+              "o",
+              "o",
+              "z",
+              "e",
+              "N",
+              "b",
+              "u",
+              "t",
+              "a",
+              "b",
+              "e",
+              "m",
+              "a",
+              "sh",
+              "i",
+              "t",
+              "a"
+            ],
+            "edits": 1
+          }
+        }
+      },
+      "utmos": {
+        "voicevox": 2.9328861236572266,
+        "kokoro": 4.056250095367432,
+        "openjtalk": 2.2086424827575684
+      }
+    },
+    {
+      "id": "s10",
+      "text": "午後3時に、駅の東口で会いましょう。",
+      "spoken_kana": "ゴゴサンジニエキノヒガシグチデアイマショー",
+      "group": "sentence",
+      "display": "午後3時に、駅の東口で会いましょう。",
+      "results": {
+        "voicevox": [
+          {
+            "seconds": 0.8527251659998001,
+            "audio_s": 3.4133333333333336
+          },
+          {
+            "seconds": 0.900569207999979,
+            "audio_s": 3.4133333333333336
+          },
+          {
+            "seconds": 0.9019614169997112,
+            "audio_s": 3.4133333333333336
+          }
+        ],
+        "kokoro": [
+          {
+            "seconds": 0.9423492500000066,
+            "audio_s": 4.25
+          },
+          {
+            "seconds": 1.01580954200017,
+            "audio_s": 4.25
+          },
+          {
+            "seconds": 0.9848860829997648,
+            "audio_s": 4.25
+          }
+        ],
+        "openjtalk": [
+          {
+            "seconds": 0.05663979200016911,
+            "audio_s": 4.095
+          },
+          {
+            "seconds": 0.060343208000176674,
+            "audio_s": 4.095
+          },
+          {
+            "seconds": 0.0599397080000017,
+            "audio_s": 4.095
+          }
+        ]
+      },
+      "reference_phones": [
+        "g",
+        "o",
+        "g",
+        "o",
+        "s",
+        "a",
+        "N",
+        "j",
+        "i",
+        "n",
+        "i",
+        "e",
+        "k",
+        "i",
+        "n",
+        "o",
+        "h",
+        "i",
+        "g",
+        "a",
+        "sh",
+        "i",
+        "g",
+        "u",
+        "ch",
+        "i",
+        "d",
+        "e",
+        "a",
+        "i",
+        "m",
+        "a",
+        "sh",
+        "o",
+        "o"
+      ],
+      "checks": {
+        "voicevox": {
+          "reazon": {
+            "text": "午後三時に駅の東口で会いましょう",
+            "phones": [
+              "g",
+              "o",
+              "g",
+              "o",
+              "s",
+              "a",
+              "N",
+              "j",
+              "i",
+              "n",
+              "i",
+              "e",
+              "k",
+              "i",
+              "n",
+              "o",
+              "h",
+              "i",
+              "g",
+              "a",
+              "sh",
+              "i",
+              "g",
+              "u",
+              "ch",
+              "i",
+              "d",
+              "e",
+              "a",
+              "i",
+              "m",
+              "a",
+              "sh",
+              "o",
+              "o"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "午後3時に駅の東口で会いましょう",
+            "phones": [
+              "g",
+              "o",
+              "g",
+              "o",
+              "s",
+              "a",
+              "N",
+              "j",
+              "i",
+              "n",
+              "i",
+              "e",
+              "k",
+              "i",
+              "n",
+              "o",
+              "h",
+              "i",
+              "g",
+              "a",
+              "sh",
+              "i",
+              "g",
+              "u",
+              "ch",
+              "i",
+              "d",
+              "e",
+              "a",
+              "i",
+              "m",
+              "a",
+              "sh",
+              "o",
+              "o"
+            ],
+            "edits": 0
+          }
+        },
+        "kokoro": {
+          "reazon": {
+            "text": "午後三時に駅の東口で会いましょう",
+            "phones": [
+              "g",
+              "o",
+              "g",
+              "o",
+              "s",
+              "a",
+              "N",
+              "j",
+              "i",
+              "n",
+              "i",
+              "e",
+              "k",
+              "i",
+              "n",
+              "o",
+              "h",
+              "i",
+              "g",
+              "a",
+              "sh",
+              "i",
+              "g",
+              "u",
+              "ch",
+              "i",
+              "d",
+              "e",
+              "a",
+              "i",
+              "m",
+              "a",
+              "sh",
+              "o",
+              "o"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "午後3時に駅の東口で会いましょう",
+            "phones": [
+              "g",
+              "o",
+              "g",
+              "o",
+              "s",
+              "a",
+              "N",
+              "j",
+              "i",
+              "n",
+              "i",
+              "e",
+              "k",
+              "i",
+              "n",
+              "o",
+              "h",
+              "i",
+              "g",
+              "a",
+              "sh",
+              "i",
+              "g",
+              "u",
+              "ch",
+              "i",
+              "d",
+              "e",
+              "a",
+              "i",
+              "m",
+              "a",
+              "sh",
+              "o",
+              "o"
+            ],
+            "edits": 0
+          }
+        },
+        "openjtalk": {
+          "reazon": {
+            "text": "午後三時に駅の東口で会いましょう",
+            "phones": [
+              "g",
+              "o",
+              "g",
+              "o",
+              "s",
+              "a",
+              "N",
+              "j",
+              "i",
+              "n",
+              "i",
+              "e",
+              "k",
+              "i",
+              "n",
+              "o",
+              "h",
+              "i",
+              "g",
+              "a",
+              "sh",
+              "i",
+              "g",
+              "u",
+              "ch",
+              "i",
+              "d",
+              "e",
+              "a",
+              "i",
+              "m",
+              "a",
+              "sh",
+              "o",
+              "o"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "午後3時に駅の東口で会いましょう",
+            "phones": [
+              "g",
+              "o",
+              "g",
+              "o",
+              "s",
+              "a",
+              "N",
+              "j",
+              "i",
+              "n",
+              "i",
+              "e",
+              "k",
+              "i",
+              "n",
+              "o",
+              "h",
+              "i",
+              "g",
+              "a",
+              "sh",
+              "i",
+              "g",
+              "u",
+              "ch",
+              "i",
+              "d",
+              "e",
+              "a",
+              "i",
+              "m",
+              "a",
+              "sh",
+              "o",
+              "o"
+            ],
+            "edits": 0
+          }
+        }
+      },
+      "utmos": {
+        "voicevox": 2.9604148864746094,
+        "kokoro": 4.208845615386963,
+        "openjtalk": 2.3614230155944824
+      }
+    },
+    {
+      "id": "s11",
+      "text": "写真を撮ってから、友達に送りました。",
+      "spoken_kana": "シャシンオトッテカラトモダチニオクリマシタ",
+      "group": "sentence",
+      "display": "写真を撮ってから、友達に送りました。",
+      "results": {
+        "voicevox": [
+          {
+            "seconds": 0.8260209999998551,
+            "audio_s": 3.3066666666666666
+          },
+          {
+            "seconds": 0.9244195830001445,
+            "audio_s": 3.3066666666666666
+          },
+          {
+            "seconds": 0.878964458000155,
+            "audio_s": 3.3066666666666666
+          }
+        ],
+        "kokoro": [
+          {
+            "seconds": 0.885350790999837,
+            "audio_s": 4.0
+          },
+          {
+            "seconds": 0.9170874160004132,
+            "audio_s": 4.0
+          },
+          {
+            "seconds": 0.9182722499999727,
+            "audio_s": 4.0
+          }
+        ],
+        "openjtalk": [
+          {
+            "seconds": 0.05551241700004539,
+            "audio_s": 4.045
+          },
+          {
+            "seconds": 0.057970374999968044,
+            "audio_s": 4.045
+          },
+          {
+            "seconds": 0.056834708000224055,
+            "audio_s": 4.045
+          }
+        ]
+      },
+      "reference_phones": [
+        "sh",
+        "a",
+        "sh",
+        "i",
+        "N",
+        "o",
+        "t",
+        "o",
+        "cl",
+        "t",
+        "e",
+        "k",
+        "a",
+        "r",
+        "a",
+        "t",
+        "o",
+        "m",
+        "o",
+        "d",
+        "a",
+        "ch",
+        "i",
+        "n",
+        "i",
+        "o",
+        "k",
+        "u",
+        "r",
+        "i",
+        "m",
+        "a",
+        "sh",
+        "i",
+        "t",
+        "a"
+      ],
+      "checks": {
+        "voicevox": {
+          "reazon": {
+            "text": "写真を撮ってから友達に送りました",
+            "phones": [
+              "sh",
+              "a",
+              "sh",
+              "i",
+              "N",
+              "o",
+              "t",
+              "o",
+              "cl",
+              "t",
+              "e",
+              "k",
+              "a",
+              "r",
+              "a",
+              "t",
+              "o",
+              "m",
+              "o",
+              "d",
+              "a",
+              "ch",
+              "i",
+              "n",
+              "i",
+              "o",
+              "k",
+              "u",
+              "r",
+              "i",
+              "m",
+              "a",
+              "sh",
+              "i",
+              "t",
+              "a"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "写真を撮ってから友達に送りました。",
+            "phones": [
+              "sh",
+              "a",
+              "sh",
+              "i",
+              "N",
+              "o",
+              "t",
+              "o",
+              "cl",
+              "t",
+              "e",
+              "k",
+              "a",
+              "r",
+              "a",
+              "t",
+              "o",
+              "m",
+              "o",
+              "d",
+              "a",
+              "ch",
+              "i",
+              "n",
+              "i",
+              "o",
+              "k",
+              "u",
+              "r",
+              "i",
+              "m",
+              "a",
+              "sh",
+              "i",
+              "t",
+              "a"
+            ],
+            "edits": 0
+          }
+        },
+        "kokoro": {
+          "reazon": {
+            "text": "写真を撮ってから友達に送りました",
+            "phones": [
+              "sh",
+              "a",
+              "sh",
+              "i",
+              "N",
+              "o",
+              "t",
+              "o",
+              "cl",
+              "t",
+              "e",
+              "k",
+              "a",
+              "r",
+              "a",
+              "t",
+              "o",
+              "m",
+              "o",
+              "d",
+              "a",
+              "ch",
+              "i",
+              "n",
+              "i",
+              "o",
+              "k",
+              "u",
+              "r",
+              "i",
+              "m",
+              "a",
+              "sh",
+              "i",
+              "t",
+              "a"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "写真を撮ってから友達に送りました。",
+            "phones": [
+              "sh",
+              "a",
+              "sh",
+              "i",
+              "N",
+              "o",
+              "t",
+              "o",
+              "cl",
+              "t",
+              "e",
+              "k",
+              "a",
+              "r",
+              "a",
+              "t",
+              "o",
+              "m",
+              "o",
+              "d",
+              "a",
+              "ch",
+              "i",
+              "n",
+              "i",
+              "o",
+              "k",
+              "u",
+              "r",
+              "i",
+              "m",
+              "a",
+              "sh",
+              "i",
+              "t",
+              "a"
+            ],
+            "edits": 0
+          }
+        },
+        "openjtalk": {
+          "reazon": {
+            "text": "写真を撮ってから友達に送りました",
+            "phones": [
+              "sh",
+              "a",
+              "sh",
+              "i",
+              "N",
+              "o",
+              "t",
+              "o",
+              "cl",
+              "t",
+              "e",
+              "k",
+              "a",
+              "r",
+              "a",
+              "t",
+              "o",
+              "m",
+              "o",
+              "d",
+              "a",
+              "ch",
+              "i",
+              "n",
+              "i",
+              "o",
+              "k",
+              "u",
+              "r",
+              "i",
+              "m",
+              "a",
+              "sh",
+              "i",
+              "t",
+              "a"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "写真の撮ってから友達に送りました",
+            "phones": [
+              "sh",
+              "a",
+              "sh",
+              "i",
+              "N",
+              "n",
+              "o",
+              "t",
+              "o",
+              "cl",
+              "t",
+              "e",
+              "k",
+              "a",
+              "r",
+              "a",
+              "t",
+              "o",
+              "m",
+              "o",
+              "d",
+              "a",
+              "ch",
+              "i",
+              "n",
+              "i",
+              "o",
+              "k",
+              "u",
+              "r",
+              "i",
+              "m",
+              "a",
+              "sh",
+              "i",
+              "t",
+              "a"
+            ],
+            "edits": 1
+          }
+        }
+      },
+      "utmos": {
+        "voicevox": 2.9937965869903564,
+        "kokoro": 4.143211841583252,
+        "openjtalk": 2.1416237354278564
+      }
+    },
+    {
+      "id": "s12",
+      "text": "すみません、この荷物を預かっていただけますか。",
+      "spoken_kana": "スミマセンコノニモツオアズカッテイタダケマスカ",
+      "group": "sentence",
+      "display": "すみません、この荷物を預かっていただけますか。",
+      "results": {
+        "voicevox": [
+          {
+            "seconds": 0.9415222080001513,
+            "audio_s": 3.7333333333333334
+          },
+          {
+            "seconds": 1.1209089590001895,
+            "audio_s": 3.7333333333333334
+          },
+          {
+            "seconds": 1.0792139999998653,
+            "audio_s": 3.7333333333333334
+          }
+        ],
+        "kokoro": [
+          {
+            "seconds": 0.9809209579998424,
+            "audio_s": 4.4
+          },
+          {
+            "seconds": 0.9867464580001979,
+            "audio_s": 4.4
+          },
+          {
+            "seconds": 1.0160501659997863,
+            "audio_s": 4.4
+          }
+        ],
+        "openjtalk": [
+          {
+            "seconds": 0.06560887499972523,
+            "audio_s": 4.475
+          },
+          {
+            "seconds": 0.0654932499996903,
+            "audio_s": 4.475
+          },
+          {
+            "seconds": 0.06338404100006301,
+            "audio_s": 4.475
+          }
+        ]
+      },
+      "reference_phones": [
+        "s",
+        "u",
+        "m",
+        "i",
+        "m",
+        "a",
+        "s",
+        "e",
+        "N",
+        "k",
+        "o",
+        "n",
+        "o",
+        "n",
+        "i",
+        "m",
+        "o",
+        "ts",
+        "u",
+        "o",
+        "a",
+        "z",
+        "u",
+        "k",
+        "a",
+        "cl",
+        "t",
+        "e",
+        "i",
+        "t",
+        "a",
+        "d",
+        "a",
+        "k",
+        "e",
+        "m",
+        "a",
+        "s",
+        "u",
+        "k",
+        "a"
+      ],
+      "checks": {
+        "voicevox": {
+          "reazon": {
+            "text": "この荷物を預かっていただけますか",
+            "phones": [
+              "k",
+              "o",
+              "n",
+              "o",
+              "n",
+              "i",
+              "m",
+              "o",
+              "ts",
+              "u",
+              "o",
+              "a",
+              "z",
+              "u",
+              "k",
+              "a",
+              "cl",
+              "t",
+              "e",
+              "i",
+              "t",
+              "a",
+              "d",
+              "a",
+              "k",
+              "e",
+              "m",
+              "a",
+              "s",
+              "u",
+              "k",
+              "a"
+            ],
+            "edits": 9
+          },
+          "whisper_small": {
+            "text": "すみませんこの荷物を預かっていただけますか",
+            "phones": [
+              "s",
+              "u",
+              "m",
+              "i",
+              "m",
+              "a",
+              "s",
+              "e",
+              "N",
+              "k",
+              "o",
+              "n",
+              "o",
+              "n",
+              "i",
+              "m",
+              "o",
+              "ts",
+              "u",
+              "o",
+              "a",
+              "z",
+              "u",
+              "k",
+              "a",
+              "cl",
+              "t",
+              "e",
+              "i",
+              "t",
+              "a",
+              "d",
+              "a",
+              "k",
+              "e",
+              "m",
+              "a",
+              "s",
+              "u",
+              "k",
+              "a"
+            ],
+            "edits": 0
+          }
+        },
+        "kokoro": {
+          "reazon": {
+            "text": "すみませんこの荷物を預かって頂けますか",
+            "phones": [
+              "s",
+              "u",
+              "m",
+              "i",
+              "m",
+              "a",
+              "s",
+              "e",
+              "N",
+              "k",
+              "o",
+              "n",
+              "o",
+              "n",
+              "i",
+              "m",
+              "o",
+              "ts",
+              "u",
+              "o",
+              "a",
+              "z",
+              "u",
+              "k",
+              "a",
+              "cl",
+              "t",
+              "e",
+              "i",
+              "t",
+              "a",
+              "d",
+              "a",
+              "k",
+              "e",
+              "m",
+              "a",
+              "s",
+              "u",
+              "k",
+              "a"
+            ],
+            "edits": 0
+          },
+          "whisper_small": {
+            "text": "すみません、この荷物を預かっていただけますか。",
+            "phones": [
+              "s",
+              "u",
+              "m",
+              "i",
+              "m",
+              "a",
+              "s",
+              "e",
+              "N",
+              "k",
+              "o",
+              "n",
+              "o",
+              "n",
+              "i",
+              "m",
+              "o",
+              "ts",
+              "u",
+              "o",
+              "a",
+              "z",
+              "u",
+              "k",
+              "a",
+              "cl",
+              "t",
+              "e",
+              "i",
+              "t",
+              "a",
+              "d",
+              "a",
+              "k",
+              "e",
+              "m",
+              "a",
+              "s",
+              "u",
+              "k",
+              "a"
+            ],
+            "edits": 0
+          }
+        },
+        "openjtalk": {
+          "reazon": {
+            "text": "この荷物を預かっていただけますか",
+            "phones": [
+              "k",
+              "o",
+              "n",
+              "o",
+              "n",
+              "i",
+              "m",
+              "o",
+              "ts",
+              "u",
+              "o",
+              "a",
+              "z",
+              "u",
+              "k",
+              "a",
+              "cl",
+              "t",
+              "e",
+              "i",
+              "t",
+              "a",
+              "d",
+              "a",
+              "k",
+              "e",
+              "m",
+              "a",
+              "s",
+              "u",
+              "k",
+              "a"
+            ],
+            "edits": 9
+          },
+          "whisper_small": {
+            "text": "すみませんこの荷物を預かっていただけますか",
+            "phones": [
+              "s",
+              "u",
+              "m",
+              "i",
+              "m",
+              "a",
+              "s",
+              "e",
+              "N",
+              "k",
+              "o",
+              "n",
+              "o",
+              "n",
+              "i",
+              "m",
+              "o",
+              "ts",
+              "u",
+              "o",
+              "a",
+              "z",
+              "u",
+              "k",
+              "a",
+              "cl",
+              "t",
+              "e",
+              "i",
+              "t",
+              "a",
+              "d",
+              "a",
+              "k",
+              "e",
+              "m",
+              "a",
+              "s",
+              "u",
+              "k",
+              "a"
+            ],
+            "edits": 0
+          }
+        }
+      },
+      "utmos": {
+        "voicevox": 2.93831205368042,
+        "kokoro": 4.148053169250488,
+        "openjtalk": 2.011857509613037
+      }
+    }
+  ],
+  "summary": {
+    "voicevox": {
+      "word": {
+        "items": 16,
+        "calls": 48,
+        "median_s": 0.34729589600010513,
+        "p95_s": 0.4373520839999401,
+        "total_s": 17.060502623999128,
+        "audio_s": 40.128,
+        "rtf": 0.4251520789473467,
+        "reazon": {
+          "exact": 14,
+          "edits": 8,
+          "reference_phones": 108,
+          "per": 0.07407407407407407
+        },
+        "whisper_small": {
+          "exact": 15,
+          "edits": 1,
+          "reference_phones": 108,
+          "per": 0.009259259259259259
+        }
+      },
+      "sentence": {
+        "items": 12,
+        "calls": 36,
+        "median_s": 0.8843918745001247,
+        "p95_s": 1.0792139999998653,
+        "total_s": 30.899969581000278,
+        "audio_s": 107.776,
+        "rtf": 0.28670547785221456,
+        "predicted_mos": 3.003084639708201,
+        "reazon": {
+          "exact": 8,
+          "edits": 16,
+          "reference_phones": 387,
+          "per": 0.041343669250646
+        },
+        "whisper_small": {
+          "exact": 9,
+          "edits": 5,
+          "reference_phones": 387,
+          "per": 0.012919896640826873
+        }
+      }
+    },
+    "kokoro": {
+      "word": {
+        "items": 16,
+        "calls": 48,
+        "median_s": 0.32397889599974405,
+        "p95_s": 0.47367637500019555,
+        "total_s": 16.481681709999975,
+        "audio_s": 67.95,
+        "rtf": 0.24255602222222186,
+        "reazon": {
+          "exact": 10,
+          "edits": 19,
+          "reference_phones": 108,
+          "per": 0.17592592592592593
+        },
+        "whisper_small": {
+          "exact": 9,
+          "edits": 12,
+          "reference_phones": 108,
+          "per": 0.1111111111111111
+        }
+      },
+      "sentence": {
+        "items": 12,
+        "calls": 36,
+        "median_s": 0.9266022079998493,
+        "p95_s": 1.177298915999927,
+        "total_s": 32.60021907800092,
+        "audio_s": 134.925,
+        "rtf": 0.24161733613489655,
+        "predicted_mos": 4.143978416919708,
+        "reazon": {
+          "exact": 9,
+          "edits": 3,
+          "reference_phones": 387,
+          "per": 0.007751937984496124
+        },
+        "whisper_small": {
+          "exact": 8,
+          "edits": 7,
+          "reference_phones": 387,
+          "per": 0.01808785529715762
+        }
+      }
+    },
+    "openjtalk": {
+      "word": {
+        "items": 16,
+        "calls": 48,
+        "median_s": 0.017748229500057278,
+        "p95_s": 0.023954499999945256,
+        "total_s": 0.8950790429989866,
+        "audio_s": 62.22,
+        "rtf": 0.014385712680793741,
+        "reazon": {
+          "exact": 12,
+          "edits": 8,
+          "reference_phones": 108,
+          "per": 0.07407407407407407
+        },
+        "whisper_small": {
+          "exact": 12,
+          "edits": 8,
+          "reference_phones": 108,
+          "per": 0.07407407407407407
+        }
+      },
+      "sentence": {
+        "items": 12,
+        "calls": 36,
+        "median_s": 0.05369085400025142,
+        "p95_s": 0.0654932499996903,
+        "total_s": 1.8241433709990815,
+        "audio_s": 127.785,
+        "rtf": 0.014275097789248202,
+        "predicted_mos": 2.1639456152915955,
+        "reazon": {
+          "exact": 8,
+          "edits": 12,
+          "reference_phones": 387,
+          "per": 0.031007751937984496
+        },
+        "whisper_small": {
+          "exact": 7,
+          "edits": 5,
+          "reference_phones": 387,
+          "per": 0.012919896640826873
+        }
+      }
+    }
+  },
+  "platform": "macOS-27.2.1-arm64-arm-64bit",
+  "python": "3.12.3",
+  "versions": {
+    "voicevox-core": "0.16.3",
+    "misaki": "0.9.4",
+    "unidic-lite": "1.0.8",
+    "onnxruntime": "1.32.0",
+    "pyopenjtalk-plus": "0.4.1.post10",
+    "sherpa-onnx": "2.0.3",
+    "faster-whisper": "1.2.1",
+    "ctranslate2": "4.9.1",
+    "av": "15.1.0",
+    "numpy": "2.5.5"
+  }
+}

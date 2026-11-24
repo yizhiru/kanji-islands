@@ -1,3 +1,6 @@
+import { normalize, hiragana, wordId, kanjiOf } from './japaneseText';
+import { isN2Reading } from './n2';
+export { normalize, hiragana, wordId, kanjiOf } from './japaneseText';
 import type { Dataset, Entry, Filter, PackedDataset, Source, Word } from './types';
 
 export function decodeDataset(data: Dataset | PackedDataset): Dataset {
@@ -21,13 +24,6 @@ export function decodeDataset(data: Dataset | PackedDataset): Dataset {
   };
 }
 
-export const normalize = (value: string) => value.normalize('NFKC').trim().replace(/\s+/g, '');
-export const hiragana = (value: string) =>
-  normalize(value).replace(/[ァ-ヶ]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
-export const kanjiOf = (value: string) => [
-  ...new Set([...normalize(value)].filter((c) => /\p{Unified_Ideograph}/u.test(c))),
-];
-export const wordId = (text: string) => `word:${normalize(text)}`;
 const collator = new Intl.Collator('ja');
 
 export function sourceMatches(source: Source, filter: Filter): boolean {
@@ -42,6 +38,12 @@ export const entriesFor = (word: Word, filter: Filter) =>
   filter.scope === 'all' && !filter.lesson
     ? word.entries
     : word.entries.filter((e) => e.sources.some((s) => sourceMatches(s, filter)));
+
+function studyRank(word: Word, entries: Entry[], filter: Filter) {
+  if (isN2Reading(word.text, entries)) return 0;
+  const sources = entries.flatMap((entry) => entry.sources).filter((s) => sourceMatches(s, filter));
+  return sources.some((s) => s.level === '初级') ? 1 : sources.length ? 2 : 3;
+}
 
 export function referencesFor(entries: Entry[], filter?: Filter): string {
   return (['初级', '中级'] as const)
@@ -151,18 +153,15 @@ export class Vocabulary {
           .filter((word) => entriesFor(word, filter).length > 0)
           .map((word) => {
             const entries = entriesFor(word, filter);
-            const sources = entries
-              .flatMap((e) => e.sources)
-              .filter((s) => sourceMatches(s, filter));
             return {
               word,
-              textbookRank: sources.some((s) => s.level === '初级') ? 0 : sources.length ? 1 : 2,
+              studyRank: studyRank(word, entries, filter),
               priority: Math.max(...entries.map((e) => e.priority ?? 0)),
             };
           })
           .sort(
             (a, b) =>
-              a.textbookRank - b.textbookRank ||
+              a.studyRank - b.studyRank ||
               b.priority - a.priority ||
               a.word.kanji.length - b.word.kanji.length ||
               a.word.text.length - b.word.text.length ||
@@ -193,23 +192,26 @@ export class Vocabulary {
         ).toLowerCase();
         return scoped.includes(q);
       })
-      .map((word) => ({
-        word,
-        rank:
-          normalize(word.text) === normalizedQuery
-            ? 0
-            : entriesFor(word, filter).some((e) => hiragana(e.reading_hiragana) === q)
-              ? 1
-              : normalize(word.text).startsWith(normalizedQuery)
-                ? 2
-                : 3,
-        textbook: Number(word.entries.some((e) => e.sources.length)),
-        priority: Math.max(...word.entries.map((e) => e.priority ?? 0)),
-      }))
+      .map((word) => {
+        const entries = entriesFor(word, filter);
+        return {
+          word,
+          rank:
+            normalize(word.text) === normalizedQuery
+              ? 0
+              : entries.some((e) => hiragana(e.reading_hiragana) === q)
+                ? 1
+                : normalize(word.text).startsWith(normalizedQuery)
+                  ? 2
+                  : 3,
+          studyRank: studyRank(word, entries, filter),
+          priority: Math.max(...entries.map((e) => e.priority ?? 0)),
+        };
+      })
       .sort(
         (a, b) =>
           a.rank - b.rank ||
-          b.textbook - a.textbook ||
+          a.studyRank - b.studyRank ||
           b.priority - a.priority ||
           collator.compare(a.word.text, b.word.text),
       )

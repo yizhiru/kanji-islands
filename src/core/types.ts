@@ -80,7 +80,18 @@ export interface Network {
   words: string[];
   expansions: Expansion[];
 }
+export type LocalSpeechEngine = 'openjtalk' | 'kokoro';
+export type SpeechEngine = 'system' | 'voicevox' | LocalSpeechEngine;
+export type LocalSpeechStatus =
+  | { state: 'missing' | 'preparing' | 'ready' }
+  | { state: 'downloading'; done: number; total: number }
+  | { state: 'error'; message: string };
 export interface AppBridge {
+  localSpeechStatus: () => Promise<Record<LocalSpeechEngine, LocalSpeechStatus>>;
+  synthesizeLocal: (engine: LocalSpeechEngine, text: string) => Promise<ArrayBuffer>;
+  onLocalSpeechStatus: (
+    listener: (engine: LocalSpeechEngine, status: LocalSpeechStatus) => void,
+  ) => () => void;
   voicevoxStatus: () => Promise<boolean>;
   synthesizeVoicevox: (text: string) => Promise<ArrayBuffer>;
   openSource: (level: Level, page: number) => Promise<void>;

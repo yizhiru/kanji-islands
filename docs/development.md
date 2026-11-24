@@ -1,6 +1,6 @@
 # 开发与构建
 
-需要 Node.js 22.12+、Python 3.10+。重建教材数据时需安装 `pypdf`。
+需要 Node.js 22.12+、Python 3.10+。重建教材数据时需安装 `pypdf`。桌面开发与打包使用目标系统、目标架构的 Python 3.12 构建内置朗读引擎，可用 `KANJI_BUILD_PYTHON` 指定解释器。首次构建需要联网，后续复用 `tmp/speech-runtime/`。安装包自带运行环境。
 
 数据与 PDF 不纳入 Git，克隆后需自行准备：
 
@@ -29,6 +29,7 @@ npm run format:check
 npm test
 npm run test:e2e
 npm run test:desktop  # 需先构建
+npm run test:speech   # 需先构建桌面端。用独立临时配置测试首次下载与断网重启
 ```
 
 Windows 云端打包见 [打包指南](windows-cloud-build.md)。

@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain, Menu, protocol, net, clipboard, shell } = r
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const voicevox = require('./voicevox.cjs');
+const { createLocalSpeech } = require('./local-speech.cjs');
 
 protocol.registerSchemesAsPrivileged([
   { scheme: 'islands', privileges: { standard: true, secure: true, supportFetchAPI: true } },
@@ -57,7 +58,22 @@ function createWindow() {
   } else mainWindow.loadURL('islands://app/index.html');
 }
 
-app.whenReady().then(() => {
+if (!app.requestSingleInstanceLock()) {
+  app.quit();
+} else {
+  app.on('second-instance', () => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.show();
+      mainWindow.focus();
+    } else if (app.isReady()) {
+      createWindow();
+    }
+  });
+  app.whenReady().then(startApp);
+}
+
+async function startApp() {
   protocol.handle('islands', (request) => {
     const url = new URL(request.url);
     if (url.hostname !== 'app') return new Response('Not found', { status: 404 });
@@ -93,6 +109,30 @@ app.whenReady().then(() => {
     if (event.sender !== mainWindow?.webContents) throw new Error('Unknown sender');
     if (typeof text !== 'string' || !text || text.length > 256) throw new Error('Invalid text');
     clipboard.writeText(text);
+  });
+  const speechDirectory = app.isPackaged
+    ? process.resourcesPath
+    : path.join(root, 'tmp/speech-runtime');
+  const localSpeech = createLocalSpeech(
+    path.join(
+      speechDirectory,
+      'speech-worker',
+      process.platform === 'win32' ? 'speech-worker.exe' : 'speech-worker',
+    ),
+    path.join(app.getPath('userData'), 'speech', 'v1'),
+    (engine, status) => {
+      if (mainWindow && !mainWindow.isDestroyed())
+        mainWindow.webContents.send('speech:changed', engine, status);
+    },
+  );
+  app.once('before-quit', () => localSpeech.close());
+  ipcMain.handle('speech:status', (event) => {
+    if (event.sender !== mainWindow?.webContents) throw new Error('Unknown sender');
+    return localSpeech.statuses();
+  });
+  ipcMain.handle('speech:synthesize', (event, engine, text) => {
+    if (event.sender !== mainWindow?.webContents) throw new Error('Unknown sender');
+    return localSpeech.synthesize(engine, text);
   });
   ipcMain.handle('voicevox:status', (event) => {
     if (event.sender !== mainWindow?.webContents) throw new Error('Unknown sender');
@@ -130,7 +170,7 @@ app.whenReady().then(() => {
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
-});
+}
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });

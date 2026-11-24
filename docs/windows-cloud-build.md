@@ -57,7 +57,7 @@ gh run download RUN_ID --repo yizhiru/kanji-islands --dir release/windows-cloud
 5. 校验打包后词库、许可与 PDF 的 SHA-256，启动已打包的 Windows 应用执行桌面检查。
 6. 生成安装包校验和，上传 Actions artifact。
 
-云端直接使用本机已经构建好的运行词库，不运行 `npm run build` 或 `npm test` 中的数据重建步骤，因此无需上传完整上游词典 ZIP 或安装 Python。`contents: write` 权限用于读取仅对有推送权限身份可见的草稿附件，令牌只传给下载步骤；构建和打包不自动发布内容。
+云端直接使用本机已经构建好的运行词库，不运行 `npm run build` 或 `npm test` 中的数据重建步骤，因此无需上传完整上游词典 ZIP。工作流另用 Python 3.12 打包内置语音运行环境，安装桌面版的用户无需安装 Python。`contents: write` 权限用于读取仅对有推送权限身份可见的草稿附件，令牌只传给下载步骤；构建和打包不自动发布内容。
 
 ## 更新词库
 

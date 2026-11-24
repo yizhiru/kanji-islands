@@ -87,6 +87,9 @@ try {
   assert.deepEqual(await page.evaluate(() => Object.keys(window.islands)), [
     'voicevoxStatus',
     'synthesizeVoicevox',
+    'localSpeechStatus',
+    'synthesizeLocal',
+    'onLocalSpeechStatus',
     'openSource',
     'copyText',
     'openDictionary',
@@ -132,13 +135,13 @@ try {
   );
   const first = await page.getByTestId('word-node').count();
   assert(first > 1);
-  await page.locator('[data-word="発音"]').hover();
-  await page.getByRole('button', { name: '复制词卡单词発音', exact: true }).click();
-  assert.equal(await desktop.evaluate(({ clipboard }) => clipboard.readText()), '発音');
+  await page.locator('[data-word="発電"]').hover();
+  await page.getByRole('button', { name: '复制词卡单词発電', exact: true }).click();
+  assert.equal(await desktop.evaluate(({ clipboard }) => clipboard.readText()), '発電');
   assert.equal(await page.getByRole('heading', { name: '発表', exact: true }).count(), 1);
-  await page.getByRole('button', { name: '选中词汇発音', exact: true }).click();
-  assert.equal(await page.getByLabel('平假名读音', { exact: true }).textContent(), 'はつおん');
-  await page.getByRole('button', { name: '展开汉字音', exact: true }).click();
+  await page.getByRole('button', { name: '选中词汇発電', exact: true }).click();
+  assert.equal(await page.getByLabel('平假名读音', { exact: true }).textContent(), 'はつでん');
+  await page.getByRole('button', { name: '展开汉字電', exact: true }).click();
   await page.waitForFunction(
     (count) => document.querySelectorAll('[data-testid="word-node"]').length > count,
     first,
@@ -152,7 +155,7 @@ try {
     (count) => document.querySelectorAll('[data-testid="word-node"]').length < count,
     fullCount,
   );
-  assert.equal(await page.getByLabel('平假名读音', { exact: true }).textContent(), 'はつおん');
+  assert.equal(await page.getByLabel('平假名读音', { exact: true }).textContent(), 'はつでん');
   await page.getByRole('button', { name: '设置', exact: true }).click();
   await collapseCount.fill('2');
   await page.getByRole('button', { name: '关闭设置', exact: true }).click();
@@ -183,7 +186,7 @@ try {
   );
   assert.equal(await page.getByRole('heading', { name: '発表', exact: true }).count(), 1);
   assert.equal(
-    await page.getByRole('button', { name: '继续展开共用汉字音', exact: true }).count(),
+    await page.getByRole('button', { name: '继续展开共用汉字電', exact: true }).count(),
     0,
   );
   await page.getByRole('button', { name: '撤回上一步', exact: true }).click();
@@ -196,7 +199,7 @@ try {
     (count) => document.querySelectorAll('[data-testid="word-node"]').length === count,
     expandedCount,
   );
-  assert.equal(await page.getByRole('heading', { name: '発音', exact: true }).count(), 1);
+  assert.equal(await page.getByRole('heading', { name: '発電', exact: true }).count(), 1);
 
   // Add another character branch from a visible word, then grow the real
   // network to the application limit with folding disabled.
@@ -206,7 +209,7 @@ try {
   const branch = await page.getByTestId('word-node').evaluateAll((nodes) => {
     for (const node of nodes) {
       const word = node.getAttribute('data-word');
-      const kanji = [...word].find((c) => /\p{Unified_Ideograph}/u.test(c) && !'発音'.includes(c));
+      const kanji = [...word].find((c) => /\p{Unified_Ideograph}/u.test(c) && !'発電'.includes(c));
       if (kanji && word !== '発表') return { word, kanji };
     }
     return null;

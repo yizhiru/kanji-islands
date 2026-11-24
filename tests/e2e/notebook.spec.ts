@@ -136,13 +136,50 @@ test('removes and restores a bookmarked island without changing the current sele
   await page.goto('/');
   await page.getByRole('button', { name: '加入生词本', exact: true }).click();
   await page.getByRole('button', { name: '展开汉字発', exact: true }).click();
-  await page.getByRole('button', { name: '选中词汇発音', exact: true }).click();
+  await page.getByRole('button', { name: '选中词汇発電', exact: true }).click();
   const marker = page.getByRole('button', { name: '将発表移出生词本' });
   await marker.click();
   await expect(marker).toHaveCount(0);
-  await expect(page.getByRole('heading', { name: '発音', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '発電', exact: true })).toBeVisible();
   await page.getByRole('button', { name: '撤回', exact: true }).click();
   await expect(marker).toBeVisible();
   await page.getByRole('button', { name: '生词本 · 1' }).click();
   await expect(page.getByRole('button', { name: '探索生词発表' })).toBeVisible();
+});
+
+test('keeps both bookmarks across concurrent edits, open tabs and a next-day reload', async ({
+  page,
+  context,
+}) => {
+  await page.clock.setFixedTime(new Date('2026-11-22T22:00:00+08:00'));
+  await page.goto('/');
+  const other = await context.newPage();
+  await other.goto('/');
+  await other.getByRole('combobox', { name: '输入起始词' }).fill('学校');
+  await other.getByRole('button', { name: '开始探索', exact: true }).click();
+  await expect(other.getByRole('heading', { name: '学校', exact: true })).toBeVisible();
+  await Promise.all(
+    [page, other].map((tab) =>
+      tab.getByRole('button', { name: '加入生词本', exact: true }).click(),
+    ),
+  );
+  for (const tab of [page, other]) {
+    await expect(tab.getByRole('button', { name: '生词本 · 2' })).toBeVisible();
+  }
+  await other.getByRole('button', { name: '生词本 · 2' }).click();
+  const list = other.getByRole('dialog', { name: '生词本', exact: true });
+  await list.getByRole('button', { name: '删除生词発表' }).click();
+  const marker = page.getByRole('button', { name: '将発表移出生词本' });
+  await expect(marker).toHaveCount(0);
+  await page.getByRole('button', { name: '加入生词本', exact: true }).click();
+  await expect(list.getByRole('button', { name: '探索生词発表' })).toBeVisible();
+
+  await other.close();
+  await page.clock.setFixedTime(new Date('2026-11-23T09:00:00+08:00'));
+  await page.reload();
+  await page.getByRole('button', { name: '生词本 · 2' }).click();
+  const reopened = page.getByRole('dialog', { name: '生词本', exact: true });
+  await expect(reopened.getByRole('button', { name: '探索生词学校' })).toBeVisible();
+  await reopened.getByRole('button', { name: '探索生词発表' }).click();
+  await expect(marker).toBeVisible();
 });

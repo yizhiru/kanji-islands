@@ -14,7 +14,7 @@ export function Pronunciation({
   onNotify: (message: string) => void;
   speech: PronunciationController;
 }) {
-  const { canPlay, voicevox, speaking, play } = speech;
+  const { canPlay, voicevox, engineName, speaking, play } = speech;
   const helpID = useId();
   const help = useRef<HTMLDivElement>(null);
   const pinned = useRef(false);
@@ -100,22 +100,23 @@ export function Pronunciation({
             <Info size={15} />
           </button>
           <p id={helpID} className="pronunciation-note" role="tooltip" hidden={!helpOpen}>
-            {voicevox === 'ready'
-              ? 'VOICEVOX 合成语音，仅供读音参考。'
-              : canPlay
-                ? '系统合成语音，仅供读音参考。'
-                : readings.length
-                  ? '本机未检测到日语语音，可安装后朗读。'
-                  : ''}
+            {canPlay
+              ? `${engineName === '系统日语语音' ? '系统' : engineName}合成语音，仅供读音参考。`
+              : readings.length
+                ? window.islands
+                  ? '可在设置中选择 Kokoro 或 Open JTalk 朗读。'
+                  : '本机未检测到日语语音。'
+                : ''}
             词典需联网，真人音频以收录为准。
           </p>
         </div>
       </div>
-      {voicevox === 'ready' && <small className="voicevox-credit">VOICEVOX:四国めたん</small>}
+      {speech.downloadMessage && <small role="status">{speech.downloadMessage}</small>}
+      {voicevox === 'ready' && !speech.localStatus && (
+        <small className="voicevox-credit">VOICEVOX:四国めたん</small>
+      )}
       {voicevox === 'unavailable' && !canPlay && (
-        <a href="https://voicevox.hiroshiba.jp/" target="_blank" rel="noreferrer">
-          下载 VOICEVOX
-        </a>
+        <small>可在设置中选择 Kokoro 或 Open JTalk 朗读。</small>
       )}
     </div>
   );

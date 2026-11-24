@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowRight, Download, Upload, X } from 'lucide-react';
-import n2Csv from '../assets/shikken-jlpt-n2-en.csv?raw';
+import { n2Book as n2 } from '../core/n2';
 import { useNotebookPracticeBook } from '../core/notebook';
 import {
   deletePracticeBook,
@@ -17,11 +17,6 @@ import type { PronunciationController } from '../core/usePronunciation';
 import { type Vocabulary, wordId } from '../core/vocabulary';
 import { NotebookPractice } from './NotebookPractice';
 
-const n2: PracticeBook = {
-  id: 'shikken-n2',
-  name: 'N2 核心词汇',
-  cards: parsePracticeCsv(n2Csv),
-};
 const GROUP_SIZE = 20;
 const groupKey = (id: string) => `kanji-islands.practice-group.${id}`;
 
@@ -43,7 +38,7 @@ function lastGroup(book: PracticeBook) {
 
 interface Props {
   words: ReadonlySet<string>;
-  setSaved: (id: string, saved: boolean) => boolean;
+  setSaved: (id: string, saved: boolean) => Promise<boolean>;
   vocab: Vocabulary;
   speech: PronunciationController;
   message: string;

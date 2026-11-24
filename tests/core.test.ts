@@ -75,6 +75,23 @@ const vocab = fixture([
 ]);
 
 describe('word indexing and textbook filters', () => {
+  it('uses the N2 word and reading before textbook and other candidates, within the active scope', () => {
+    const ranked = fixture([
+      { ...entry('発外', []), priority: 999 },
+      entry('発中', [source('中级', 1)]),
+      entry('発初'),
+      entry('発売', [], 'ハツバイ'),
+      entry('発電', [], 'べつ'), // Spelling alone is not a match.
+    ]);
+    const order = ['発売', '発初', '発中', '発外', '発電'];
+    expect(ranked.related('発', all).map((w) => w.text)).toEqual(order);
+    expect(ranked.search('発', all).map((w) => w.text)).toEqual(order);
+    expect(ranked.search('発外', all)[0].text).toBe('発外');
+    expect(ranked.related('発', beginner).map((w) => w.text)).toEqual(['発初']);
+    expect(expandNetwork(startNetwork(wordId('発点')), '発', ranked, all).words.slice(1)).toEqual(
+      order.map(wordId),
+    );
+  });
   it('ranks beginner, intermediate, then unmatched candidates before dictionary frequency', () => {
     const ordered = fixture([
       { ...entry('発外', []), priority: 10000 },

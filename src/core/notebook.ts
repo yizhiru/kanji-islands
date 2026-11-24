@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { normalize, type Vocabulary, wordId } from './vocabulary';
 
 const BACKUP_FORMAT = 'kanji-islands-notebook';
@@ -43,34 +43,57 @@ export function useNotebookPracticeBook(words: ReadonlySet<string>, vocab: Vocab
 }
 
 function readWords(): Set<string> {
-  try {
-    const stored: unknown = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]');
-    return new Set(
-      Array.isArray(stored)
-        ? stored.filter((id): id is string => typeof id === 'string' && id.startsWith('word:'))
-        : [],
-    );
-  } catch {
-    return new Set();
-  }
+  const stored: unknown = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]');
+  if (!Array.isArray(stored)) throw new Error('无效的生词本数据');
+  return new Set(
+    stored.filter((id): id is string => typeof id === 'string' && id.startsWith('word:')),
+  );
 }
 
 export function useNotebook(onNotify: (message: string) => void) {
-  const [words, setWords] = useState(readWords);
-  const save = (next: Set<string>) => {
+  const [words, setWords] = useState(() => new Set<string>());
+  useEffect(() => {
+    const refresh = () => {
+      try {
+        setWords(readWords());
+      } catch {
+        onNotify('生词本读取失败，请检查本地存储后重试。');
+      }
+    };
+    const onStorage = (event: StorageEvent) => {
+      if (event.storageArea === localStorage && (event.key === STORAGE_KEY || event.key === null))
+        refresh();
+    };
+    window.addEventListener('storage', onStorage);
+    window.addEventListener('pageshow', refresh);
+    refresh();
+    return () => {
+      window.removeEventListener('storage', onStorage);
+      window.removeEventListener('pageshow', refresh);
+    };
+  }, [onNotify]);
+
+  async function update(change: (current: Set<string>) => void) {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify([...next]));
-      setWords(next);
+      return await navigator.locks.request(STORAGE_KEY, () => {
+        const current = readWords();
+        const before = current.size;
+        change(current);
+        if (current.size !== before)
+          localStorage.setItem(STORAGE_KEY, JSON.stringify([...current]));
+        setWords(current);
+        return current.size - before;
+      });
     } catch {
-      throw new Error('生词本保存失败，请检查本地存储空间。');
+      throw new Error('生词本保存失败，请检查本地存储后重试。');
     }
-  };
-  const setSaved = (id: string, saved: boolean) => {
-    const next = new Set(words);
-    if (saved) next.add(id);
-    else next.delete(id);
+  }
+  const setSaved = async (id: string, saved: boolean) => {
     try {
-      save(next);
+      await update((current) => {
+        if (saved) current.add(id);
+        else current.delete(id);
+      });
       return true;
     } catch (error) {
       onNotify((error as Error).message);
@@ -78,13 +101,9 @@ export function useNotebook(onNotify: (message: string) => void) {
     }
   };
   const toggle = (id: string) => setSaved(id, !words.has(id));
-  const merge = (imported: string[]) => {
-    // Read again after the file finishes loading to include recent changes.
-    const merged = readWords();
-    const before = merged.size;
-    for (const id of imported) merged.add(id);
-    save(merged);
-    return merged.size - before;
-  };
+  const merge = (imported: string[]) =>
+    update((current) => {
+      for (const id of imported) current.add(id);
+    });
   return { words, toggle, setSaved, merge };
 }

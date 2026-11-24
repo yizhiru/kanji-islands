@@ -284,3 +284,40 @@ test('automatically folds by recent character count, supports custom counts and 
   await page.getByRole('button', { name: '关闭设置', exact: true }).click();
   await expect(page.locator('[data-word="表面"]')).toBeVisible();
 });
+
+test('defaults to system Japanese and falls back on the same word if preferred VOICEVOX stalls', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(window, 'islands', {
+      value: {
+        voicevoxStatus: async () => true,
+        synthesizeVoicevox: () => {
+          document.documentElement.dataset.vox = 'called';
+          return new Promise(() => {});
+        },
+      },
+    });
+  });
+  await page.goto('/');
+  const read = page.getByRole('button', { name: '朗读はっぴょう', exact: true });
+  await read.click();
+  const spoken = () => page.evaluate(() => (window as unknown as { spoken: string[] }).spoken);
+  await expect.poll(spoken).toEqual(['はっぴょう']);
+  await expect(page.locator('html')).not.toHaveAttribute('data-vox', 'called');
+  const settings = page.getByRole('button', { name: '设置', exact: true });
+  const preference = page.getByRole('combobox', { name: '朗读引擎' });
+  await settings.click();
+  await expect(preference).toHaveValue('system');
+  await preference.selectOption('voicevox');
+  await page.reload();
+  await settings.click();
+  await expect(preference).toHaveValue('voicevox');
+  await expect(page.getByText('已连接 · VOICEVOX:四国めたん')).toBeVisible();
+  await page.getByRole('button', { name: '关闭设置' }).click();
+  await read.click();
+  await expect(page.locator('html')).toHaveAttribute('data-vox', 'called');
+  await expect.poll(spoken).toEqual(['はっぴょう']);
+  await settings.click();
+  await expect(page.getByText('未连接。', { exact: false })).toBeVisible();
+});

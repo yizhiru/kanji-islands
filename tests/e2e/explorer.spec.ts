@@ -13,17 +13,17 @@ test('expands a word into a multi-hop network, shows selected readings, and supp
   await expect(
     page
       .getByTestId('word-node')
-      .filter({ has: page.getByRole('button', { name: '选中词汇発音', exact: true }) }),
+      .filter({ has: page.getByRole('button', { name: '选中词汇発電', exact: true }) }),
   ).toBeVisible();
   const firstCount = await page.getByTestId('word-node').count();
-  await page.getByRole('button', { name: '选中词汇発音', exact: true }).click();
-  await expect(page.getByLabel('平假名读音', { exact: true })).toHaveText('はつおん');
-  await page.getByRole('button', { name: '展开汉字音', exact: true }).click();
+  await page.getByRole('button', { name: '选中词汇発電', exact: true }).click();
+  await expect(page.getByLabel('平假名读音', { exact: true })).toHaveText('はつでん');
+  await page.getByRole('button', { name: '展开汉字電', exact: true }).click();
   await expect.poll(() => page.getByTestId('word-node').count()).toBeGreaterThan(firstCount);
   await expect(page.getByRole('button', { name: '继续展开共用汉字発', exact: true })).toBeVisible();
-  await expect(page.getByRole('button', { name: '继续展开共用汉字音', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: '继续展开共用汉字電', exact: true })).toBeVisible();
   await page.getByRole('button', { name: '显示读音', exact: true }).click();
-  await expect(page.getByLabel('平假名读音', { exact: true })).toHaveText('はつおん');
+  await expect(page.getByLabel('平假名读音', { exact: true })).toHaveText('はつでん');
   await page.getByRole('button', { name: '撤回上一步' }).click();
   await expect(page.getByTestId('word-node')).toHaveCount(firstCount);
   await page.getByRole('button', { name: '重做', exact: true }).click();
@@ -49,16 +49,16 @@ test('hides card readings on hover and focus while details stay visible independ
   await page.getByRole('button', { name: '展开汉字発', exact: true }).focus();
   await expect(root.locator('.node-reading')).toBeHidden();
   await page.getByRole('button', { name: '展开汉字発', exact: true }).click();
-  const card = page.locator('[data-word="発音"]');
+  const card = page.locator('[data-word="発電"]');
   await card.hover();
   await expect(card.locator('.node-reading')).toBeHidden();
-  await page.getByRole('button', { name: '选中词汇発音', exact: true }).click();
-  await expect(page.getByLabel('平假名读音', { exact: true })).toHaveText('はつおん');
+  await page.getByRole('button', { name: '选中词汇発電', exact: true }).click();
+  await expect(page.getByLabel('平假名读音', { exact: true })).toHaveText('はつでん');
   await page.getByRole('button', { name: '显示读音', exact: true }).click();
   await expect(root.locator('.node-reading')).toBeVisible();
   await page.getByRole('button', { name: '显示读音', exact: true }).click();
   await expect(root.locator('.node-reading')).toBeHidden();
-  await expect(page.getByLabel('平假名读音', { exact: true })).toHaveText('はつおん');
+  await expect(page.getByLabel('平假名读音', { exact: true })).toHaveText('はつでん');
 });
 
 test('persists display settings and toggles card readings with Alt+R', async ({ page }) => {
@@ -267,10 +267,10 @@ test('copies card and detail words without expanding or selecting another card',
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('発表');
   await page.getByRole('button', { name: '展开汉字発', exact: true }).click();
   const count = await page.getByTestId('word-node').count();
-  await page.locator('[data-word="発音"]').hover();
-  await page.getByRole('button', { name: '复制词卡单词発音', exact: true }).click();
-  await expect(page.getByRole('status')).toContainText('已复制「発音」');
-  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('発音');
+  await page.locator('[data-word="発電"]').hover();
+  await page.getByRole('button', { name: '复制词卡单词発電', exact: true }).click();
+  await expect(page.getByRole('status')).toContainText('已复制「発電」');
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('発電');
   await expect(page.getByRole('heading', { name: '発表', exact: true })).toBeVisible();
   await expect(page.getByTestId('word-node')).toHaveCount(count);
   expect(
@@ -382,21 +382,21 @@ test('explains missing local speech voices and retains the external dictionary f
 test('removes a kanji branch and its detached words with undo and redo', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: '展开汉字発', exact: true }).click();
-  await page.getByRole('button', { name: '选中词汇発音', exact: true }).click();
-  await page.getByRole('button', { name: '展开汉字音', exact: true }).click();
+  await page.getByRole('button', { name: '选中词汇発電', exact: true }).click();
+  await page.getByRole('button', { name: '展开汉字電', exact: true }).click();
   const count = await page.getByTestId('word-node').count();
-  await page.getByRole('button', { name: '删除汉字音及其分支', exact: true }).click();
-  await expect(page.getByRole('button', { name: '继续展开共用汉字音', exact: true })).toHaveCount(
+  await page.getByRole('button', { name: '删除汉字電及其分支', exact: true }).click();
+  await expect(page.getByRole('button', { name: '继续展开共用汉字電', exact: true })).toHaveCount(
     0,
   );
   await expect(page.getByRole('button', { name: '继续展开共用汉字発', exact: true })).toBeVisible();
-  await expect(page.locator('[data-word="発音"]')).toBeVisible();
+  await expect(page.locator('[data-word="発電"]')).toBeVisible();
   expect(await page.getByTestId('word-node').count()).toBeLessThan(count);
   await page.getByRole('button', { name: '撤回上一步', exact: true }).click();
   await expect(page.getByTestId('word-node')).toHaveCount(count);
-  await expect(page.getByRole('button', { name: '删除汉字音及其分支', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: '删除汉字電及其分支', exact: true })).toBeVisible();
   await page.getByRole('button', { name: '重做', exact: true }).click();
-  await expect(page.getByRole('button', { name: '继续展开共用汉字音', exact: true })).toHaveCount(
+  await expect(page.getByRole('button', { name: '继续展开共用汉字電', exact: true })).toHaveCount(
     0,
   );
   await page.getByRole('button', { name: '删除汉字発及其分支', exact: true }).click();
@@ -428,4 +428,75 @@ test('keeps standard readings and meanings for a pending textbook word across fi
     await expect(page.locator('.word-references')).toContainText('该词不在当前筛选范围内');
     await expect(page.getByLabel('课次符号说明', { exact: true })).toHaveCount(0);
   }
+});
+
+test('labels word islands by grammatical class with readings shown or hidden', async ({
+  page,
+}, testInfo) => {
+  await page.goto('/');
+  const root = page.locator('.word-node.is-root');
+  const label = root.locator('.node-pos');
+  const toggle = page.getByRole('switch', { name: '显示词性角标' });
+  const settings = page.getByRole('button', { name: '设置', exact: true });
+  const close = page.getByRole('button', { name: '关闭设置' });
+  await expect(root).toBeVisible();
+  await expect(label).toHaveCount(0);
+  await expect(page.getByLabel('词性', { exact: true })).toContainText('名词');
+  await settings.click();
+  await expect(toggle).not.toBeChecked();
+  await toggle.check();
+  await close.click();
+  await page.reload();
+  await expect(label).toHaveText('名·サ变');
+  await expect(label).toHaveCSS('position', 'absolute');
+  await expect(label).toHaveAttribute('title', /可接する/);
+  await page.getByRole('button', { name: '加入生词本', exact: true }).click();
+  await page.getByRole('button', { name: '展开汉字発', exact: true }).click();
+  await expect(page.locator('[data-word="発つ"] .node-pos')).toHaveText('五段');
+  await expect(page.locator('.node-pos')).toHaveCount(await page.getByTestId('word-node').count());
+  await expect(root.getByRole('button', { name: '将発表移出生词本' })).toBeVisible();
+  const otherLabel = page.locator('[data-word="発つ"] .node-pos');
+  await expect(otherLabel).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+  await expect(label).not.toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+  await page.mouse.move(0, 0);
+  await page.screenshot({ path: testInfo.outputPath('island-labels-desktop.png') });
+  await page
+    .locator('.network-svg > g')
+    .screenshot({ path: testInfo.outputPath('island-labels-network.png') });
+  await page.getByRole('button', { name: '选中词汇発つ', exact: true }).click();
+  await expect(label).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+  await expect(otherLabel).not.toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+  await page.getByRole('button', { name: '显示读音', exact: true }).click();
+  await expect(label).toBeVisible();
+  await expect(root.locator('.node-reading')).toBeHidden();
+  const input = page.getByRole('combobox', { name: '输入起始词' });
+  for (const [word, short, full] of [
+    ['走る', '五段', '五段动词'],
+    ['食べる', '一段', '一段动词'],
+    ['美しい', 'い形', 'い形容词'],
+    ['静か', 'な形', 'な形容词'],
+    ['おいしさ', '名', '名词'],
+    ['架空発表', '?', '词性未标注'],
+  ]) {
+    await input.fill(word);
+    await page.getByRole('button', { name: '开始探索', exact: true }).click();
+    await expect(root).toHaveAttribute('data-word', word);
+    await expect(label).toHaveText(short);
+    await expect(page.getByLabel('词性', { exact: true })).toContainText(full);
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
+  await input.fill('美しい');
+  await page.getByRole('button', { name: '开始探索', exact: true }).click();
+  await expect(label).toHaveText('い形');
+  await page.getByRole('button', { name: '加入生词本', exact: true }).click();
+  await root.scrollIntoViewIfNeeded();
+  await page.screenshot({ path: testInfo.outputPath('island-labels-mobile.png') });
+  await settings.click();
+  await expect(toggle).toBeChecked();
+  await toggle.uncheck();
+  await close.click();
+  await expect(label).toHaveCount(0);
+  await page.reload();
+  await expect(root).toBeVisible();
+  await expect(label).toHaveCount(0);
 });

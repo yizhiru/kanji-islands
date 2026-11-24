@@ -9,7 +9,8 @@ import {
   forceY,
 } from 'd3-force';
 import type { SimulationNodeDatum } from 'd3-force';
-import { Bookmark, LocateFixed, Minus, Plus, Move, X } from 'lucide-react';
+import { LocateFixed, Minus, Plus, Move, X } from 'lucide-react';
+import { partsOfSpeech } from '../core/partsOfSpeech';
 import { graphOf } from '../core/network';
 import type { Filter, Network } from '../core/types';
 import { entriesFor, referencesFor, Vocabulary } from '../core/vocabulary';
@@ -19,6 +20,7 @@ interface Props {
   vocab: Vocabulary;
   network: Network;
   filter: Filter;
+  showPartOfSpeech: boolean;
   showReading: boolean;
   notebookWords: ReadonlySet<string>;
   onRemoveSaved: (id: string) => void;
@@ -43,6 +45,7 @@ export function NetworkCanvas({
   vocab,
   network,
   filter,
+  showPartOfSpeech,
   showReading,
   notebookWords,
   onRemoveSaved,
@@ -116,6 +119,32 @@ export function NetworkCanvas({
     simulation.stop();
   }, [graph]);
 
+  const cardText = useMemo(
+    () =>
+      new Map(
+        nodes
+          .filter((node) => node.kind === 'word')
+          .map((node) => {
+            const word = vocab.get(node.id);
+            const entries = entriesFor(word, filter);
+            return [
+              node.id,
+              {
+                word,
+                reading: [...new Set(entries.map((entry) => entry.reading_hiragana))].join(' / '),
+                reference: node.root
+                  ? '探索起点'
+                  : referencesFor(entries, filter) ||
+                    (word.entries.length ? '未匹配标日课次' : '自定义词汇'),
+                pos: showPartOfSpeech
+                  ? partsOfSpeech(entries.length ? entries : word.entries)
+                  : null,
+              },
+            ] as const;
+          }),
+      ),
+    [nodes, vocab, filter.scope, filter.lesson, showPartOfSpeech],
+  );
   const byId = new Map(nodes.map((n) => [n.id, n]));
   const fit = () => {
     if (!nodes.length) return;
@@ -236,10 +265,8 @@ export function NetworkCanvas({
                   </div>
                 </foreignObject>
               );
-            const word = vocab.get(node.id);
+            const { word, reading, reference, pos } = cardText.get(node.id)!;
             const selected = node.id === network.selected;
-            const entries = entriesFor(word, filter);
-            const reading = [...new Set(entries.map((e) => e.reading_hiragana))].join(' / ');
             return (
               <foreignObject
                 key={node.id}
@@ -268,9 +295,7 @@ export function NetworkCanvas({
                         event.stopPropagation();
                         onRemoveSaved(node.id);
                       }}
-                    >
-                      <Bookmark size={17} fill="currentColor" aria-hidden="true" />
-                    </button>
+                    />
                   )}
                   <CopyButton
                     text={node.text}
@@ -305,15 +330,15 @@ export function NetworkCanvas({
                       {node.text}
                     </button>
                   )}
-                  <span className="node-subtitle node-reference">
-                    {node.root
-                      ? '探索起点'
-                      : referencesFor(entries, filter) ||
-                        (word.entries.length ? '未匹配标日课次' : '自定义词汇')}
-                  </span>
+                  <span className="node-subtitle node-reference">{reference}</span>
                   <span className="node-subtitle node-reading" lang="ja">
                     {reading || '词库中暂无读音'}
                   </span>
+                  {pos && (
+                    <span className="node-pos" title={pos.full}>
+                      {pos.short}
+                    </span>
+                  )}
                 </div>
               </foreignObject>
             );

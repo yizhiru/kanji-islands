@@ -100,7 +100,7 @@ function About({ vocab, onClose }: { vocab: Vocabulary; onClose: () => void }) {
         <b>日文：</b>来自用户导入的词典。<b>英文：</b>Jitendex / JMdict。
       </p>
       <p>支持在设置中导入本地 Yomitan 词典；不内置或自动下载明镜。每种语言的释义均标注实际来源。</p>
-      <p>上次的词网、生词本和用户词典保存在本机。朗读支持本机 VOICEVOX 或系统日语语音。</p>
+      <p>上次的词网、生词本和用户词典保存在本机。桌面版可在设置中选择日语朗读引擎。</p>
       <p>
         内置词典派生数据：CC BY-SA 4.0。署名：greyindex、Stephen Kraus / Jitendex、EDRDG /
         JMdict。应用代码：MIT。用户词典遵循各自许可。
@@ -136,14 +136,15 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
   const [query, setQuery] = useState('');
   const [focused, setFocused] = useState(false);
   const [suggestionIndex, setSuggestionIndex] = useState(-1);
+  const [showPartOfSpeech, setShowPartOfSpeech] = useState(initialDisplay.showPartOfSpeech);
   const [showReading, setShowReading] = useState(initialDisplay.showReading);
   const [autoPlay, setAutoPlay] = useState(true);
   const [speechRequest, setSpeechRequest] = useState(0);
   const [autoCollapse, setAutoCollapse] = useState(initialDisplay.autoCollapse);
   const [visibleKanjiCount, setVisibleKanjiCount] = useState(initialDisplay.visibleKanjiCount);
   useEffect(() => {
-    saveDisplaySettings({ autoCollapse, visibleKanjiCount, showReading });
-  }, [autoCollapse, visibleKanjiCount, showReading]);
+    saveDisplaySettings({ autoCollapse, visibleKanjiCount, showReading, showPartOfSpeech });
+  }, [autoCollapse, visibleKanjiCount, showReading, showPartOfSpeech]);
   const [detailsCollapsed, setDetailsCollapsed] = useState(false);
   const [about, setAbout] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -522,13 +523,14 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
               vocab={vocab}
               network={visibleNetwork}
               notebookWords={notebook.words}
-              onRemoveSaved={(id) => {
-                if (notebook.setSaved(id, false)) {
+              onRemoveSaved={async (id) => {
+                if (await notebook.setSaved(id, false)) {
                   setMessage(`已将「${vocab.get(id).text}」移出生词本`);
                   setRemovedWord(id);
                 }
               }}
               filter={filter}
+              showPartOfSpeech={showPartOfSpeech}
               showReading={showReading}
               onSelect={select}
               onExpand={expand}
@@ -594,8 +596,8 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
             {removedWord && !notebook.words.has(removedWord) && (
               <button
                 className="toast-undo"
-                onClick={() => {
-                  if (notebook.setSaved(removedWord, true)) notify('已恢复到生词本');
+                onClick={async () => {
+                  if (await notebook.setSaved(removedWord, true)) notify('已恢复到生词本');
                 }}
               >
                 撤回
@@ -621,7 +623,6 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
         <Notebook
           vocab={vocab}
           words={notebook.words}
-          onRemove={notebook.toggle}
           setSaved={notebook.setSaved}
           speech={speech}
           message={message}
@@ -640,6 +641,8 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
         <Settings
           dictionaries={dictionaries}
           speech={speech}
+          showPartOfSpeech={showPartOfSpeech}
+          onShowPartOfSpeech={setShowPartOfSpeech}
           autoCollapse={autoCollapse}
           visibleKanjiCount={visibleKanjiCount}
           onAutoCollapse={setAutoCollapse}

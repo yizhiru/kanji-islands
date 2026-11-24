@@ -3,6 +3,7 @@ import { useEffect, useId, useState } from 'react';
 import type { Filter, Network } from '../core/types';
 import { BATCH_SIZE } from '../core/network';
 import { entriesFor, referencesFor, Vocabulary } from '../core/vocabulary';
+import { partsOfSpeech } from '../core/partsOfSpeech';
 import { verbPairsFor } from '../core/verbPairs';
 import { EntryMeanings } from './EntryMeanings';
 import type { DictionaryInfo } from '../core/dictionaries/types';
@@ -94,6 +95,9 @@ export function WordDetails({
         </button>
         <p className="selected-reading" lang="ja" aria-label="平假名读音">
           {[...new Set(entries.map((e) => e.reading_hiragana))].join(' / ') || '词库中暂无读音'}
+        </p>
+        <p className="selected-pos" aria-label="词性">
+          {partsOfSpeech(scopedEntries.length ? scopedEntries : entries).full}
         </p>
         <Pronunciation
           word={word.text}
@@ -258,7 +262,7 @@ export function WordDetails({
             value={relatedSort}
             onChange={(event) => onRelatedSort(event.target.value as 'default' | 'notebook')}
           >
-            <option value="default">默认排序</option>
+            <option value="default">N2 → 标日 → 其他</option>
             <option value="notebook">生词优先</option>
           </select>
         </label>

@@ -1,6 +1,6 @@
 {
   "name": "kanji-islands",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "private": true,
   "description": "汉字岛：词汇成岛，汉字相连。",
   "author": "Kanji Islands contributors",
@@ -21,7 +21,11 @@
     "test:e2e": "playwright test",
     "test:desktop": "node scripts/smoke-desktop.mjs",
     "package": "npm run build && electron-builder --dir",
-    "dist": "npm run build && electron-builder"
+    "dist": "npm run build && electron-builder",
+    "test:speech": "node scripts/smoke-speech.mjs",
+    "speech:build": "node scripts/build-speech.cjs",
+    "predev": "npm run speech:build",
+    "prestart": "npm run speech:build"
   },
   "dependencies": {
     "d3-force": "3.0.0",
@@ -65,6 +69,13 @@
       {
         "from": "中级词汇表_完整校对文字版.pdf",
         "to": "sources/intermediate.pdf"
+      },
+      {
+        "from": "tmp/speech-runtime/speech-worker",
+        "to": "speech-worker",
+        "filter": [
+          "**/*"
+        ]
       }
     ],
     "mac": {
@@ -88,6 +99,7 @@
       "target": [
         "AppImage"
       ]
-    }
+    },
+    "beforePack": "./scripts/build-speech.cjs"
   }
 }

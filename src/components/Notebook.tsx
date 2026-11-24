@@ -13,7 +13,6 @@ import type { PronunciationController } from '../core/usePronunciation';
 export function Notebook({
   vocab,
   words,
-  onRemove,
   setSaved,
   speech,
   message,
@@ -24,12 +23,11 @@ export function Notebook({
 }: {
   vocab: Vocabulary;
   words: ReadonlySet<string>;
-  onRemove: (id: string) => void;
-  setSaved: (id: string, saved: boolean) => boolean;
+  setSaved: (id: string, saved: boolean) => Promise<boolean>;
   speech: PronunciationController;
   message: string;
   onNotify: (message: string) => void;
-  onImport: (ids: string[]) => number;
+  onImport: (ids: string[]) => Promise<number>;
   onSelect: (id: string) => void;
   onClose: () => void;
 }) {
@@ -44,7 +42,7 @@ export function Notebook({
     setFeedback(undefined);
     try {
       if (file.size > MAX_BACKUP_BYTES) throw new Error('备份文件超过 10 MB，请检查所选文件。');
-      const added = onImport(parseNotebookBackup(await file.text()));
+      const added = await onImport(parseNotebookBackup(await file.text()));
       setFeedback({ text: added ? `已导入 ${added} 个生词。` : '没有新增生词。' });
     } catch (error) {
       setFeedback({
@@ -169,7 +167,7 @@ export function Notebook({
             <button
               className="text-button"
               aria-label={`删除生词${word.text}`}
-              onClick={() => onRemove(word.id)}
+              onClick={() => setSaved(word.id, false)}
             >
               删除
             </button>

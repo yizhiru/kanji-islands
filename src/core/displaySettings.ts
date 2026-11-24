@@ -4,10 +4,16 @@ export interface DisplaySettings {
   autoCollapse: boolean;
   visibleKanjiCount: number;
   showReading: boolean;
+  showPartOfSpeech: boolean;
 }
 
 const key = 'kanji-islands.display-settings.v1';
-const defaults: DisplaySettings = { autoCollapse: true, visibleKanjiCount: 2, showReading: true };
+const defaults: DisplaySettings = {
+  autoCollapse: true,
+  visibleKanjiCount: 2,
+  showReading: true,
+  showPartOfSpeech: false,
+};
 
 export function loadDisplaySettings(): DisplaySettings {
   try {
@@ -21,6 +27,7 @@ export function loadDisplaySettings(): DisplaySettings {
         saved.visibleKanjiCount <= MAX_WORDS
           ? saved.visibleKanjiCount
           : defaults.visibleKanjiCount,
+      showPartOfSpeech: saved?.showPartOfSpeech === true,
       showReading:
         typeof saved?.showReading === 'boolean' ? saved.showReading : defaults.showReading,
     };

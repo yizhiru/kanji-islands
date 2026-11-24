@@ -1,0 +1,8 @@
+Kokoro-82M v1.0 / jf_alpha · hexgrad · Apache License 2.0
+https://huggingface.co/hexgrad/Kokoro-82M
+ONNX export: https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX
+Japanese frontend: Misaki Cutlet, with UniDic Lite 1.0.8 (dictionary notices in dictionary/).
+Open JTalk and HTS Engine: https://open-jtalk.sourceforge.net/
+HTS Voice "Mei" (Normal) © 2009–2013 Nagoya Institute of Technology.
+Creative Commons Attribution 3.0: https://creativecommons.org/licenses/by/3.0/
+https://github.com/r9y9/pyopenjtalk/blob/v0.4.1/pyopenjtalk/htsvoice/LICENSE_mei_normal.htsvoice

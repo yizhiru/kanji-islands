@@ -6,7 +6,7 @@ import {
   decodeDataset,
   kanjiOf,
   referencesFor,
-  sourceMatches,
+  wordReferences,
   Vocabulary,
   wordId,
 } from '../src/core/vocabulary';
@@ -20,8 +20,8 @@ import {
   startNetwork,
 } from '../src/core/network';
 
-const all: Filter = { scope: 'all', lesson: '' };
-const beginner: Filter = { scope: 'beginner', lesson: '' };
+const all: Filter = { scope: 'all' };
+const beginner: Filter = { scope: 'beginner' };
 const source = (level: '初级' | '中级', lesson: number, symbol = ''): Source => ({
   level,
   lessons: [{ lesson, symbol }],
@@ -75,6 +75,24 @@ const vocab = fixture([
 ]);
 
 describe('word indexing and textbook filters', () => {
+  it('finds index-only lesson occurrences without assigning them to a reading or sense', () => {
+    const data = fixture([entry('開く', [source('中级', 2)], 'ひらく')]).data;
+    const scoped = new Vocabulary({
+      ...data,
+      textbookIndex: [
+        { ...source('初级', 18, '※'), words: ['開く', '教材例句'] },
+        { ...source('中级', 2), words: ['開く'] },
+      ],
+    });
+    const word = scoped.search('開く', beginner)[0];
+    expect(wordReferences(word, beginner)).toBe('初级18※');
+    expect(word.entries[0].reading_hiragana).toBe('ひらく');
+    expect(entriesFor(word, beginner)).toEqual([]);
+    expect(scoped.search('ひらく', beginner)).toEqual([]);
+    expect(scoped.search('教材例句', beginner)[0].entries).toEqual([]);
+    expect(scoped.related('句', beginner)[0].text).toBe('教材例句');
+    expect(scoped.search('教材例句', { scope: 'intermediate' })).toEqual([]);
+  });
   it('uses the N2 word and reading before textbook and other candidates, within the active scope', () => {
     const ranked = fixture([
       { ...entry('発外', []), priority: 999 },
@@ -102,10 +120,7 @@ describe('word indexing and textbook filters', () => {
     const words = ordered.related('発', all).map((w) => w.text);
     expect(new Set(words.slice(0, 2))).toEqual(new Set(['発初', '発両']));
     expect(words.slice(2)).toEqual(['発中', '発外']);
-    expect(ordered.related('発', { scope: 'intermediate', lesson: '' }).map((w) => w.text)).toEqual(
-      ['発中', '発両'],
-    );
-    expect(ordered.related('発', { scope: 'all', lesson: '中级:1' }).map((w) => w.text)).toEqual([
+    expect(ordered.related('発', { scope: 'intermediate' }).map((w) => w.text)).toEqual([
       '発中',
       '発両',
     ]);
@@ -128,14 +143,9 @@ describe('word indexing and textbook filters', () => {
     ]);
     expect(dictionary.search('量子', all)[0].text).toBe('量子計算');
     expect(dictionary.inScope(all)).toHaveLength(3);
-    expect(dictionary.inScope({ scope: 'textbook', lesson: '' }).map((w) => w.text)).toEqual([
-      '計算',
-      '表面',
-    ]);
+    expect(dictionary.inScope({ scope: 'textbook' }).map((w) => w.text)).toEqual(['計算', '表面']);
     expect(dictionary.search('量子', beginner)).toEqual([]);
-    expect(dictionary.inScope({ scope: 'all', lesson: '初级:1' }).map((w) => w.text)).toEqual([
-      '計算',
-    ]);
+    expect(dictionary.inScope(beginner).map((w) => w.text)).toEqual(['計算']);
     expect(referencesFor(dictionary.get(wordId('量子計算')).entries)).toBe('');
   });
   it('uses complete Unicode kanji and ignores kana, repeated characters and iteration marks', () => {
@@ -145,20 +155,17 @@ describe('word indexing and textbook filters', () => {
   it('groups spellings without dropping multiple readings', () => {
     expect(vocab.get(wordId('生物')).entries).toHaveLength(2);
     expect(entriesFor(vocab.get(wordId('生物')), beginner)[0].reading_hiragana).toBe('なまもの');
-    const textbook: Filter = { scope: 'textbook', lesson: '' };
+    const textbook: Filter = { scope: 'textbook' };
     expect(entriesFor(vocab.get(wordId('生物')), textbook)).toHaveLength(2);
     expect(referencesFor(entriesFor(vocab.get(wordId('生物')), textbook), textbook)).toBe(
       '初级1；中级2',
     );
     expect(vocab.search('せいぶつ', textbook)[0].text).toBe('生物');
   });
-  it('matches scope and lesson on the same source occurrence', () => {
-    const e = entry('共有', [source('初级', 1), source('中级', 2)]);
-    expect(e.sources.some((s) => sourceMatches(s, { scope: 'beginner', lesson: '中级:2' }))).toBe(
-      false,
-    );
-    expect(referencesFor([e])).toBe('初级1；中级2');
-    expect(referencesFor([e], { scope: 'beginner', lesson: '初级:1' })).toBe('初级1');
+  it('shows all lesson occurrences in the selected scope', () => {
+    const e = entry('共有', [source('初级', 1), source('初级', 8), source('中级', 2)]);
+    expect(referencesFor([e])).toBe('初级1、8；中级2');
+    expect(referencesFor([e], beginner)).toBe('初级1、8');
   });
   it('finds only actual shared characters in the chosen scope', () => {
     expect(vocab.related('発', beginner).map((w) => w.text)).toEqual(
@@ -175,7 +182,7 @@ describe('word indexing and textbook filters', () => {
   it('supports a custom seed and handles a range without connected words', () => {
     expect(vocab.get(wordId('未収録語')).kanji).toContain('語');
     expect(vocab.get(wordId('未収録語')).entries).toEqual([]);
-    expect(vocab.random({ scope: 'beginner', lesson: '初级:48' })).toBeUndefined();
+    expect(fixture([entry('学校')]).random(beginner)).toBeUndefined();
   });
 });
 
@@ -361,6 +368,29 @@ describe('production vocabulary integrity', () => {
       }
     },
   );
+  it('ships all four volumes including previously unresolved occurrences and the line-break correction', () => {
+    expect(data.textbookIndex).toHaveLength(7687);
+    const has = (word: string, lesson: number, symbol: string) =>
+      data.textbookIndex!.some(
+        (row) =>
+          row.words.includes(word) &&
+          row.level === '初级' &&
+          row.lessons.some((ref) => ref.lesson === lesson && ref.symbol === symbol),
+      );
+    expect(has('開く', 18, '※')).toBe(true);
+    expect(has('カエデ', 34, '▼')).toBe(true);
+    expect(has('スケート', 23, '')).toBe(true);
+    expect(data.textbookIndex!.some((row) => row.words.includes('ケートボード'))).toBe(false);
+  });
+  it('ships the reviewed serving counter and keeps OCR evidence off the lesson word list', () => {
+    const serving = data.entries.find((e) => e.word === '~人前')!;
+    expect(serving.reading_hiragana).toBe('にんまえ');
+    expect(serving.jmdict_id).toBe(1368480);
+    expect(referencesFor([serving])).toContain('中级15');
+    expect(data.textbookIndex!.some((row) => row.words.includes('指輸'))).toBe(false);
+    const ring = data.entries.find((e) => e.word === '指輪' && e.jmdict_id === 1310050)!;
+    expect(ring.sources.some((s) => s.raw_line === '指輸 2※')).toBe(true);
+  });
   it('keeps corrected references and original evidence and labels lemma meanings', () => {
     const skate = data.entries.find((e) => e.word === 'スケート')!;
     expect(skate.sources[0].lessons[1].symbol).toBe('');
@@ -416,8 +446,6 @@ describe('notebook candidate ordering', () => {
     const expanded = expandNetwork(startNetwork(wordId('発0')), '発', vocab, all, saved);
     for (const id of saved) expect(expanded.words).toContain(id);
     expect(vocab.related('発', all, wordId('発0'))).toEqual(baseline);
-    expect(vocab.related('発', { scope: 'intermediate', lesson: '' }, undefined, saved)).toEqual(
-      [],
-    );
+    expect(vocab.related('発', { scope: 'intermediate' }, undefined, saved)).toEqual([]);
   });
 });

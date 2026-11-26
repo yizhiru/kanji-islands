@@ -2,7 +2,7 @@ import { ArrowUpRight, BookOpen, Eye, EyeOff, GitBranch, Plus } from 'lucide-rea
 import { useEffect, useId, useState } from 'react';
 import type { Filter, Network } from '../core/types';
 import { BATCH_SIZE } from '../core/network';
-import { entriesFor, referencesFor, Vocabulary } from '../core/vocabulary';
+import { entriesFor, referencesFor, wordReferences, Vocabulary } from '../core/vocabulary';
 import { partsOfSpeech } from '../core/partsOfSpeech';
 import { verbPairsFor } from '../core/verbPairs';
 import { EntryMeanings } from './EntryMeanings';
@@ -17,6 +17,8 @@ const formNames: Record<string, string> = {
   polite_past: '礼貌体过去式',
   polite_negative: '礼貌体否定式',
   past: '过去式',
+  teiru: 'ている形',
+  attributive_na: 'な形（修饰名词）',
   adverbial_ku: 'く形（副词用法）',
   adverbial_ni: 'に形（副词用法）',
   nominal_sa: 'さ形（名词化）',
@@ -53,9 +55,12 @@ export function WordDetails({
 }: Props) {
   const [showMeaning, setShowMeaning] = useState(true);
   const referenceHelpId = useId();
+  const readingHelpId = useId();
   const word = vocab.get(network.selected);
   const entries = word.entries;
   const scopedEntries = entriesFor(word, filter);
+  const readings = [...new Set(entries.map((entry) => entry.reading_hiragana))];
+  const indexedPolyphone = readings.length > 1 && !!word.lessonSources?.length;
   const [chosenKanji, setChosenKanji] = useState('');
   const [relatedPages, setRelatedPages] = useState<Record<string, number>>({});
   useEffect(() => {
@@ -66,7 +71,7 @@ export function WordDetails({
   const related = active
     ? vocab.related(active, filter, word.id, relatedSort === 'notebook' ? notebook : undefined)
     : [];
-  const relatedKey = (kanji: string) => JSON.stringify([filter.scope, filter.lesson, kanji]);
+  const relatedKey = (kanji: string) => JSON.stringify([filter.scope, kanji]);
   const relatedLimit = active ? (relatedPages[relatedKey(active)] ?? 12) : 12;
   const showMoreRelated = (kanji: string, total: number) => {
     const key = relatedKey(kanji);
@@ -77,7 +82,10 @@ export function WordDetails({
     }));
   };
   const verbPairs = verbPairsFor(vocab, word, filter);
-  const references = textbookReferences(referencesFor(scopedEntries, filter));
+  const references = textbookReferences(wordReferences(word, filter));
+  const verifiedReferences = indexedPolyphone
+    ? textbookReferences(referencesFor(entries, filter))
+    : '';
   return (
     <aside id="word-details" className="details-panel" aria-label="词汇详情" hidden={collapsed}>
       <div className="details-heading">
@@ -94,27 +102,64 @@ export function WordDetails({
           {notebook.has(word.id) ? '移出生词本' : '加入生词本'}
         </button>
         <p className="selected-reading" lang="ja" aria-label="平假名读音">
-          {[...new Set(entries.map((e) => e.reading_hiragana))].join(' / ') || '词库中暂无读音'}
+          {readings.join(' / ') || '词库中暂无读音'}
         </p>
         <p className="selected-pos" aria-label="词性">
           {partsOfSpeech(scopedEntries.length ? scopedEntries : entries).full}
         </p>
-        <Pronunciation
-          word={word.text}
-          readings={[...new Set(entries.map((e) => e.reading_hiragana))]}
-          onNotify={onNotify}
-          speech={speech}
-        />
+        <Pronunciation word={word.text} readings={readings} onNotify={onNotify} speech={speech} />
         <div className="word-references">
           <BookOpen size={16} />
           <span>
             {references ||
               (scopedEntries.length
                 ? '未匹配标日课次'
-                : entries.length
+                : entries.length || word.lessonSources?.length
                   ? '该词不在当前筛选范围内'
                   : '自定义起点 · 词库暂未收录')}
           </span>
+          {indexedPolyphone && references && !collapsed && (
+            <div className="reading-help" key={JSON.stringify([word.id, filter.scope])}>
+              <button className="text-button" popoverTarget={readingHelpId} aria-haspopup="dialog">
+                教材读音
+              </button>
+              <div
+                className="reading-popover"
+                popover="auto"
+                id={readingHelpId}
+                role="dialog"
+                aria-label="读音与课次"
+              >
+                <strong lang="ja">{word.text}</strong>
+                <p>{references}</p>
+                {verifiedReferences ? (
+                  <dl>
+                    {readings.map((reading) => (
+                      <div key={reading}>
+                        <dt lang="ja">{reading}</dt>
+                        <dd>
+                          {textbookReferences(
+                            referencesFor(
+                              entries.filter((e) => e.reading_hiragana === reading),
+                              filter,
+                            ),
+                          ) || '当前范围暂无对应记录'}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                ) : (
+                  <p>
+                    词典读音为<span lang="ja">{readings.join('、')}</span>
+                    。教材索引已确认课次，课文中的具体读音仍待核对。
+                  </p>
+                )}
+                {verifiedReferences && verifiedReferences !== references && (
+                  <p>其余课次的具体读音仍待核对。</p>
+                )}
+              </div>
+            </div>
+          )}
           {references && (
             <div className="reference-help" key={`${word.id}:${references}`}>
               <button
@@ -190,31 +235,40 @@ export function WordDetails({
             查看释义
           </button>
         ) : (
-          entries.map((entry) => (
-            <div className="entry-meanings" key={entry.id}>
-              {entries.length > 1 && (
-                <span className="variant-label">
-                  {entry.reading_hiragana} ·{' '}
-                  {textbookReferences(referencesFor([entry], filter)) || '未匹配标日课次'}
-                </span>
-              )}
-              {entry.inflection && (
-                <div className="inflection-note">
-                  <b>{formNames[entry.inflection.form] || entry.inflection.form}</b>
-                  <span>
-                    原形：{entry.inflection.lemma}（{entry.inflection.lemma_reading_hiragana}）
+          entries.map((entry) => {
+            const entryReferences = textbookReferences(referencesFor([entry], filter));
+            return (
+              <div className="entry-meanings" key={entry.id}>
+                {entries.length > 1 && (
+                  <span className="variant-label">
+                    {entry.reading_hiragana}
+                    {entryReferences
+                      ? ' · ' + entryReferences
+                      : indexedPolyphone
+                        ? ''
+                        : word.lessonSources?.length && !entry.sources.length
+                          ? ' · 该读音的课次待核对'
+                          : ' · 未匹配标日课次'}
                   </span>
-                  <span>以下为原形释义；实际含义需结合活用。</span>
-                </div>
-              )}
-              <EntryMeanings
-                word={word.text}
-                entry={entry}
-                dictionaries={dictionaries}
-                speech={speech}
-              />
-            </div>
-          ))
+                )}
+                {entry.inflection && (
+                  <div className="inflection-note">
+                    <b>{formNames[entry.inflection.form] || entry.inflection.form}</b>
+                    <span>
+                      原形：{entry.inflection.lemma}（{entry.inflection.lemma_reading_hiragana}）
+                    </span>
+                    <span>以下为原形释义；实际含义需结合活用。</span>
+                  </div>
+                )}
+                <EntryMeanings
+                  word={word.text}
+                  entry={entry}
+                  dictionaries={dictionaries}
+                  speech={speech}
+                />
+              </div>
+            );
+          })
         )}
       </section>
       {verbPairs.length > 0 && (
@@ -291,7 +345,11 @@ export function WordDetails({
                 >
                   <span lang="ja">{item.text}</span>
                   <small>
-                    {notebook.has(item.id) && '生词 · '}
+                    {notebook.has(item.id) && (
+                      <>
+                        <strong className="related-saved-label">生词</strong> ·{' '}
+                      </>
+                    )}
                     {network.words.includes(item.id) ? '已在网络' : '加入网络'}
                   </small>
                   <ArrowUpRight size={14} />

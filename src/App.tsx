@@ -38,7 +38,7 @@ import {
   decodeDataset,
   kanjiOf,
   normalize,
-  referencesFor,
+  wordReferences,
   Vocabulary,
   wordId,
 } from './core/vocabulary';
@@ -91,7 +91,7 @@ function About({ vocab, onClose }: { vocab: Vocabulary; onClose: () => void }) {
       </p>
       <p>
         <b>标日词库：</b>
-        按《标准日本语》初、中级课次筛选。课次来自教材词表，词典释义不等于教材原文。
+        收录《标准日本语》初、中级词汇。课次来自教材词表，词典释义不等于教材原文。
       </p>
       <p>
         <b>中文：</b>优先使用用户导入词典；缺失时使用 Jitendex 中文版（模型翻译／校订）。
@@ -400,7 +400,7 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
                     <span lang="ja">{word.text}</span>
                     <small>
                       {showReading && entriesFor(word, filter)[0]?.reading_hiragana}{' '}
-                      <span>{referencesFor(entriesFor(word, filter), filter)}</span>
+                      <span>{wordReferences(word, filter)}</span>
                     </small>
                     <ArrowRight size={15} />
                   </button>
@@ -425,7 +425,7 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
                 key={scope}
                 aria-pressed={filter.scope === scope}
                 className={filter.scope === scope ? 'active' : ''}
-                onClick={() => changeFilter({ scope, lesson: '' })}
+                onClick={() => changeFilter({ scope })}
               >
                 {scopeNames[scope]}
               </button>
@@ -565,26 +565,6 @@ function Explorer({ vocab }: { vocab: Vocabulary }) {
             <span>
               {scopeNames[filter.scope]} · {scopeWords.toLocaleString()} 个词形
             </span>
-            <span className="footer-separator">/</span>
-            <label>
-              课次{' '}
-              <select
-                aria-label="筛选课次"
-                value={filter.lesson}
-                onChange={(e) => changeFilter({ ...filter, lesson: e.target.value })}
-              >
-                <option value="">全部课次</option>
-                {(['初级', '中级'] as const).map((level) => (
-                  <optgroup label={level} key={level}>
-                    {Array.from({ length: level === '初级' ? 48 : 32 }, (_, i) => (
-                      <option key={i} value={`${level}:${i + 1}`}>
-                        {level} · 第 {i + 1} 课
-                      </option>
-                    ))}
-                  </optgroup>
-                ))}
-              </select>
-            </label>
           </div>
         </footer>
       </main>

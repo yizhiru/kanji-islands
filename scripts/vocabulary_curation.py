@@ -6,6 +6,22 @@ Glosses remain those of the lemma and are labelled accordingly in the output.
 
 INFLECTIONS = {
     # surface: (lemma, lemma reading, surface reading, form, required POS)
+    "ご存じです": ("ご存じ", "ごぞんじ", "ごぞんじです", "polite_nonpast", "n"),
+    "そのとおりです": ("その通り", "そのとおり", "そのとおりです", "polite_nonpast", "exp"),
+    "お邪魔しました": ("お邪魔する", "おじゃまする", "おじゃましました", "polite_past", "vs"),
+    "存じている": ("存じる", "ぞんじる", "ぞんじている", "teiru", "v1"),
+    "このような": ("この様", "このよう", "このような", "attributive_na", "adj-na"),
+    "そのような": ("その様", "そのよう", "そのような", "attributive_na", "adj-na"),
+    "どのような": ("どの様", "どのよう", "どのような", "attributive_na", "adj-na"),
+    "そのように": ("その様", "そのよう", "そのように", "adverbial_ni", "adj-na"),
+    "お世話になります": ("お世話になる", "おせわになる", "おせわになります", "polite_nonpast", "v5r"),
+    "お世話になりました": ("お世話になる", "おせわになる", "おせわになりました", "polite_past", "v5r"),
+    "お久しぶりです": ("お久しぶり", "おひさしぶり", "おひさしぶりです", "polite_nonpast", "exp"),
+    "お疲れ様です": ("お疲れ様", "おつかれさま", "おつかれさまです", "polite_nonpast", "int"),
+    "お疲れ様でした": ("お疲れ様", "おつかれさま", "おつかれさまでした", "polite_past", "int"),
+    "ご愁傷様です": ("ご愁傷様", "ごしゅうしょうさま", "ごしゅうしょうさまです", "polite_nonpast", "exp"),
+    "ご苦労様です": ("ご苦労様", "ごくろうさま", "ごくろうさまです", "polite_nonpast", "exp"),
+    "ご苦労様でした": ("ご苦労様", "ごくろうさま", "ごくろうさまでした", "polite_past", "exp"),
     "歩いて": ("歩く", "あるく", "あるいて", "te", "v5k"),
     "ちがいます": ("違う", "ちがう", "ちがいます", "polite_nonpast", "v5u"),
     "分かりました": ("分かる", "わかる", "わかりました", "polite_past", "v5r"),

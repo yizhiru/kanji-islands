@@ -2,14 +2,16 @@
 """Build the full pinned Jitendex snapshot, with verified textbook overlays.
 
 Identical senses are interned to keep alternate spellings/readings inexpensive.
-Only previously curated (word, reading, JMdict ID) matches receive lesson tags.
+Word-level lesson membership comes from the proofread four-volume CSV.
+Individual dictionary readings retain their previously curated source links.
 """
 import hashlib
 import json
 import zipfile
 
+from biaori_lessons import CSV_PATH, load_lesson_index
 from build_vocabulary import ROOT, raw_senses, applies
-from check_zhwiktionary_coverage import hira, sha256
+from check_zhwiktionary_coverage import SOURCES, canonical_surface, hira, sha256
 
 
 def encode(value):
@@ -23,6 +25,7 @@ def main():
         "scripts/build_vocabulary.py", "scripts/check_zhwiktionary_coverage.py",
         "scripts/check_jitendex_coverage.py",
     )]
+    inputs.extend([CSV_PATH, ROOT / "scripts/biaori_lessons.py", *(ROOT / f for _, f in SOURCES)])
     digest = hashlib.sha256("".join(sha256(p) for p in inputs).encode()).hexdigest()
     dest = ROOT / "data/vocabulary/standard.json"
     stamp = dest.with_suffix(".sha256")
@@ -30,8 +33,18 @@ def main():
         print("Full dictionary cache is current.", flush=True)
         return
     curated = json.loads(inputs[0].read_text())
+    lesson_index = load_lesson_index()
     overlays = {}
     for entry in curated["entries"]:
+        corrections = {note["review_key"]: note["replacement_word"]
+                       for note in entry.get("curation_notes", []) if note.get("replacement_word")}
+        for source in entry["sources"]:
+            row = lesson_index[source["row_id"]]
+            if replacement := corrections.get(source["review_key"]):
+                # Preserve the raw evidence in sources, but index the corrected spelling.
+                row["words"] = canonical_surface(replacement).split("/")
+            if entry["word"] not in row["words"]:
+                row["words"].append(entry["word"])
         overlays.setdefault((entry["word"], entry["reading_hiragana"], entry["jmdict_id"]), []).append(entry)
     entries, pool, interned, seen, used = [], [], {}, set(), set()
     fallbacks = 0
@@ -45,7 +58,7 @@ def main():
 
     def add_curated(e, priority=0):
         sources = [{
-            "level": s["level"], "lessons": s.get("corrected_lessons", s["lessons"]),
+            "level": s["level"], "lessons": lesson_index[s["row_id"]]["lessons"],
             "original_lessons": s["lessons"], "original_word": s["original_word"],
             "raw_line": s["raw_line"], "pdf_page": s["pdf_page"], "book_page": s["book_page"],
             **({"correction_note": s["correction_note"]} if "correction_note" in s else {}),
@@ -113,11 +126,13 @@ def main():
     assert used == {e["id"] for e in curated["entries"]}
     assert len(entries) == len({e["id"] for e in entries})
     metadata = {"entryCount": len(entries), "dictionaryEntries": len({e["jmdict_id"] for e in entries}),
-        "textbookEntries": len(used), "textbookWords": len({e["word"] for e in entries if e.get("sources")}),
+        "textbookEntries": len(used), "textbookWords": len({w for row in lesson_index.values() for w in row["words"]}),
+        "textbookIndexRows": len(lesson_index),
         "pendingGroups": curated["metadata"]["summary"]["unmatched_groups"] + curated["metadata"]["summary"]["ambiguous_groups"],
         "sourceHash": digest, "chineseVersion": "Jitendex 非官方中文版 v2026.08.11-zh.4",
         "englishVersion": "Jitendex 2026.08.11.0 / JMdict", "englishOnlyEntries": fallbacks}
-    result = {"version": 2, "metadata": metadata, "senses": pool, "entries": entries}
+    result = {"version": 2, "metadata": metadata, "senses": pool, "entries": entries,
+              "textbookIndex": list(lesson_index.values())}
     temporary = dest.with_suffix(".json.part")
     temporary.write_text(encode(result))
     temporary.replace(dest)

@@ -4,7 +4,7 @@ import copy
 import unittest
 
 from build_vocabulary import (
-    compact_references, exclude_obsolete_readings, normalize_translations,
+    applies, compact_references, exclude_obsolete_readings, normalize_translations,
     variant_signature,
 )
 from vocabulary_curation import inflection_for
@@ -75,6 +75,11 @@ class CurationBoundaryTests(unittest.TestCase):
         self.assertEqual(form["lemma"], "分かる")
         self.assertEqual(form["meanings_scope"], "lemma")
         self.assertIsNone(inflection_for("何のお構いもできませんで"))
+
+    def test_noboru_keeps_only_the_climbing_sense(self):
+        self.assertTrue(applies(["〔上る・登る only〕"], "登る", "のぼる")[0])
+        self.assertFalse(applies(["〔上る・昇る only〕"], "登る", "のぼる")[0])
+        self.assertFalse(applies(["〔上る only〕"], "登る", "のぼる")[0])
 
     def test_corrected_display_does_not_change_original_source_symbols(self):
         source = {"level": "初级", "lessons": [{"lesson": 23, "symbol": "ス"}],

@@ -114,9 +114,7 @@ test('falls back to display defaults when stored settings are invalid', async ({
   await expect(page.getByRole('spinbutton', { name: '自动折叠保留汉字数' })).toHaveValue('2');
 });
 
-test('searches real words, accepts custom seeds, and changes scope and lesson', async ({
-  page,
-}) => {
+test('searches real words, accepts custom seeds, and changes scope', async ({ page }) => {
   await page.goto('/');
   const input = page.getByRole('combobox', { name: '输入起始词' });
   await input.fill('はつおん');
@@ -130,7 +128,6 @@ test('searches real words, accepts custom seeds, and changes scope and lesson', 
   await expect.poll(() => page.getByTestId('word-node').count()).toBeGreaterThan(1);
   await page.getByRole('button', { name: '标日', exact: true }).click();
   await expect(page.getByTestId('word-node')).toHaveCount(1);
-  await page.getByRole('combobox', { name: '筛选课次' }).selectOption('初级:28');
   await page.getByRole('button', { name: '通过発展开关联词', exact: true }).click();
   await page.getByRole('button', { name: '查看关联词発音', exact: true }).click();
   await expect(page.locator('[data-testid="word-node"][data-word="発音"]')).toBeVisible();
@@ -154,10 +151,21 @@ test('restores the last exploration and undo history without external requests',
   await expect.poll(() => page.getByTestId('word-node').count()).toBeGreaterThan(1);
   const expandedCount = await page.getByTestId('word-node').count();
   await page.getByRole('button', { name: '选中词汇発音', exact: true }).click();
+  await page.evaluate(() => {
+    const key = 'kanji-islands.exploration.v1';
+    const saved = JSON.parse(localStorage.getItem(key)!);
+    saved.filter.lesson = '初级:1';
+    localStorage.setItem(key, JSON.stringify(saved));
+  });
   await page.reload();
   await expect(textbook).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByRole('heading', { name: '発音', exact: true })).toBeVisible();
   await expect(page.getByTestId('word-node')).toHaveCount(expandedCount);
+  expect(
+    await page.evaluate(
+      () => JSON.parse(localStorage.getItem('kanji-islands.exploration.v1')!).filter,
+    ),
+  ).toEqual({ scope: 'textbook' });
   await page.getByRole('button', { name: '撤回上一步', exact: true }).click();
   await expect(page.getByRole('heading', { name: '発表', exact: true })).toBeVisible();
   await page.reload();
@@ -237,9 +245,7 @@ test('searches the standard dictionary and keeps textbook-only filters', async (
   await expect(page.locator('.entry-meanings')).not.toHaveCount(0);
   await page.getByRole('button', { name: '标日', exact: true }).click();
   await expect(page.locator('.scope-control button')).toHaveText(['标准词库', '标日']);
-  await expect(page.getByRole('combobox', { name: '筛选课次' }).locator('optgroup')).toHaveCount(2);
-  await expect(page.locator('option[value="初级:1"]')).toHaveCount(1);
-  await expect(page.locator('option[value="中级:1"]')).toHaveCount(1);
+  await expect(page.getByRole('combobox', { name: '筛选课次' })).toHaveCount(0);
   await search.fill('量子力学');
   await expect(page.locator('#search-suggestions [role="option"]')).toHaveCount(0);
   await search.fill('発音');
@@ -415,19 +421,38 @@ test('keeps standard readings and meanings for a pending textbook word across fi
   await page.getByRole('button', { name: '开始探索', exact: true }).click();
   const reading = page.getByLabel('平假名读音', { exact: true });
   await expect(reading).toHaveText('りょっか / りょくか');
+  const help = page.getByRole('button', { name: '教材读音', exact: true });
+  const popup = page.getByRole('dialog', { name: '读音与课次' });
+  await expect(popup).toBeHidden();
+  await expect(page.locator('.variant-label')).toHaveText(['りょっか', 'りょくか']);
+  await help.focus();
+  await page.keyboard.press('Enter');
+  await expect(popup).toContainText('りょっか、りょくか');
+  await expect(popup).toContainText('课文中的具体读音仍待核对');
+  await page.keyboard.press('Escape');
+  await expect(popup).toBeHidden();
+  await expect(help).toBeFocused();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await help.click();
+  await expect(popup).toBeInViewport({ ratio: 1 });
+  const buttonBounds = (await help.boundingBox())!;
+  const popupBounds = (await popup.boundingBox())!;
+  expect(
+    Math.abs(popupBounds.x + popupBounds.width - buttonBounds.x - buttonBounds.width),
+  ).toBeLessThan(2);
+  await page.getByRole('heading', { name: '緑化', exact: true }).click();
+  await expect(popup).toBeHidden();
   const meanings = await page.locator('.meaning-section').innerText();
-  await expect(page.locator('.word-references')).toContainText('未匹配标日课次');
+  await expect(page.locator('.word-references')).toContainText('标日中级19※');
 
   await page.getByRole('button', { name: '标日', exact: true }).click();
-  for (const lesson of ['', '中级:19', '初级:1']) {
-    await page.getByRole('combobox', { name: '筛选课次' }).selectOption(lesson);
-    await expect(reading).toHaveText('りょっか / りょくか');
-    await expect(page.getByRole('button', { name: '朗读りょっか', exact: true })).toBeVisible();
-    await expect(page.getByRole('button', { name: '朗读りょくか', exact: true })).toBeVisible();
-    await expect(page.locator('.meaning-section')).toHaveText(meanings, { useInnerText: true });
-    await expect(page.locator('.word-references')).toContainText('该词不在当前筛选范围内');
-    await expect(page.getByLabel('课次符号说明', { exact: true })).toHaveCount(0);
-  }
+  await expect(help).toBeVisible();
+  await expect(reading).toHaveText('りょっか / りょくか');
+  await expect(page.getByRole('button', { name: '朗读りょっか', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: '朗读りょくか', exact: true })).toBeVisible();
+  await expect(page.locator('.meaning-section')).toHaveText(meanings, { useInnerText: true });
+  await expect(page.locator('.word-references')).toContainText('标日中级19※');
+  await expect(page.getByLabel('课次符号说明', { exact: true })).toBeVisible();
 });
 
 test('labels word islands by grammatical class with readings shown or hidden', async ({

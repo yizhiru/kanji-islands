@@ -1,17 +1,27 @@
 import { useEffect, useRef, useState } from 'react';
 import {
-  ArrowRight,
   BookmarkMinus,
   Check,
   Eye,
   EyeOff,
+  Keyboard,
   LogOut,
   RotateCcw,
   Volume2,
+  X,
 } from 'lucide-react';
 import type { PronunciationController } from '../core/usePronunciation';
 import { practiceAnswer, type PracticeCard } from '../core/practiceBooks';
 import type { Vocabulary } from '../core/vocabulary';
+
+const shortcuts = {
+  kana: { key: 'A', label: '显示或隐藏假名' },
+  meaning: { key: 'S', label: '显示或隐藏释义' },
+  speak: { key: 'D', label: '朗读当前词' },
+  next: { key: 'F', label: '下一个词，或完成本轮。有下一组时继续练习' },
+  help: { key: 'G', label: '打开或关闭快捷键说明' },
+  exit: { key: 'Escape', label: '关闭说明，或退出当前练习' },
+} as const;
 
 function shuffled(cards: readonly PracticeCard[]) {
   const deck = [...cards];
@@ -50,6 +60,7 @@ export function NotebookPractice({
   onClose,
 }: Props) {
   const dialog = useRef<HTMLDialogElement>(null);
+  const help = useRef<HTMLDialogElement>(null);
   // A round keeps its original order and length as familiar words are removed.
   const [deck, setDeck] = useState(() => shuffled(cards));
   const [index, setIndex] = useState(0);
@@ -97,7 +108,34 @@ export function NotebookPractice({
       className="practice-dialog"
       ref={dialog}
       aria-labelledby="practice-title"
+      onKeyDown={(event) => {
+        if (
+          event.defaultPrevented ||
+          event.nativeEvent.isComposing ||
+          event.altKey ||
+          event.ctrlKey ||
+          event.metaKey ||
+          event.shiftKey ||
+          (event.target instanceof HTMLElement &&
+            (event.target.isContentEditable || event.target.closest('input, textarea, select')))
+        )
+          return;
+        const key = event.key.toLowerCase();
+        const scope = help.current?.open ? help.current : event.currentTarget;
+        const button = Array.from(
+          scope.querySelectorAll<HTMLButtonElement>('button[aria-keyshortcuts]'),
+        ).find(
+          (item) =>
+            item.closest('dialog') === scope &&
+            item.getAttribute('aria-keyshortcuts')?.toLowerCase() === key,
+        );
+        // Escape uses the dialog's native cancel event.
+        if (!button || key === 'escape') return;
+        event.preventDefault();
+        if (!event.repeat && (!saving || key === shortcuts.help.key.toLowerCase())) button.click();
+      }}
       onCancel={(event) => {
+        if (event.target !== event.currentTarget) return;
         event.preventDefault();
         onClose();
       }}
@@ -109,10 +147,24 @@ export function NotebookPractice({
             {group && `第 ${group} 组 · `}
             {Math.min(index + 1, deck.length)} / {deck.length}
           </span>
-          <button className="secondary-button" onClick={onClose}>
-            <LogOut size={16} />
-            退出练习
-          </button>
+          <div className="practice-header-actions">
+            <button
+              className="text-button"
+              aria-haspopup="dialog"
+              aria-keyshortcuts={shortcuts.help.key}
+              onClick={() => help.current?.showModal()}
+            >
+              <Keyboard size={16} /> 快捷键 <kbd aria-hidden="true">{shortcuts.help.key}</kbd>
+            </button>
+            <button
+              className="secondary-button"
+              aria-keyshortcuts={shortcuts.exit.key}
+              onClick={onClose}
+            >
+              <LogOut size={16} />
+              退出练习 <kbd aria-hidden="true">Esc</kbd>
+            </button>
+          </div>
         </header>
         <progress
           className="practice-progress"
@@ -127,11 +179,13 @@ export function NotebookPractice({
                 <button
                   className="practice-word"
                   lang="ja"
+                  aria-keyshortcuts={shortcuts.speak.key}
                   aria-label={`朗读${card.word}`}
                   onClick={() => speech.play(answer.readings[0] ?? '')}
                 >
                   {card.word}
                   <Volume2 size={23} aria-hidden="true" />
+                  <kbd aria-hidden="true">{shortcuts.speak.key}</kbd>
                 </button>
                 {showKana ? (
                   <p className="practice-kana" lang="ja">
@@ -147,18 +201,22 @@ export function NotebookPractice({
               <div className="practice-reveal">
                 <button
                   className="secondary-button"
+                  aria-keyshortcuts={shortcuts.kana.key}
                   aria-pressed={showKana}
                   onClick={() => setShowKana(!showKana)}
                 >
                   {showKana ? <EyeOff size={15} /> : <Eye size={15} />}
-                  {showKana ? '隐藏假名' : '显示假名'}
+                  {showKana ? '隐藏假名' : '显示假名'}{' '}
+                  <kbd aria-hidden="true">{shortcuts.kana.key}</kbd>
                 </button>
                 <button
                   className="text-button"
+                  aria-keyshortcuts={shortcuts.meaning.key}
                   aria-pressed={showMeaning}
                   onClick={() => setShowMeaning(!showMeaning)}
                 >
-                  {showMeaning ? '隐藏释义' : '显示释义'}
+                  {showMeaning ? '隐藏释义' : '显示释义'}{' '}
+                  <kbd aria-hidden="true">{shortcuts.meaning.key}</kbd>
                 </button>
               </div>
             </>
@@ -220,10 +278,11 @@ export function NotebookPractice({
               <button
                 className="primary-button"
                 disabled={saving}
+                aria-keyshortcuts={shortcuts.next.key}
                 onClick={() => moveTo(index + 1)}
               >
                 {index + 1 < deck.length ? '下一个' : '完成练习'}
-                <ArrowRight size={16} />
+                <kbd aria-hidden="true">{shortcuts.next.key}</kbd>
               </button>
             </>
           ) : (
@@ -232,14 +291,47 @@ export function NotebookPractice({
                 {returnLabel}
               </button>
               {onNextGroup && (
-                <button className="primary-button" disabled={saving} onClick={onNextGroup}>
-                  练习下一组 <ArrowRight size={16} />
+                <button
+                  className="primary-button"
+                  disabled={saving}
+                  aria-keyshortcuts={shortcuts.next.key}
+                  onClick={onNextGroup}
+                >
+                  练习下一组 <kbd aria-hidden="true">{shortcuts.next.key}</kbd>
                 </button>
               )}
             </>
           )}
         </footer>
       </div>
+      <dialog
+        className="settings-dialog practice-shortcuts"
+        ref={help}
+        aria-labelledby="practice-shortcuts-title"
+      >
+        <div className="modal-heading">
+          <h2 id="practice-shortcuts-title">练习快捷键</h2>
+          <button
+            className="icon-button"
+            aria-label="关闭快捷键说明"
+            aria-keyshortcuts={shortcuts.help.key}
+            onClick={() => help.current?.close()}
+          >
+            <X size={18} />
+          </button>
+        </div>
+        <p>左手四指放在 A、S、D、F 上，就能练完一组。</p>
+        <dl>
+          {Object.values(shortcuts).map(({ key, label }) => (
+            <div key={key}>
+              <dt>
+                <kbd>{key === 'Escape' ? 'Esc' : key}</kbd>
+              </dt>
+              <dd>{label}</dd>
+            </div>
+          ))}
+        </dl>
+      </dialog>
     </dialog>
   );
 }

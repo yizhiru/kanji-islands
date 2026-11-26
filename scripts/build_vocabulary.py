@@ -89,6 +89,10 @@ def applies(restrictions, word, reading):
         if not body.endswith(" only"):
             unsupported.append(restriction)
             continue
+        # This restriction names two verb spellings in JMdict 1352570. A middle
+        # dot can also be part of a single headword, so do not split it globally.
+        if word == "登る" and body == "上る・登る only":
+            continue
         parts = re.split(r",\s*|、|\s+or\s+", body[:-5].strip())
         if not all(part and not any(c in part for c in "[]{};") for part in parts):
             unsupported.append(restriction)
@@ -231,7 +235,7 @@ def candidates_for(row, records, aligned, upstream):
         for hit in match["hits"]:
             rid, method = hit["record_id"], match["method"]
             record, pair = records[rid], aligned[rid]
-            form = row.get("inflection") if method == "verified_inflection_lemma" else None
+            form = row.get("inflection") if method in {"verified_inflection_lemma", "reviewed_dictionary_link"} else None
             if form and not any(form["required_pos"] in s["pos"] for s in pair["senses"]):
                 continue
             reading = hira(hit["matched_reading"])
@@ -261,7 +265,10 @@ def candidates_for(row, records, aligned, upstream):
             for sense in pair["senses"]:
                 if form and form["required_pos"] not in sense["pos"]:
                     continue
-                if not allowed_pos(row, match["query"], sense, method):
+                if method == "reviewed_dictionary_link":
+                    if sense["number"] not in hit["reviewed_senses"]:
+                        continue
+                elif not allowed_pos(row, match["query"], sense, method):
                     continue
                 existing = next((s for s in candidate["senses"] if s["id"] == sense["id"]), None)
                 if existing is not None and (existing["zh"], existing["en"]) != (sense["zh"], sense["en"]):
@@ -455,6 +462,39 @@ def validate(main, review, rows):
     return accepted, pending
 
 
+def load_reviewed_links(rows):
+    by_id = {row["id"]: row for row in rows}
+    links = {}
+    with (ROOT / "scripts/biaori_reviewed_links.tsv").open(encoding="utf-8", newline="") as f:
+        for link in csv.DictReader(f, delimiter="\t"):
+            row_id = int(link["row_id"])
+            row = by_id[row_id]
+            if row_id in links or (row["level"], row["raw_line"]) != (link["level"], link["raw_line"]):
+                raise ValueError(f"Reviewed link no longer matches PDF row {row_id}")
+            links[row_id] = link
+    return links
+
+
+def apply_reviewed_link(row, link, records, direct, aligned):
+    ids = [rid for rid in direct[norm(link["dictionary_word"])]
+           if records[rid]["jmdict_id"] == int(link["jmdict_id"])
+           and hira(records[rid]["reading"]) == link["dictionary_reading"]]
+    if len(ids) != 1:
+        raise ValueError(f"Expected one pinned dictionary record for {row['raw_line']}: {ids}")
+    rid, = ids
+    numbers = {int(n) for n in link["senses"].split(",")}
+    available = {s["number"] for s in aligned[rid]["senses"]}
+    if not numbers or not numbers <= available:
+        raise ValueError(f"Missing reviewed dictionary senses for {row['raw_line']}")
+    if row.get("inflection"):
+        assert (row["inflection"]["lemma"], row["inflection"]["surface_reading_hiragana"]) == (
+            link["dictionary_word"], link["reading"])
+    row["lookup_key"] = link["display_word"]
+    row["matches"] = [{"query": row["lookup_key"], "method": "reviewed_dictionary_link",
+                       "hits": [{"record_id": rid, "matched_reading": link["reading"],
+                                 "reviewed_senses": numbers}]}]
+
+
 def main():
     DEST.mkdir(parents=True, exist_ok=True)
     for directory in (ZH_DIR, EN_DIR):
@@ -488,7 +528,9 @@ def main():
             lemma["lookup_key"] = form["lemma"]
             lemma["annotations"] = ["(" + form["lemma_reading_hiragana"] + ")"]
             lemma_inputs.append(lemma)
-    records, direct, reading, aliases, dictionary_stats = load_dictionary(rows + lemma_inputs)
+    links = load_reviewed_links(rows)
+    link_inputs = [{"lookup_key": link["dictionary_word"]} for link in links.values()]
+    records, direct, reading, aliases, dictionary_stats = load_dictionary(rows + lemma_inputs + link_inputs)
     # The old coverage parser treated all kana brackets as readings. Only actual
     # reading annotations and word-class labels are passed to its matching stage.
     match_inputs = copy.deepcopy(rows)
@@ -513,8 +555,16 @@ def main():
     entries, issue_groups, processing_log = {}, {}, []
     manual_rows = 0
     for row in rows:
+        link = links.get(row["id"])
+        if link and row["review_id"] not in resolutions:
+            apply_reviewed_link(row, link, records, direct, aligned)
+        else:
+            link = None
         components = candidates_for(row, records, aligned, upstream)
         adjustments = []
+        if link:
+            adjustments.append({"kind": "reviewed_dictionary_link", "evidence": link["note"],
+                                "dictionary_word": link["dictionary_word"], "sense_numbers": link["senses"]})
         if row.get("inflection"):
             adjustments.append({"kind": "inflection_lemma_link", "inflection": row["inflection"]})
         exclude_obsolete_readings(row, components, adjustments)
@@ -526,7 +576,7 @@ def main():
         reasons = row_reasons(row, components)
         decision = resolutions.get(row["review_id"], {})
         chosen = [c["candidates"][0] for c in components if len(c["candidates"]) == 1]
-        manual = bool((decision.get("replacement_word") or decision.get("source_corrections"))
+        manual = bool((link or decision.get("replacement_word") or decision.get("source_corrections"))
                       and not reasons and len(chosen) == len(components))
         if decision.get("candidate_ids"):
             assert decision.get("note", "").strip(), "Manual resolutions require an evidence note"
@@ -540,9 +590,12 @@ def main():
             for candidate in chosen:
                 entry = merge_entry(entries, candidate, row, manual)
                 if manual:
+                    replacement = decision.get("replacement_word")
+                    if link and row["lookup_key"] != canonical_surface(row["surface"]):
+                        replacement = row["lookup_key"]
                     add_unique(entry.setdefault("curation_notes", []), {
-                        "review_key": row["review_id"], "note": decision["note"],
-                        "replacement_word": decision.get("replacement_word"),
+                        "review_key": row["review_id"], "note": link["note"] if link else decision["note"],
+                        "replacement_word": replacement,
                     })
             manual_rows += int(manual)
         else:
@@ -582,7 +635,7 @@ def main():
             "source_corrections": "Preserve original lessons and raw_line; display separately recorded corrected_lessons with evidence",
             "kana_display": "Hiragana reading only; keep the original Japanese word spelling",
             "textbook_verification": "Automatic unique matches are not claimed to match the textbook's exact reading/translation",
-            "manual_resolutions": "Preserved in review.json.resolutions; choose exactly one candidate per component and record evidence in note",
+            "manual_resolutions": "Existing choices in review.json.resolutions; additional PDF-row, dictionary and sense links in scripts/biaori_reviewed_links.tsv",
         },
         "pdf_page_audits": audits,
     }

@@ -13,7 +13,7 @@ import { LocateFixed, Minus, Plus, Move, X } from 'lucide-react';
 import { partsOfSpeech } from '../core/partsOfSpeech';
 import { graphOf } from '../core/network';
 import type { Filter, Network } from '../core/types';
-import { entriesFor, referencesFor, Vocabulary } from '../core/vocabulary';
+import { entriesFor, wordReferences, Vocabulary } from '../core/vocabulary';
 import { CopyButton } from './CopyButton';
 
 interface Props {
@@ -78,7 +78,7 @@ export function NetworkCanvas({
   useEffect(() => {
     positions.current.clear();
     setCamera({ x: 0, y: 0, zoom: 1 });
-  }, [network.root, filter.scope, filter.lesson]);
+  }, [network.root, filter.scope]);
 
   useEffect(() => {
     const list: Positioned[] = graph.nodes.map((node, i) => {
@@ -134,7 +134,7 @@ export function NetworkCanvas({
                 reading: [...new Set(entries.map((entry) => entry.reading_hiragana))].join(' / '),
                 reference: node.root
                   ? '探索起点'
-                  : referencesFor(entries, filter) ||
+                  : wordReferences(word, filter) ||
                     (word.entries.length ? '未匹配标日课次' : '自定义词汇'),
                 pos: showPartOfSpeech
                   ? partsOfSpeech(entries.length ? entries : word.entries)
@@ -143,7 +143,7 @@ export function NetworkCanvas({
             ] as const;
           }),
       ),
-    [nodes, vocab, filter.scope, filter.lesson, showPartOfSpeech],
+    [nodes, vocab, filter.scope, showPartOfSpeech],
   );
   const byId = new Map(nodes.map((n) => [n.id, n]));
   const fit = () => {

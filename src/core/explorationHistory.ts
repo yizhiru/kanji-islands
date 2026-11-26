@@ -51,14 +51,13 @@ export function loadExploration(): ExplorationHistory {
     if (
       saved?.filter &&
       ['all', 'textbook', 'beginner', 'intermediate'].includes(saved.filter.scope) &&
-      typeof saved.filter.lesson === 'string' &&
       saved.timeline &&
       isNetwork(saved.timeline.present)
     ) {
       const steps = (value: unknown) =>
         Array.isArray(value) ? value.slice(0, HISTORY_LIMIT).filter(isNetwork) : [];
       return {
-        filter: saved.filter,
+        filter: { scope: saved.filter.scope },
         timeline: {
           present: saved.timeline.present,
           past: steps(saved.timeline.past),
@@ -70,7 +69,7 @@ export function loadExploration(): ExplorationHistory {
     // Unavailable or damaged storage is equivalent to a fresh start.
   }
   return {
-    filter: { scope: 'all', lesson: '' },
+    filter: { scope: 'all' },
     timeline: { present: startNetwork(wordId('発表')), past: [], future: [] },
   };
 }

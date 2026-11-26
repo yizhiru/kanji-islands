@@ -4,9 +4,11 @@ export interface Lesson {
   lesson: number;
   symbol: string;
 }
-export interface Source {
+export interface LessonSource {
   level: Level;
   lessons: Lesson[];
+}
+export interface Source extends LessonSource {
   original_word: string;
   raw_line: string;
   pdf_page: number;
@@ -37,6 +39,7 @@ export interface Entry {
 }
 export interface Dataset {
   version: 1;
+  textbookIndex?: (LessonSource & { words: string[] })[];
   metadata: {
     entryCount: number;
     pendingGroups: number;
@@ -46,6 +49,7 @@ export interface Dataset {
     dictionaryEntries?: number;
     textbookEntries?: number;
     textbookWords?: number;
+    textbookIndexRows?: number;
     englishOnlyEntries?: number;
   };
   entries: Entry[];
@@ -53,6 +57,7 @@ export interface Dataset {
 export interface PackedDataset {
   version: 2;
   metadata: Dataset['metadata'];
+  textbookIndex?: Dataset['textbookIndex'];
   senses: Sense[];
   entries: (Omit<Entry, 'senses' | 'meanings_zh' | 'meanings_en' | 'references' | 'sources'> & {
     sense_ids: number[];
@@ -63,11 +68,11 @@ export interface Word {
   id: string;
   text: string;
   kanji: string[];
+  lessonSources?: LessonSource[];
   entries: Entry[];
 }
 export interface Filter {
   scope: Scope;
-  lesson: string;
 }
 export interface Expansion {
   kanji: string;

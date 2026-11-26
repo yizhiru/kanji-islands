@@ -26,6 +26,10 @@ test('persists notebook words, promotes candidates and removes saved words', asy
     'aria-label',
     '查看关联词発音',
   );
+  const savedLabel = page
+    .getByRole('button', { name: '查看关联词発音', exact: true })
+    .getByText('生词', { exact: true });
+  await expect(savedLabel).toHaveCSS('color', 'rgb(0, 0, 0)');
   await page.getByRole('button', { name: '通过発展开关联词', exact: true }).click();
   await page.getByRole('button', { name: '查看关联词発音', exact: true }).click();
   await expect(page.locator('[data-testid="word-node"][data-word="発音"]')).toBeVisible();
@@ -107,10 +111,11 @@ test('practices saved words without autoplay, reveals answers and undoes the fin
   await page.getByRole('button', { name: '开始练习' }).click();
   const practice = page.getByRole('dialog', { name: '生词练习', exact: true });
   await expect(practice).toBeVisible();
+  await practice.screenshot({ path: test.info().outputPath('practice-mobile.png') });
   expect(await practice.boundingBox()).toMatchObject({ x: 0, y: 0, width: 390, height: 844 });
   await expect(page.locator('html')).not.toHaveAttribute('data-spoken');
   await expect(practice.getByText('はっぴょう')).toHaveCount(0);
-  await practice.getByRole('button', { name: '朗读発表' }).click();
+  await page.keyboard.press('d');
   await expect(page.locator('html')).toHaveAttribute('data-spoken', 'はっぴょう');
   await expect(practice.getByText('はっぴょう')).toHaveCount(0);
   await practice.getByRole('button', { name: '显示假名' }).click();

@@ -814,6 +814,57 @@ button:hover:not(:disabled) {
 .word-references > span {
   min-width: 0;
 }
+.reading-help {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+.reading-help + .reference-help {
+  margin-left: 0;
+}
+.reading-help .text-button {
+  min-height: 24px;
+}
+.reading-popover {
+  width: min(270px, calc(100vw - 32px));
+  max-height: 70vh;
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--paper);
+  box-shadow: 0 8px 25px #303f361a;
+  color: #485944;
+  font-size: 13px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+@supports (top: anchor(bottom)) {
+  .reading-help .text-button {
+    anchor-name: --textbook-reading-button;
+  }
+  .reading-popover {
+    position: fixed;
+    position-anchor: --textbook-reading-button;
+    inset: anchor(bottom) anchor(right) auto auto;
+    margin: 6px 0 0;
+    position-try-fallbacks: flip-block;
+  }
+}
+.reading-popover p,
+.reading-popover dl {
+  margin: 0;
+}
+.reading-popover p + p,
+.reading-popover dl {
+  margin-top: 8px;
+}
+.reading-popover dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.reading-popover dd {
+  margin: 0;
+}
 .reference-help {
   position: relative;
   flex-shrink: 0;
@@ -1122,6 +1173,10 @@ button:hover:not(:disabled) {
   font-size: 10px;
   color: #b0b69e;
 }
+.related-saved-label {
+  color: #000;
+  font-weight: 600;
+}
 .related-word svg {
   color: #b3bba1;
 }
@@ -1159,23 +1214,6 @@ button:hover:not(:disabled) {
   display: flex;
   align-items: center;
   gap: 8px;
-}
-.footer-separator {
-  color: #d0d4c4;
-  margin: 0 6px;
-}
-.page-footer label {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-.page-footer select {
-  font-size: 10px;
-  border: 0;
-  background: transparent;
-  color: #909d7f;
-  padding: 4px 15px 4px 3px;
-  max-width: 145px;
 }
 .toast {
   position: fixed;
@@ -1528,9 +1566,6 @@ button:hover:not(:disabled) {
     gap: 10px;
     flex-wrap: wrap;
     font-size: 9px;
-  }
-  .page-footer select {
-    max-width: 135px;
   }
   .about-dialog {
     padding: 22px;
@@ -2061,6 +2096,60 @@ button:hover:not(:disabled) {
   font-size: clamp(42px, 7vw, 84px);
   line-height: 1.35;
   overflow-wrap: anywhere;
+}
+.practice-dialog kbd {
+  display: inline-block;
+  vertical-align: middle;
+  margin-inline-start: 4px;
+  padding: 1px 4px;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  font:
+    500 11px/1.2 system-ui,
+    sans-serif;
+}
+.practice-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-inline-start: auto;
+}
+.practice-shortcuts {
+  width: min(390px, calc(100% - 32px));
+}
+.practice-shortcuts > p {
+  margin: 12px 0;
+  font-size: 14px;
+}
+.practice-shortcuts dl {
+  margin: 0;
+}
+.practice-shortcuts dl > div {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  gap: 8px;
+  align-items: baseline;
+  border-top: 1px solid var(--line);
+  padding: 10px 0;
+}
+.practice-shortcuts dd {
+  margin: 0;
+  font-size: 14px;
+}
+.practice-shortcuts dt kbd {
+  display: inline-block;
+  margin: 0;
+  min-width: 28px;
+  text-align: center;
+  padding-block: 3px;
+}
+.practice-word kbd {
+  color: var(--green);
+}
+@media (hover: none) and (pointer: coarse) {
+  .practice-dialog kbd {
+    display: none;
+  }
 }
 .practice-word svg {
   margin-left: 8px;
